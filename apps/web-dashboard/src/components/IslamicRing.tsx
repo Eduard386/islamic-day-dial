@@ -8,16 +8,13 @@ type Props = {
   size?: number;
 };
 
-const MARKER_LABELS: Record<string, string> = {
-  maghrib: 'Maghrib',
-  isha: 'Isha',
-  islamic_midnight: 'Midnight',
-  last_third_start: 'Last 3rd',
-  fajr: 'Fajr',
-  sunrise: 'Sunrise',
-  dhuhr: 'Dhuhr',
-  asr: 'Asr',
-};
+/** Primary: Fajr, Dhuhr, Asr, Maghrib, Isha — short ticks */
+const PRIMARY_MARKER_IDS = new Set<string>(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']);
+
+/** Secondary: Sunrise, Midnight, Last 3rd — very short strokes */
+const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'islamic_midnight', 'last_third_start']);
+
+const MARKER_STROKE = 'rgba(200, 198, 220, 0.8)';
 
 /** Gap segments: deep dark */
 const GAP_SEGMENT_IDS = new Set<string>(['midnight_to_last_third', 'last_third_to_fajr']);
@@ -83,9 +80,9 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           <stop offset="100%" stopColor="#08080e" />
         </radialGradient>
         <radialGradient id="moon" cx="35%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#fffef0" />
-          <stop offset="40%" stopColor="#fef9c3" />
-          <stop offset="100%" stopColor="#fde68a" />
+          <stop offset="0%" stopColor="#f5e6c8" />
+          <stop offset="40%" stopColor="#e8c878" />
+          <stop offset="100%" stopColor="#d4a04a" />
         </radialGradient>
         {/* Segment gradients — direction from start to end of arc */}
         {displaySegments
@@ -155,39 +152,45 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         );
       })}
 
-      {/* Ticks at segment junctions — inside ring, extending inward */}
+      {/* Markers — primary = short ticks, secondary = small dots; all from inner edge */}
       {ring.markers.map((m) => {
-        const isPrimary = m.kind === 'primary' || m.id === 'islamic_midnight' || m.id === 'last_third_start';
-        const tickLen = isPrimary ? size * 0.05 : size * 0.04;
+        const isPrimary = PRIMARY_MARKER_IDS.has(m.id);
+        const isSecondary = SECONDARY_MARKER_IDS.has(m.id);
         const inner = polarToXY(cx, cy, ringInner, m.angleDeg);
-        const outer = polarToXY(cx, cy, ringInner - tickLen, m.angleDeg);
-        const labelPt = polarToXY(cx, cy, ringR + ringStroke / 2 + (isPrimary ? 16 : 12), m.angleDeg);
 
-        return (
-          <g key={m.id}>
+        if (isPrimary) {
+          const tickLen = size * 0.032;
+          const outer = polarToXY(cx, cy, ringInner - tickLen, m.angleDeg);
+          return (
             <line
+              key={m.id}
               x1={inner.x}
               y1={inner.y}
               x2={outer.x}
               y2={outer.y}
-              stroke="rgba(255,255,255,0.95)"
-              strokeWidth={isPrimary ? 2.2 : 1.5}
+              stroke={MARKER_STROKE}
+              strokeWidth={1.8}
               strokeLinecap="round"
             />
-            <text
-              x={labelPt.x}
-              y={labelPt.y}
-              fill={isPrimary ? COLORS.text : COLORS.textSecondary}
-              fontSize={isPrimary ? 10 : 9}
-              fontWeight={isPrimary ? 600 : 400}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontFamily="Inter, sans-serif"
-            >
-              {MARKER_LABELS[m.id] ?? m.id}
-            </text>
-          </g>
-        );
+          );
+        }
+        if (isSecondary) {
+          const tickLen = size * 0.014;
+          const outer = polarToXY(cx, cy, ringInner - tickLen, m.angleDeg);
+          return (
+            <line
+              key={m.id}
+              x1={inner.x}
+              y1={inner.y}
+              x2={outer.x}
+              y2={outer.y}
+              stroke={MARKER_STROKE}
+              strokeWidth={1.2}
+              strokeLinecap="round"
+            />
+          );
+        }
+        return null;
       })}
 
       {/* Current position — moon at night, black pearl by day */}
@@ -201,14 +204,14 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
               cy={pos.y}
               r={11.5}
               fill={isNight ? 'url(#moon)' : 'url(#pearl)'}
-              stroke={isNight ? '#e4d48c' : '#404060'}
+              stroke={isNight ? '#c9a04a' : '#404060'}
               strokeWidth={1.5}
             />
             <circle
               cx={pos.x - 2.2}
               cy={pos.y - 2.2}
               r={2.8}
-              fill={isNight ? '#fffef0' : '#606080'}
+              fill={isNight ? '#f0d8a0' : '#606080'}
               opacity={isNight ? 0.9 : 0.6}
             />
           </>

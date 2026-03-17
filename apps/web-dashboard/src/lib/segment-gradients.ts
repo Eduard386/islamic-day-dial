@@ -16,8 +16,8 @@ const DARK = '#0f172a';      // end Isha / start Fajr
 const BLUE = '#38bdf8';      // end Fajr / start Sunrise
 const YELLOW = '#eab308';    // end Sunrise / start Dhuhr
 const GREEN = '#22c55e';     // end Dhuhr / start Asr
-const PINK = '#f472b6';      // end Asr / start Maghrib
-const PURPLE = '#8b5cf6';    // end Maghrib / start Isha
+const PINK = '#c9a8b8';      // dusty rose / mauve — end Asr / start Maghrib
+const PURPLE = '#9d8bb8';   // mauve — end Maghrib / start Isha (softer transition)
 
 const ANCHORS: Record<string, string> = {
   maghrib: PINK,
@@ -31,8 +31,8 @@ const ANCHORS: Record<string, string> = {
 };
 
 const ANCHORS_ACTIVE: Record<string, string> = {
-  maghrib: '#f9a8d4',
-  isha: '#a78bfa',
+  maghrib: '#d4b8c8',
+  isha: '#b09fc8',
   mid: '#1e293b',
   last3rd: '#1e293b',
   fajr: '#1e293b',

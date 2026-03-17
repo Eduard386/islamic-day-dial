@@ -126,19 +126,19 @@
 - список всех prayer times на основном часовом экране;
 - сложные настройки.
 
-### 4.3. Маркеры кольца
+### 4.3. Маркеры кольца (текущая реализация)
 
-#### Основные маркеры (primary)
+#### Основные маркеры (primary) — короткие штрихи
 
 - Maghrib
 - Isha
 - Fajr
-- Sunrise
 - Dhuhr
 - Asr
 
-#### Дополнительные маркеры (secondary)
+#### Дополнительные маркеры (secondary) — короткие штрихи (короче primary)
 
+- Sunrise
 - Islamic Midnight
 - Last Third Start
 
@@ -169,22 +169,13 @@
 - Dhuhr → Asr
 - Asr → Maghrib
 
-### 4.6. Содержимое центра кольца
+### 4.6. Содержимое центра кольца (текущая реализация)
 
-Минимальный вариант:
-
-- `14 Ramadan 1447`
-- `До Maghrib 01:12:34`
-- `Сейчас: Asr`
-- `16:42 local`
-
-Альтернативный вариант:
-
+- название текущей фазы (Maghrib, Isha, Fajr, Duha, Dhuhr, Asr, Last Third; пусто для Midnight → Last Third);
 - дата по Хиджре;
-- следующая граница;
-- countdown;
-- текущая фаза;
-- local time мелко.
+- локальное время (HH:MM, без секунд).
+
+Countdown и григорианская дата на основном экране не отображаются (доступны в debug panel).
 
 ### 4.7. Принципы визуального веса
 
@@ -1270,3 +1261,69 @@ MVP считается готовым, если выполнено всё ниж
 
 Это минимизирует повторную работу, ускоряет MVP и сохраняет задел на будущее.
 
+---
+
+## 27. Текущая реализация Web Dashboard (финал, март 2025)
+
+Web dashboard реализован и визуально завершён. Ниже — актуальное состояние.
+
+### 27.1. Структура монорепо
+
+```
+islamic-day-dial/
+  apps/web-dashboard/     — Vite + React, SVG кольцо
+  packages/core/          — доменная логика
+  packages/test-fixtures/ — тестовые сценарии
+```
+
+### 27.2. Кольцо (IslamicRing)
+
+- **Maghrib** сверху (0°), направление по часовой стрелке.
+- **8 сегментов**: Maghrib→Isha, Isha→Midnight, Midnight→Last 3rd, Last 3rd→Fajr, Fajr→Sunrise, Sunrise→Dhuhr, Dhuhr→Asr, Asr→Maghrib.
+- **Gap-сегменты** (Midnight→Last 3rd, Last 3rd→Fajr) — тёмный цвет `#0a0a18`, без градиента.
+- **Градиенты** — плавный переход по кругу: каждый сегмент начинается цветом конца предыдущего.
+- **Цветовая схема**: Isha→Midnight тёмнеет до DARK; Fajr DARK→голубой→Sunrise; Sunrise голубой→жёлтый→Dhuhr; Dhuhr жёлтый→зелёный→Asr; Asr зелёный→пыльно-розовый→Maghrib; Maghrib пыльно-розовый→mauve→Isha.
+- **Halo** — только у активного сегмента, opacity 0.4.
+
+### 27.3. Маркеры на кольце
+
+- **Primary** (короткие штрихи): Fajr, Dhuhr, Asr, Maghrib, Isha.
+- **Secondary** (очень короткие штрихи): Sunrise, Midnight, Last 3rd.
+- Цвет приглушённый: `rgba(200, 198, 220, 0.8)`.
+- Все от внутреннего края кольца внутрь круга.
+- Подписей на кольце нет.
+
+### 27.4. Центр кольца (CenterInfo)
+
+- **Название сегмента** — Maghrib, Isha, (пусто для Midnight→Last 3rd), Last Third, Fajr, Duha, Dhuhr, Asr.
+- **Дата по Хиджре** — `day monthNameEn year`.
+- **Текущее время** — `HH:MM`, без секунд.
+- При пустом названии (Midnight→Last 3rd) дата и время сохраняют положение за счёт placeholder с `min-height`.
+
+### 27.5. Шар текущего времени
+
+- **День** — чёрная жемчужина (radialGradient pearl).
+- **Ночь** (Isha→Midnight, Midnight→Last 3rd, Last Third→Fajr) — луна: тёмно-оранжевый градиент `#f5e6c8`→`#e8c878`→`#d4a04a`, highlight `#f0d8a0`, обводка `#c9a04a`.
+
+### 27.6. Ключевые файлы
+
+- `apps/web-dashboard/src/components/IslamicRing.tsx` — рендер кольца, сегментов, маркеров, шара.
+- `apps/web-dashboard/src/components/CenterInfo.tsx` — центр: период, дата, время.
+- `apps/web-dashboard/src/lib/segment-gradients.ts` — градиенты и anchor-цвета.
+- `apps/web-dashboard/src/lib/colors.ts` — COLORS, ringGap.
+- `packages/core/` — типы, Hijri, prayer times, day bounds, phases, ring geometry, `computeIslamicDaySnapshot()`.
+
+### 27.7. Запуск
+
+```bash
+cd apps/web-dashboard && npx vite
+```
+
+Открыть `http://localhost:5173/islamic-day-dial/` (порт может отличаться).
+
+### 27.8. Следующие шаги (по roadmap)
+
+- **Phase 4** — visual polishing (выполнен).
+- **Phase 5** — Wear OS productization: изучить ограничения Watch Face Format (WFF), адаптировать layout для watch face, первый релиз в Google Play.
+- **Phase 6** — sales validation.
+- **Phase 7** — Apple Watch app.

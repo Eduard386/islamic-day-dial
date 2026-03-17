@@ -6,15 +6,24 @@ import {
 
 type Props = {
   snapshot: ComputedIslamicDay;
+  now: Date;
 };
 
-export function CenterInfo({ snapshot }: Props) {
+export function CenterInfo({ snapshot, now }: Props) {
   const periodLabel = formatCurrentPeriod(snapshot.currentPhase);
+  const localTime = now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 
   return (
     <div className="center-info">
-      {periodLabel && <div className="current-period">{periodLabel}</div>}
+      <div className={`current-period${!periodLabel ? ' current-period-empty' : ''}`}>
+        {periodLabel || '\u00A0'}
+      </div>
       <div className="hijri-date">{formatHijriDate(snapshot.hijriDate)}</div>
+      <div className="local-time">{localTime}</div>
     </div>
   );
 }
