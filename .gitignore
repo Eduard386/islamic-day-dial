@@ -7,6 +7,7 @@ vitest.config.d.ts.map
 vitest.config.js
 vitest.config.js.map
 apps/**/*.d.ts
+!apps/web-dashboard/src/vite-env.d.ts
 apps/**/*.d.ts.map
 apps/**/*.js
 apps/**/*.js.map
