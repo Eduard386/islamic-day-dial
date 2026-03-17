@@ -1,6 +1,7 @@
 import type { ComputedIslamicDay, IslamicPhaseId, RingSegment } from '@islamic-day-dial/core';
 import { describeArc, polarToXY } from '../lib/geometry';
-import { SEGMENT_COLORS, SEGMENT_COLORS_ACTIVE, COLORS } from '../lib/colors';
+import { COLORS } from '../lib/colors';
+import { SEGMENT_GRADIENTS, SEGMENT_GRADIENTS_ACTIVE } from '../lib/segment-gradients';
 
 type Props = {
   snapshot: ComputedIslamicDay;
@@ -8,76 +9,47 @@ type Props = {
 };
 
 const MARKER_LABELS: Record<string, string> = {
-  maghrib: 'Mgh',
+  maghrib: 'Maghrib',
   isha: 'Isha',
-  islamic_midnight: 'Mid',
-  last_third_start: '⅓',
+  islamic_midnight: 'Midnight',
+  last_third_start: 'Last 3rd',
   fajr: 'Fajr',
-  sunrise: 'Rise',
-  dhuhr: 'Dhr',
+  sunrise: 'Sunrise',
+  dhuhr: 'Dhuhr',
   asr: 'Asr',
 };
 
-/** Merged night segment: isha → fajr (Mid and ⅓ are markers only, no separate segments) */
-const NIGHT_SEGMENT_IDS = new Set<IslamicPhaseId>([
+/** Gap segments: deep dark */
+const GAP_SEGMENT_IDS = new Set<string>(['midnight_to_last_third', 'last_third_to_fajr']);
+
+/** Night phases: show moon instead of black pearl */
+const NIGHT_PHASES = new Set<IslamicPhaseId>([
   'isha_to_midnight',
   'midnight_to_last_third',
   'last_third_to_fajr',
 ]);
 
-const NIGHT_COLOR = '#8b5cf6';
-const NIGHT_COLOR_ACTIVE = '#a78bfa';
-
-type DisplaySegment = {
-  id: string;
-  startAngleDeg: number;
-  endAngleDeg: number;
-  color: string;
-  colorActive: string;
-  isActive: boolean;
-};
-
 function getDisplaySegments(
   segments: RingSegment[],
   currentPhase: IslamicPhaseId,
-): DisplaySegment[] {
-  const result: DisplaySegment[] = [];
-  let nightStart: number | null = null;
-  let nightEnd: number | null = null;
-
-  for (const seg of segments) {
-    if (NIGHT_SEGMENT_IDS.has(seg.id as IslamicPhaseId)) {
-      if (nightStart === null) nightStart = seg.startAngleDeg;
-      nightEnd = seg.endAngleDeg;
-      continue;
-    }
+): Array<{
+  id: string;
+  startAngleDeg: number;
+  endAngleDeg: number;
+  isActive: boolean;
+  isGap: boolean;
+}> {
+  return segments.map((seg) => {
+    const isGap = GAP_SEGMENT_IDS.has(seg.id);
     const isActive = seg.id === currentPhase;
-    result.push({
+    return {
       id: seg.id,
       startAngleDeg: seg.startAngleDeg,
       endAngleDeg: seg.endAngleDeg,
-      color: SEGMENT_COLORS[seg.id as IslamicPhaseId],
-      colorActive: SEGMENT_COLORS_ACTIVE[seg.id as IslamicPhaseId],
       isActive,
-    });
-  }
-
-  if (nightStart !== null && nightEnd !== null) {
-    const isActive =
-      currentPhase === 'isha_to_midnight' ||
-      currentPhase === 'midnight_to_last_third' ||
-      currentPhase === 'last_third_to_fajr';
-    result.splice(1, 0, {
-      id: 'isha_to_fajr',
-      startAngleDeg: nightStart,
-      endAngleDeg: nightEnd,
-      color: NIGHT_COLOR,
-      colorActive: NIGHT_COLOR_ACTIVE,
-      isActive,
-    });
-  }
-
-  return result;
+      isGap,
+    };
+  });
 }
 
 export function IslamicRing({ snapshot, size = 420 }: Props) {
@@ -85,6 +57,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
   const cy = size / 2;
   const ringR = size * 0.38;
   const ringStroke = size * 0.09;
+  const ringInner = ringR - ringStroke / 2;
 
   const { ring, currentPhase } = snapshot;
   const progressAngle = ring.progress * 360;
@@ -98,11 +71,10 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
       style={{ display: 'block' }}
     >
       <defs>
-        <filter id="glow-soft" x="-25%" y="-25%" width="150%" height="150%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
+        <filter id="glow-active" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
         <radialGradient id="pearl" cx="40%" cy="35%" r="60%">
@@ -110,50 +82,86 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           <stop offset="50%" stopColor="#1a1a2e" />
           <stop offset="100%" stopColor="#08080e" />
         </radialGradient>
+        <radialGradient id="moon" cx="35%" cy="30%" r="65%">
+          <stop offset="0%" stopColor="#fffef0" />
+          <stop offset="40%" stopColor="#fef9c3" />
+          <stop offset="100%" stopColor="#fde68a" />
+        </radialGradient>
+        {/* Segment gradients — direction from start to end of arc */}
+        {displaySegments
+          .filter((s) => !s.isGap)
+          .map((seg) => {
+            const grad = seg.isActive
+              ? SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId]
+              : SEGMENT_GRADIENTS[seg.id as IslamicPhaseId];
+            const start = polarToXY(cx, cy, ringR, seg.startAngleDeg);
+            const end = polarToXY(cx, cy, ringR, seg.endAngleDeg);
+            return (
+              <linearGradient
+                key={`grad-${seg.id}-${seg.isActive}`}
+                id={`grad-${seg.id}-${seg.isActive}`}
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                gradientUnits="userSpaceOnUse"
+              >
+                {grad.stops.map((s, i) => (
+                  <stop key={i} offset={`${s.offset}%`} stopColor={s.color} />
+                ))}
+              </linearGradient>
+            );
+          })}
       </defs>
 
-      {/* Glow layer — filter on group for even glow */}
-      <g filter="url(#glow-soft)" opacity={0.5}>
-        {displaySegments.map((seg) => {
+      {/* Halo — only active segment, stronger */}
+      {displaySegments
+        .filter((s) => s.isActive && !s.isGap)
+        .map((seg) => {
+          const grad = SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId];
+          const midColor = grad.stops[Math.floor(grad.stops.length / 2)]?.color ?? grad.stops[0]!.color;
           const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
           if (!path) return null;
           return (
-            <path
-              key={`glow-${seg.id}`}
-              d={path}
-              fill="none"
-              stroke={seg.isActive ? seg.colorActive : seg.color}
-              strokeWidth={ringStroke + 14}
-              strokeLinecap="round"
-            />
+            <g key={`glow-${seg.id}`} filter="url(#glow-active)" opacity={0.4}>
+              <path
+                d={path}
+                fill="none"
+                stroke={midColor}
+                strokeWidth={ringStroke + 16}
+                strokeLinecap="butt"
+              />
+            </g>
           );
         })}
-      </g>
 
-      {/* Crisp segments */}
+      {/* Segments — gradients, inactive dimmer, gaps darkest */}
       {displaySegments.map((seg) => {
         const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
         if (!path) return null;
-        const color = seg.isActive ? seg.colorActive : seg.color;
+        const opacity = seg.isGap ? 1 : seg.isActive ? 1 : 0.65;
+        const stroke =
+          seg.isGap ? COLORS.ringGap : `url(#grad-${seg.id}-${seg.isActive})`;
         return (
           <path
             key={seg.id}
             d={path}
             fill="none"
-            stroke={color}
+            stroke={stroke}
             strokeWidth={ringStroke}
             strokeLinecap="butt"
+            opacity={opacity}
           />
         );
       })}
 
-      {/* Marker ticks + labels */}
+      {/* Ticks at segment junctions — inside ring, extending inward */}
       {ring.markers.map((m) => {
-        const isPrimary = m.kind === 'primary';
-        const tickLen = isPrimary ? size * 0.035 : size * 0.025;
-        const inner = polarToXY(cx, cy, ringR - ringStroke / 2 - 2, m.angleDeg);
-        const outer = polarToXY(cx, cy, ringR - ringStroke / 2 - 2 - tickLen, m.angleDeg);
-        const labelPt = polarToXY(cx, cy, ringR + ringStroke / 2 + (isPrimary ? 14 : 12), m.angleDeg);
+        const isPrimary = m.kind === 'primary' || m.id === 'islamic_midnight' || m.id === 'last_third_start';
+        const tickLen = isPrimary ? size * 0.05 : size * 0.04;
+        const inner = polarToXY(cx, cy, ringInner, m.angleDeg);
+        const outer = polarToXY(cx, cy, ringInner - tickLen, m.angleDeg);
+        const labelPt = polarToXY(cx, cy, ringR + ringStroke / 2 + (isPrimary ? 16 : 12), m.angleDeg);
 
         return (
           <g key={m.id}>
@@ -162,14 +170,15 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
               y1={inner.y}
               x2={outer.x}
               y2={outer.y}
-              stroke={isPrimary ? COLORS.markerPrimary : COLORS.markerSecondary}
-              strokeWidth={isPrimary ? 2 : 1.2}
+              stroke="rgba(255,255,255,0.95)"
+              strokeWidth={isPrimary ? 2.2 : 1.5}
+              strokeLinecap="round"
             />
             <text
               x={labelPt.x}
               y={labelPt.y}
               fill={isPrimary ? COLORS.text : COLORS.textSecondary}
-              fontSize={isPrimary ? 11 : 9}
+              fontSize={isPrimary ? 10 : 9}
               fontWeight={isPrimary ? 600 : 400}
               textAnchor="middle"
               dominantBaseline="central"
@@ -181,21 +190,27 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         );
       })}
 
-      {/* Current position — black pearl */}
+      {/* Current position — moon at night, black pearl by day */}
       {(() => {
         const pos = polarToXY(cx, cy, ringR, progressAngle);
+        const isNight = NIGHT_PHASES.has(currentPhase);
         return (
           <>
-            <circle cx={pos.x} cy={pos.y} r={11} fill="#08080e" opacity={0.25} />
             <circle
               cx={pos.x}
               cy={pos.y}
-              r={7}
-              fill="url(#pearl)"
-              stroke="#404060"
-              strokeWidth={1}
+              r={11.5}
+              fill={isNight ? 'url(#moon)' : 'url(#pearl)'}
+              stroke={isNight ? '#e4d48c' : '#404060'}
+              strokeWidth={1.5}
             />
-            <circle cx={pos.x - 1.5} cy={pos.y - 1.5} r={2} fill="#606080" opacity={0.6} />
+            <circle
+              cx={pos.x - 2.2}
+              cy={pos.y - 2.2}
+              r={2.8}
+              fill={isNight ? '#fffef0' : '#606080'}
+              opacity={isNight ? 0.9 : 0.6}
+            />
           </>
         );
       })()}

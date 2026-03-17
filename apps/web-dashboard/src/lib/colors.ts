@@ -26,6 +26,7 @@ export const COLORS = {
   bg: '#060612',
   surface: '#0e0e24',
   surfaceLight: '#1a1a3e',
+  ringGap: '#0a0a18',
   text: '#e8e8f0',
   textSecondary: '#8888aa',
   accent: '#c69214',

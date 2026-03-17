@@ -37,10 +37,10 @@ export function formatPhase(phase: IslamicPhaseId): string {
 const PERIOD_NAMES: Record<IslamicPhaseId, string> = {
   maghrib_to_isha: 'Maghrib',
   isha_to_midnight: 'Isha',
-  midnight_to_last_third: 'Night',
+  midnight_to_last_third: '',
   last_third_to_fajr: 'Last Third',
   fajr_to_sunrise: 'Fajr',
-  sunrise_to_dhuhr: 'Sunrise',
+  sunrise_to_dhuhr: 'Duha',
   dhuhr_to_asr: 'Dhuhr',
   asr_to_maghrib: 'Asr',
 };
@@ -52,7 +52,7 @@ export function formatCurrentPeriod(phase: IslamicPhaseId): string {
 const TRANSITION_LABELS: Record<string, string> = {
   isha: 'Isha',
   islamic_midnight: 'Islamic Midnight',
-  last_third_start: 'Last Third',
+  last_third_start: '2/3',
   fajr: 'Fajr',
   sunrise: 'Sunrise',
   dhuhr: 'Dhuhr',
