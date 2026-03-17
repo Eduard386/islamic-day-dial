@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WatchFace width="450" height="450" clipShape="CIRCLE">
+    <Scene backgroundColor="#FF060612">
+        <!-- Background circle (WFF uses Ellipse+Fill, not Draw/Circle) -->
+        <Group x="0" y="0" width="450" height="450">
+            <PartDraw x="0" y="0" width="450" height="450">
+                <Ellipse x="0" y="0" width="450" height="450">
+                    <Fill color="#FF060612" />
+                </Ellipse>
+            </PartDraw>
+        </Group>
+
+        <!-- Ring: Islamic day progress (RANGED_VALUE 0-100) -->
+        <ComplicationSlot slotId="100" x="75" y="75" width="300" height="300"
+            supportedTypes="RANGED_VALUE" isCustomizable="false">
+            <BoundingArc centerX="225" centerY="225" width="342" height="342"
+                thickness="40" startAngle="90" endAngle="450" />
+            <DefaultProviderPolicy
+                primaryProvider="com.islamicdaydial.watchface/com.islamicdaydial.watchface.IslamicDayComplicationDataSourceService"
+                primaryProviderType="RANGED_VALUE"
+                defaultSystemProvider="STEP_COUNT"
+                defaultSystemProviderType="RANGED_VALUE" />
+            <Complication type="RANGED_VALUE">
+                <PartDraw x="75" y="75" width="300" height="300">
+                    <Arc centerX="150" centerY="150" width="300" height="300"
+                        startAngle="90" endAngle="90 + [COMPLICATION.RANGED_VALUE_VALUE] * 3.6">
+                        <Stroke color="#FF38bdf8" thickness="40" />
+                    </Arc>
+                </PartDraw>
+            </Complication>
+        </ComplicationSlot>
+
+        <!-- Hijri date (SHORT_TEXT) -->
+        <ComplicationSlot slotId="101" x="125" y="200" width="200" height="50"
+            supportedTypes="SHORT_TEXT" isCustomizable="false">
+            <DefaultProviderPolicy
+                primaryProvider="com.islamicdaydial.watchface/com.islamicdaydial.watchface.IslamicDayComplicationDataSourceService"
+                primaryProviderType="SHORT_TEXT"
+                defaultSystemProvider="DATE"
+                defaultSystemProviderType="SHORT_TEXT" />
+            <Complication type="SHORT_TEXT">
+                <PartText x="125" y="200" width="200" height="50">
+                    <Text>
+                        <Parameter expression="[COMPLICATION.TEXT]" />
+                    </Text>
+                </PartText>
+            </Complication>
+        </ComplicationSlot>
+
+        <!-- Time -->
+        <DigitalClock x="125" y="250" width="200" height="60">
+            <TimeText format="HH:mm" color="#FFe8e8f0" />
+        </DigitalClock>
+    </Scene>
+</WatchFace>

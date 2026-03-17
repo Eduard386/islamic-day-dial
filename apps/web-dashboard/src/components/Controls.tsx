@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { Location } from '@islamic-day-dial/core';
 import type { TimeMode } from '../hooks/useIslamicDay';
 
+const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
+
 type Props = {
   location: Location;
   timezone: string;
@@ -17,6 +19,11 @@ const PRESETS: Record<string, { location: Location; timezone: string }> = {
   London: { location: { latitude: 51.5074, longitude: -0.1278 }, timezone: 'Europe/London' },
   'New York': { location: { latitude: 40.7128, longitude: -74.006 }, timezone: 'America/New_York' },
   Jakarta: { location: { latitude: -6.2088, longitude: 106.8456 }, timezone: 'Asia/Jakarta' },
+  Tokyo: { location: { latitude: 35.6762, longitude: 139.6503 }, timezone: 'Asia/Tokyo' },
+  Cairo: { location: { latitude: 30.0444, longitude: 31.2357 }, timezone: 'Africa/Cairo' },
+  Sydney: { location: { latitude: -33.8688, longitude: 151.2093 }, timezone: 'Australia/Sydney' },
+  'São Paulo': { location: { latitude: -23.5505, longitude: -46.6333 }, timezone: 'America/Sao_Paulo' },
+  Mumbai: { location: { latitude: 19.076, longitude: 72.8777 }, timezone: 'Asia/Kolkata' },
 };
 
 export function Controls({
@@ -63,6 +70,7 @@ export function Controls({
         </div>
       </section>
 
+      {!IS_DEMO && (
       <section>
         <h4>Manual Location</h4>
         <div className="input-row">
@@ -74,7 +82,9 @@ export function Controls({
           <button onClick={applyManualLocation}>Apply</button>
         </div>
       </section>
+      )}
 
+      {!IS_DEMO && (
       <section>
         <h4>Time Control</h4>
         <div className="time-buttons">
@@ -112,6 +122,7 @@ export function Controls({
           </label>
         </div>
       </section>
+      )}
     </div>
   );
 }

@@ -13,6 +13,7 @@
     "lint": "eslint 'packages/*/src/**/*.ts'",
     "typecheck": "tsc --build",
     "precommit": "npm run lint && npm run typecheck && npm test",
+    "test:wear": "cd apps/wear-watchface && ./gradlew testDebugUnitTest",
     "prepare": "husky"
   },
   "devDependencies": {

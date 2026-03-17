@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SHORT_TEXT=1, RANGED_VALUE=9 -->
+    <integer-array name="supported_complication_types">
+        <item>1</item>
+        <item>9</item>
+    </integer-array>
+</resources>

@@ -5,6 +5,8 @@ import { DebugPanel } from './components/DebugPanel';
 import { Controls } from './components/Controls';
 import './App.css';
 
+const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
+
 export default function App() {
   const state = useIslamicDay();
   const { snapshot, location, timezone, timeMode, effectiveNow } = state;
@@ -21,7 +23,7 @@ export default function App() {
           <div className="dial-wrapper">
             <IslamicRing snapshot={snapshot} size={420} />
             <div className="center-overlay">
-              <CenterInfo snapshot={snapshot} now={effectiveNow} />
+              <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
             </div>
           </div>
         </div>
@@ -35,12 +37,14 @@ export default function App() {
             onTimezoneChange={state.setTimezone}
             onTimeModeChange={state.setTimeMode}
           />
-          <DebugPanel
-            snapshot={snapshot}
-            location={location}
-            timezone={timezone}
-            now={effectiveNow}
-          />
+          {!IS_DEMO && (
+            <DebugPanel
+              snapshot={snapshot}
+              location={location}
+              timezone={timezone}
+              now={effectiveNow}
+            />
+          )}
         </div>
       </main>
     </div>

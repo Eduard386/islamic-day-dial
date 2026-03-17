@@ -7,14 +7,16 @@ import {
 type Props = {
   snapshot: ComputedIslamicDay;
   now: Date;
+  timezone: string;
 };
 
-export function CenterInfo({ snapshot, now }: Props) {
+export function CenterInfo({ snapshot, now, timezone }: Props) {
   const periodLabel = formatCurrentPeriod(snapshot.currentPhase);
   const localTime = now.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+    timeZone: timezone,
   });
 
   return (

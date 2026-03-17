@@ -13,3 +13,9 @@ apps/**/*.js.map
 coverage/
 .env
 .env.local
+
+# Android / Gradle (apps/wear-watchface)
+apps/wear-watchface/.gradle/
+apps/wear-watchface/build/
+apps/wear-watchface/app/build/
+apps/wear-watchface/logcat.txt

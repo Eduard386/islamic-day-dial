@@ -19,6 +19,16 @@ const MARKER_STROKE = 'rgba(200, 198, 220, 0.8)';
 /** Gap segments: deep dark */
 const GAP_SEGMENT_IDS = new Set<string>(['midnight_to_last_third', 'last_third_to_fajr']);
 
+/** Segments needing fixed light glow (dark gradients or gap) — otherwise midColor is too dark */
+const LIGHT_GLOW_SEGMENTS = new Set<string>([
+  'maghrib_to_isha',
+  'isha_to_midnight',
+  'fajr_to_sunrise',
+  'asr_to_maghrib',
+  'midnight_to_last_third',
+  'last_third_to_fajr',
+]);
+
 /** Night phases: show moon instead of black pearl */
 const NIGHT_PHASES = new Set<IslamicPhaseId>([
   'isha_to_midnight',
@@ -69,7 +79,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
     >
       <defs>
         <filter id="glow-active" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
@@ -111,21 +121,24 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           })}
       </defs>
 
-      {/* Halo — only active segment, stronger */}
+      {/* Halo — active segment; use fixed light color for dark/gap segments */}
       {displaySegments
-        .filter((s) => s.isActive && !s.isGap)
+        .filter((s) => s.isActive)
         .map((seg) => {
           const grad = SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId];
           const midColor = grad.stops[Math.floor(grad.stops.length / 2)]?.color ?? grad.stops[0]!.color;
+          const glowColor = LIGHT_GLOW_SEGMENTS.has(seg.id)
+            ? 'rgba(230, 210, 255, 0.85)'
+            : midColor;
           const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
           if (!path) return null;
           return (
-            <g key={`glow-${seg.id}`} filter="url(#glow-active)" opacity={0.4}>
+            <g key={`glow-${seg.id}`} filter="url(#glow-active)" opacity={0.28}>
               <path
                 d={path}
                 fill="none"
-                stroke={midColor}
-                strokeWidth={ringStroke + 16}
+                stroke={glowColor}
+                strokeWidth={ringStroke + 6}
                 strokeLinecap="butt"
               />
             </g>
