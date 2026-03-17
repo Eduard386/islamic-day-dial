@@ -31,6 +31,7 @@ export {
   formatHijriDate,
   formatCountdown,
   formatPhase,
+  formatCurrentPeriod,
   formatTransition,
 } from './formatting.js';
 export { computeIslamicDaySnapshot } from './snapshot.js';

@@ -7,15 +7,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "composite": true,
-    "noEmit": true
+    "jsx": "react-jsx",
+    "outDir": "dist",
+    "declaration": false,
+    "sourceMap": true
   },
-  "include": [],
-  "references": [
-    { "path": "packages/core" },
-    { "path": "packages/test-fixtures" }
-  ]
+  "include": ["src"]
 }
