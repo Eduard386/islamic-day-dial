@@ -4,13 +4,18 @@ import type { TimeMode } from '../hooks/useIslamicDay';
 
 const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
 
+const CURRENT_CITY = 'Current city';
+
 type Props = {
   location: Location;
   timezone: string;
   timeMode: TimeMode;
+  selectedPreset: string;
   onLocationChange: (loc: Location) => void;
   onTimezoneChange: (tz: string) => void;
   onTimeModeChange: (mode: TimeMode) => void;
+  onPresetSelect: (name: string) => void;
+  onCurrentCity: () => void;
 };
 
 const PRESETS: Record<string, { location: Location; timezone: string }> = {
@@ -30,9 +35,12 @@ export function Controls({
   location,
   timezone,
   timeMode,
+  selectedPreset,
   onLocationChange,
   onTimezoneChange,
   onTimeModeChange,
+  onPresetSelect,
+  onCurrentCity,
 }: Props) {
   const [latInput, setLatInput] = useState(String(location.latitude));
   const [lonInput, setLonInput] = useState(String(location.longitude));
@@ -49,9 +57,15 @@ export function Controls({
   };
 
   const applyPreset = (name: string) => {
+    if (name === CURRENT_CITY) {
+      onCurrentCity();
+      return;
+    }
     const p = PRESETS[name];
+    if (!p) return;
     onLocationChange(p.location);
     onTimezoneChange(p.timezone);
+    onPresetSelect(name);
     setLatInput(String(p.location.latitude));
     setLonInput(String(p.location.longitude));
     setTzInput(p.timezone);
@@ -64,8 +78,21 @@ export function Controls({
       <section>
         <h4>Location Presets</h4>
         <div className="preset-buttons">
+          <button
+            key={CURRENT_CITY}
+            className={selectedPreset === CURRENT_CITY ? 'active' : ''}
+            onClick={() => applyPreset(CURRENT_CITY)}
+          >
+            {CURRENT_CITY}
+          </button>
           {Object.keys(PRESETS).map((name) => (
-            <button key={name} onClick={() => applyPreset(name)}>{name}</button>
+            <button
+              key={name}
+              className={selectedPreset === name ? 'active' : ''}
+              onClick={() => applyPreset(name)}
+            >
+              {name}
+            </button>
           ))}
         </div>
       </section>

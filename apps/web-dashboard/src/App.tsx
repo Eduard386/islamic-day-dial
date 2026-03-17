@@ -9,7 +9,7 @@ const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
 
 export default function App() {
   const state = useIslamicDay();
-  const { snapshot, location, timezone, timeMode, effectiveNow } = state;
+  const { snapshot, location, timezone, timeMode, selectedPreset, effectiveNow } = state;
 
   return (
     <div className="app">
@@ -19,7 +19,7 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        <div className="dial-column">
+        <div className="dial-section">
           <div className="dial-wrapper">
             <IslamicRing snapshot={snapshot} size={420} />
             <div className="center-overlay">
@@ -28,14 +28,17 @@ export default function App() {
           </div>
         </div>
 
-        <div className="side-column">
+        <div className="controls-section">
           <Controls
             location={location}
             timezone={timezone}
             timeMode={timeMode}
+            selectedPreset={selectedPreset}
             onLocationChange={state.setLocation}
             onTimezoneChange={state.setTimezone}
             onTimeModeChange={state.setTimeMode}
+            onPresetSelect={state.setSelectedPreset}
+            onCurrentCity={state.applyCurrentCity}
           />
           {!IS_DEMO && (
             <DebugPanel
