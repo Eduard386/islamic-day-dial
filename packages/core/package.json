@@ -1,0 +1,15 @@
+{
+  "name": "@islamic-day-dial/core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@umalqura/core": "^0.0.7",
+    "adhan": "^4.4.3"
+  }
+}

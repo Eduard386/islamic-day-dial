@@ -1,0 +1,13 @@
+{
+  "name": "@islamic-day-dial/test-fixtures",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@islamic-day-dial/core": "*"
+  }
+}
