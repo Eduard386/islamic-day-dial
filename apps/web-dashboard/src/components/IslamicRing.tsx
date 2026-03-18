@@ -8,8 +8,6 @@ import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 type Props = {
   snapshot: ComputedIslamicDay;
   size?: number;
-  /** Debug: override hijri day for moon phase (1–30). Only when !IS_DEMO. */
-  debugHijriDay?: number;
 };
 
 /** Primary: Fajr, Dhuhr, Asr, Maghrib, Isha — short ticks */
@@ -58,7 +56,7 @@ function getDisplaySegments(
   });
 }
 
-export function IslamicRing({ snapshot, size = 420, debugHijriDay }: Props) {
+export function IslamicRing({ snapshot, size = 420 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
   const ringR = size * 0.38;
@@ -202,7 +200,6 @@ export function IslamicRing({ snapshot, size = 420, debugHijriDay }: Props) {
         const markerState = getCurrentMarkerVisualState(
           currentPhase,
           snapshot.hijriDate,
-          debugHijriDay,
         );
         return (
           <CurrentMarker

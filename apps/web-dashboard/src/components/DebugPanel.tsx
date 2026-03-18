@@ -5,9 +5,6 @@ type Props = {
   location: Location;
   timezone: string;
   now: Date;
-  /** Debug: override hijri day for moon phase (1–30). */
-  debugHijriDay?: number;
-  onDebugHijriDayChange?: (day: number | undefined) => void;
 };
 
 function fmtTime(d: Date): string {

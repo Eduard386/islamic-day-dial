@@ -247,6 +247,13 @@ body {
   color: var(--text);
 }
 
+.hijri-day-display {
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 0.85rem;
+  min-width: 4em;
+}
+
 /* ---------- Debug Panel ---------- */
 
 .debug-panel {

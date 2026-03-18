@@ -7,18 +7,14 @@ const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
 const CURRENT_CITY = 'Current city';
 
 type Props = {
-  location: Location;
-  timezone: string;
   timeMode: TimeMode;
   selectedPreset: string;
+  currentHijriDay: number;
   onLocationChange: (loc: Location) => void;
   onTimezoneChange: (tz: string) => void;
   onTimeModeChange: (mode: TimeMode) => void;
   onPresetSelect: (name: string) => void;
   onCurrentCity: () => void;
-  /** Debug: override hijri day (1–30) for moon phase */
-  debugHijriDay?: number;
-  onDebugHijriDayChange?: (day: number | undefined) => void;
 };
 
 const PRESETS: Record<string, { location: Location; timezone: string }> = {
@@ -73,31 +69,31 @@ const PRESETS: Record<string, { location: Location; timezone: string }> = {
 };
 
 export function Controls({
-  location,
-  timezone,
   timeMode,
   selectedPreset,
+  currentHijriDay,
   onLocationChange,
   onTimezoneChange,
   onTimeModeChange,
   onPresetSelect,
   onCurrentCity,
-  debugHijriDay,
-  onDebugHijriDayChange,
 }: Props) {
-  const [latInput, setLatInput] = useState(String(location.latitude));
-  const [lonInput, setLonInput] = useState(String(location.longitude));
-  const [tzInput, setTzInput] = useState(timezone);
-  const [offsetHours, setOffsetHours] = useState(0);
+  const [dayOffset, setDayOffset] = useState(0);
+  const [hourOffset, setHourOffset] = useState(0);
 
-  const applyManualLocation = () => {
-    const lat = parseFloat(latInput);
-    const lon = parseFloat(lonInput);
-    if (!isNaN(lat) && !isNaN(lon)) {
-      onLocationChange({ latitude: lat, longitude: lon });
+  const MS_PER_HOUR = 3600000;
+  const MS_PER_DAY = 24 * MS_PER_HOUR;
+
+  const applyTimeOffset = (days: number, hours: number) => {
+    const totalMs = days * MS_PER_DAY + hours * MS_PER_HOUR;
+    if (totalMs === 0) {
+      onTimeModeChange({ kind: 'live' });
+    } else {
+      onTimeModeChange({ kind: 'offset', offsetMs: totalMs });
     }
-    if (tzInput) onTimezoneChange(tzInput);
   };
+
+  const displayedHijriDay = currentHijriDay;
 
   const applyPreset = (name: string) => {
     if (name === CURRENT_CITY) {
@@ -109,9 +105,6 @@ export function Controls({
     onLocationChange(p.location);
     onTimezoneChange(p.timezone);
     onPresetSelect(name);
-    setLatInput(String(p.location.latitude));
-    setLonInput(String(p.location.longitude));
-    setTzInput(p.timezone);
   };
 
   return (
@@ -138,77 +131,61 @@ export function Controls({
         </div>
       </section>
 
-      {!IS_DEMO && (
-      <section>
-        <h4>Manual Location</h4>
-        <div className="input-row">
-          <label>Lat<input value={latInput} onChange={e => setLatInput(e.target.value)} /></label>
-          <label>Lon<input value={lonInput} onChange={e => setLonInput(e.target.value)} /></label>
-        </div>
-        <div className="input-row">
-          <label>TZ<input value={tzInput} onChange={e => setTzInput(e.target.value)} /></label>
-          <button onClick={applyManualLocation}>Apply</button>
-        </div>
-      </section>
-      )}
 
       {!IS_DEMO && (
       <section>
-        <h4>Time Control</h4>
-        <div className="time-buttons">
-          <button
-            className={timeMode.kind === 'live' ? 'active' : ''}
-            onClick={() => onTimeModeChange({ kind: 'live' })}
-          >
-            Live
-          </button>
-          <button onClick={() => {
-            const off = offsetHours * 3600000;
-            onTimeModeChange({ kind: 'offset', offsetMs: off });
-          }}>
-            Apply Offset
-          </button>
-        </div>
+        <h4>Time Travel</h4>
         <div className="input-row">
           <label>
-            Offset (hours)
+            Days
             <input
               type="range"
-              min={-24}
-              max={24}
-              step={0.25}
-              value={offsetHours}
+              min={-15}
+              max={15}
+              value={dayOffset}
               onChange={e => {
-                const h = parseFloat(e.target.value);
-                setOffsetHours(h);
-                if (timeMode.kind === 'offset') {
-                  onTimeModeChange({ kind: 'offset', offsetMs: h * 3600000 });
-                }
+                const d = parseInt(e.target.value, 10);
+                setDayOffset(d);
+                applyTimeOffset(d, hourOffset);
               }}
             />
-            <span className="offset-value">{offsetHours >= 0 ? '+' : ''}{offsetHours}h</span>
+            <span className="offset-value">
+              {dayOffset === 0 ? '0' : `${dayOffset > 0 ? '+' : ''}${dayOffset}d`}
+            </span>
           </label>
         </div>
-      </section>
-      )}
-
-      {!IS_DEMO && onDebugHijriDayChange && (
-      <section>
-        <h4>Debug: Date</h4>
-        <p className="hint">Override Hijri day (1–30) for moon phase</p>
         <div className="input-row">
           <label>
-            Hijri day (1–30)
+            Hours
             <input
               type="range"
-              min={1}
-              max={30}
-              value={debugHijriDay ?? 15}
-              onChange={e => onDebugHijriDayChange(parseInt(e.target.value, 10))}
+              min={-12}
+              max={12}
+              step={0.5}
+              value={hourOffset}
+              onChange={e => {
+                const h = parseFloat(e.target.value);
+                setHourOffset(h);
+                applyTimeOffset(dayOffset, h);
+              }}
             />
-            <span className="offset-value">{debugHijriDay ?? 'auto'}</span>
+            <span className="offset-value">
+              {hourOffset === 0 ? '0' : `${hourOffset > 0 ? '+' : ''}${hourOffset}h`}
+            </span>
           </label>
-          <button onClick={() => onDebugHijriDayChange(undefined)}>Auto</button>
+        </div>
+        <div className="input-row">
+          <span className="hijri-day-display">Day {displayedHijriDay}</span>
+          <button
+            className={timeMode.kind === 'live' ? 'active' : ''}
+            onClick={() => {
+              setDayOffset(0);
+              setHourOffset(0);
+              onTimeModeChange({ kind: 'live' });
+            }}
+          >
+            Now
+          </button>
         </div>
       </section>
       )}
