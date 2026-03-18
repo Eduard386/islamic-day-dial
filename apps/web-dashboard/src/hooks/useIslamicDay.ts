@@ -36,8 +36,9 @@ function getEffectiveNow(mode: TimeMode): Date {
   }
 }
 
-const FALLBACK_LOCATION: Location = { latitude: 41.0082, longitude: 28.9784 }; // Istanbul
+const FALLBACK_LOCATION: Location = { latitude: 21.4225, longitude: 39.8262 }; // Mecca
 const CURRENT_CITY = 'Current city';
+const DEFAULT_PRESET = 'Mecca';
 
 /** Fallback when geolocation fails: use location of a city in user's timezone */
 const TIMEZONE_TO_LOCATION: Record<string, Location> = {
@@ -64,7 +65,7 @@ export function useIslamicDay(): DashboardState {
   const [location, setLocation] = useState<Location>(FALLBACK_LOCATION);
   const [timezone, setTimezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [timeMode, setTimeMode] = useState<TimeMode>({ kind: 'live' });
-  const [selectedPreset, setSelectedPreset] = useState(CURRENT_CITY);
+  const [selectedPreset, setSelectedPreset] = useState(DEFAULT_PRESET);
 
   const applyCurrentCity = useCallback(() => {
     setSelectedPreset(CURRENT_CITY);

@@ -17,8 +17,22 @@ function getVisitorId(): string {
   return id;
 }
 
+const OWNER_KEY = '__owner__';
+const OWNER_SECRET = 'idd2026';
+
+function checkUrlForOwner(): void {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('owner') === OWNER_SECRET) {
+    localStorage.setItem(OWNER_KEY, 'true');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('owner');
+    window.history.replaceState({}, '', url.toString());
+    console.log('✅ You are now marked as owner');
+  }
+}
+
 function isOwner(): boolean {
-  return localStorage.getItem('__owner__') === 'true';
+  return localStorage.getItem(OWNER_KEY) === 'true';
 }
 
 function detectOS(ua: string): string {
@@ -72,6 +86,8 @@ async function getGeoData(): Promise<GeoData> {
 }
 
 export async function trackVisit(): Promise<void> {
+  checkUrlForOwner();
+  
   if (!supabase) {
     console.log('[Analytics] Supabase not configured');
     return;
@@ -113,13 +129,3 @@ export async function trackVisit(): Promise<void> {
   }
 }
 
-/** Call this in browser console to exclude yourself */
-export function markAsOwner(): void {
-  localStorage.setItem('__owner__', 'true');
-  console.log('✅ You are now marked as owner. Refresh to apply.');
-}
-
-/** Expose to window for easy console access */
-export function exposeToWindow(): void {
-  (window as unknown as Record<string, unknown>).markAsOwner = markAsOwner;
-}
