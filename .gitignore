@@ -21,3 +21,7 @@ apps/wear-watchface/build/
 apps/wear-watchface/app/build/
 apps/wear-watchface/watchface/build/
 apps/wear-watchface/logcat.txt
+
+# Xcode (apps/apple-watch)
+apps/apple-watch/*.xcodeproj/xcuserdata/
+apps/apple-watch/*.xcworkspace/xcuserdata/

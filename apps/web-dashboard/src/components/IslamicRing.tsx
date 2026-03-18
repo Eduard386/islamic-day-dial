@@ -18,8 +18,22 @@ const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'islamic_midnight', 'la
 
 const MARKER_STROKE = 'rgba(200, 198, 220, 0.8)';
 
-/** Gap segments: deep dark */
+/** Gap segments + Isha group: all use same dark color */
 const GAP_SEGMENT_IDS = new Set<string>(['midnight_to_last_third', 'last_third_to_fajr']);
+
+/** All 3 Isha arcs use same dark color (ringGap) */
+const ISHA_DARK_SEGMENT_IDS = new Set<string>([
+  'isha_to_midnight',
+  'midnight_to_last_third',
+  'last_third_to_fajr',
+]);
+
+/** When in any of these 3 night sectors, highlight all 3 */
+const NIGHT_SECTORS_GROUP = new Set<string>([
+  'isha_to_midnight',
+  'midnight_to_last_third',
+  'last_third_to_fajr',
+]);
 
 /** Segments needing fixed light glow (dark gradients or gap) — otherwise midColor is too dark */
 const LIGHT_GLOW_SEGMENTS = new Set<string>([
@@ -43,9 +57,12 @@ function getDisplaySegments(
   isActive: boolean;
   isGap: boolean;
 }> {
+  const inNightGroup = NIGHT_SECTORS_GROUP.has(currentPhase);
   return segments.map((seg) => {
-    const isGap = GAP_SEGMENT_IDS.has(seg.id);
-    const isActive = seg.id === currentPhase;
+    const isGap = GAP_SEGMENT_IDS.has(seg.id) || ISHA_DARK_SEGMENT_IDS.has(seg.id);
+    const isActive =
+      seg.id === currentPhase ||
+      (inNightGroup && NIGHT_SECTORS_GROUP.has(seg.id));
     return {
       id: seg.id,
       startAngleDeg: seg.startAngleDeg,
@@ -82,7 +99,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           </feMerge>
         </filter>
         <CurrentMarkerDefs r={MARKER_R} />
-        {/* Segment gradients — direction from start to end of arc */}
+        {/* Segment gradients — direction from start to end of arc (Isha arcs use solid dark) */}
         {displaySegments
           .filter((s) => !s.isGap)
           .map((seg) => {
@@ -135,13 +152,13 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         })}
 
 
-      {/* Segments — gradients, inactive dimmer, gaps darkest */}
+      {/* Segments — gradients, inactive dimmer; Isha arcs + gaps = same dark color */}
       {displaySegments.map((seg) => {
         const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
         if (!path) return null;
-        const opacity = seg.isGap ? 1 : seg.isActive ? 1 : 0.65;
-        const stroke =
-          seg.isGap ? COLORS.ringGap : `url(#grad-${seg.id}-${seg.isActive})`;
+        const useDarkColor = seg.isGap;
+        const opacity = useDarkColor ? 1 : seg.isActive ? 1 : 0.65;
+        const stroke = useDarkColor ? COLORS.ringGap : `url(#grad-${seg.id}-${seg.isActive})`;
         return (
           <path
             key={seg.id}
