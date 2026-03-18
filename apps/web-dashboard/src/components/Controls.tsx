@@ -78,14 +78,16 @@ export function Controls({
   onPresetSelect,
   onCurrentCity,
 }: Props) {
+  const [monthOffset, setMonthOffset] = useState(0);
   const [dayOffset, setDayOffset] = useState(0);
   const [hourOffset, setHourOffset] = useState(0);
 
   const MS_PER_HOUR = 3600000;
   const MS_PER_DAY = 24 * MS_PER_HOUR;
 
-  const applyTimeOffset = (days: number, hours: number) => {
-    const totalMs = days * MS_PER_DAY + hours * MS_PER_HOUR;
+  const applyTimeOffset = (months: number, days: number, hours: number) => {
+    const totalDays = months * 30 + days;
+    const totalMs = totalDays * MS_PER_DAY + hours * MS_PER_HOUR;
     if (totalMs === 0) {
       onTimeModeChange({ kind: 'live' });
     } else {
@@ -137,6 +139,25 @@ export function Controls({
         <h4>Time Travel</h4>
         <div className="input-row">
           <label>
+            Months
+            <input
+              type="range"
+              min={-6}
+              max={6}
+              value={monthOffset}
+              onChange={e => {
+                const m = parseInt(e.target.value, 10);
+                setMonthOffset(m);
+                applyTimeOffset(m, dayOffset, hourOffset);
+              }}
+            />
+            <span className="offset-value">
+              {monthOffset === 0 ? '0' : `${monthOffset > 0 ? '+' : ''}${monthOffset}m`}
+            </span>
+          </label>
+        </div>
+        <div className="input-row">
+          <label>
             Days
             <input
               type="range"
@@ -146,7 +167,7 @@ export function Controls({
               onChange={e => {
                 const d = parseInt(e.target.value, 10);
                 setDayOffset(d);
-                applyTimeOffset(d, hourOffset);
+                applyTimeOffset(monthOffset, d, hourOffset);
               }}
             />
             <span className="offset-value">
@@ -166,7 +187,7 @@ export function Controls({
               onChange={e => {
                 const h = parseFloat(e.target.value);
                 setHourOffset(h);
-                applyTimeOffset(dayOffset, h);
+                applyTimeOffset(monthOffset, dayOffset, h);
               }}
             />
             <span className="offset-value">
@@ -179,6 +200,7 @@ export function Controls({
           <button
             className={timeMode.kind === 'live' ? 'active' : ''}
             onClick={() => {
+              setMonthOffset(0);
               setDayOffset(0);
               setHourOffset(0);
               onTimeModeChange({ kind: 'live' });

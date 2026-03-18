@@ -1,5 +1,5 @@
 import {
-  formatHijriDate,
+  formatHijriDateParts,
   formatCurrentPeriod,
   type ComputedIslamicDay,
 } from '@islamic-day-dial/core';
@@ -12,6 +12,7 @@ type Props = {
 
 export function CenterInfo({ snapshot, now, timezone }: Props) {
   const periodLabel = formatCurrentPeriod(snapshot.currentPhase);
+  const dateParts = formatHijriDateParts(snapshot.hijriDate);
   const localTime = now.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -24,7 +25,8 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
       <div className={`current-period${!periodLabel ? ' current-period-empty' : ''}`}>
         {periodLabel || '\u00A0'}
       </div>
-      <div className="hijri-date">{formatHijriDate(snapshot.hijriDate)}</div>
+      <div className="hijri-date">{dateParts.dayMonth}</div>
+      <div className="hijri-year">{dateParts.year}</div>
       <div className="local-time">{localTime}</div>
     </div>
   );

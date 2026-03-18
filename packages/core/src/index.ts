@@ -29,9 +29,11 @@ export {
 } from './ring.js';
 export {
   formatHijriDate,
+  formatHijriDateParts,
   formatCountdown,
   formatPhase,
   formatCurrentPeriod,
   formatTransition,
+  type HijriDateParts,
 } from './formatting.js';
 export { computeIslamicDaySnapshot } from './snapshot.js';

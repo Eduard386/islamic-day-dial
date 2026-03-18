@@ -95,12 +95,13 @@ body {
 }
 
 .current-period {
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: rgba(232, 232, 240, 0.85);
+  color: rgba(232, 232, 240, 0.7);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   min-height: 1.2em;
+  margin-top: 45px;
 }
 
 .current-period-empty {
@@ -112,6 +113,15 @@ body {
   font-weight: 600;
   color: var(--accent);
   flex-shrink: 0;
+  line-height: 1.2;
+  margin-top: 8px;
+}
+
+.hijri-year {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .local-time {
@@ -119,6 +129,7 @@ body {
   font-weight: 600;
   color: rgba(232, 232, 240, 0.85);
   font-variant-numeric: tabular-nums;
+  margin-top: 35px;
 }
 
 /* ---------- Controls Section ---------- */
