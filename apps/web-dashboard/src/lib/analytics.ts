@@ -21,6 +21,56 @@ function isOwner(): boolean {
   return localStorage.getItem('__owner__') === 'true';
 }
 
+function detectOS(ua: string): string {
+  if (/Windows/.test(ua)) return 'Windows';
+  if (/iPhone|iPad|iPod/.test(ua)) return 'iOS';
+  if (/Mac OS X/.test(ua)) return 'macOS';
+  if (/Android/.test(ua)) return 'Android';
+  if (/Linux/.test(ua)) return 'Linux';
+  if (/CrOS/.test(ua)) return 'ChromeOS';
+  return 'Unknown';
+}
+
+function detectBrowser(ua: string): string {
+  if (/Edg\//.test(ua)) return 'Edge';
+  if (/OPR\/|Opera/.test(ua)) return 'Opera';
+  if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) return 'Chrome';
+  if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return 'Safari';
+  if (/Firefox\//.test(ua)) return 'Firefox';
+  if (/MSIE|Trident/.test(ua)) return 'IE';
+  return 'Unknown';
+}
+
+function detectDeviceType(ua: string): string {
+  if (/iPad/.test(ua)) return 'tablet';
+  if (/Mobile|iPhone|iPod|Android.*Mobile/.test(ua)) return 'mobile';
+  if (/Android/.test(ua)) return 'tablet';
+  return 'desktop';
+}
+
+interface GeoData {
+  country?: string;
+  city?: string;
+  region?: string;
+  timezone?: string;
+}
+
+async function getGeoData(): Promise<GeoData> {
+  try {
+    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return {};
+    const data = await res.json();
+    return {
+      country: data.country_name || data.country,
+      city: data.city,
+      region: data.region,
+      timezone: data.timezone,
+    };
+  } catch {
+    return {};
+  }
+}
+
 export async function trackVisit(): Promise<void> {
   if (!supabase) {
     console.log('[Analytics] Supabase not configured');
@@ -33,14 +83,24 @@ export async function trackVisit(): Promise<void> {
   }
 
   try {
+    const ua = navigator.userAgent;
+    const geo = await getGeoData();
+    
     const { error } = await supabase.from('visits').insert({
       visitor_id: getVisitorId(),
       path: window.location.pathname,
       referrer: document.referrer || null,
-      user_agent: navigator.userAgent,
+      user_agent: ua,
       screen_width: window.screen.width,
       screen_height: window.screen.height,
       language: navigator.language,
+      os: detectOS(ua),
+      browser: detectBrowser(ua),
+      device_type: detectDeviceType(ua),
+      country: geo.country || null,
+      city: geo.city || null,
+      region: geo.region || null,
+      timezone: geo.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
 
     if (error) {
@@ -60,6 +120,6 @@ export function markAsOwner(): void {
 }
 
 /** Expose to window for easy console access */
-if (typeof window !== 'undefined') {
-  (window as unknown as Record<string, unknown>).__markAsOwner = markAsOwner;
+export function exposeToWindow(): void {
+  (window as unknown as Record<string, unknown>).markAsOwner = markAsOwner;
 }

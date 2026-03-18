@@ -3,7 +3,7 @@ import { useIslamicDay } from './hooks/useIslamicDay';
 import { IslamicRing } from './components/IslamicRing';
 import { CenterInfo } from './components/CenterInfo';
 import { Controls } from './components/Controls';
-import { trackVisit } from './lib/analytics';
+import { trackVisit, exposeToWindow } from './lib/analytics';
 import './App.css';
 
 export default function App() {
@@ -11,6 +11,7 @@ export default function App() {
 
   useEffect(() => {
     trackVisit();
+    exposeToWindow();
   }, []);
   const { snapshot, timezone, timeMode, selectedPreset, effectiveNow } = state;
 
