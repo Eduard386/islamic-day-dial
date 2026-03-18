@@ -1,7 +1,0 @@
-com.islamicdaydial.watchface-pngs-0 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/build/generated/res/pngs/debug
-com.islamicdaydial.watchface-resValues-1 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/build/generated/res/resValues/debug
-com.islamicdaydial.watchface-packageDebugResources-2 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.islamicdaydial.watchface-packageDebugResources-3 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.islamicdaydial.watchface-debug-4 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/build/intermediates/merged_res/debug/mergeDebugResources
-com.islamicdaydial.watchface-debug-5 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/src/debug/res
-com.islamicdaydial.watchface-main-6 /Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/wear-watchface/watchface/src/main/res

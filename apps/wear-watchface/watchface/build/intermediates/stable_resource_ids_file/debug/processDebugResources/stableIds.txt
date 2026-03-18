@@ -1,5 +1,0 @@
-com.islamicdaydial.watchface:xml/watch_face_info = 0x7f040000
-com.islamicdaydial.watchface:string/watch_face_name = 0x7f030000
-com.islamicdaydial.watchface:raw/watchface = 0x7f020000
-com.islamicdaydial.watchface:drawable/watch_face_preview = 0x7f010001
-com.islamicdaydial.watchface:drawable/ic_launcher = 0x7f010000

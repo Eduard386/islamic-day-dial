@@ -19,4 +19,5 @@ coverage/
 apps/wear-watchface/.gradle/
 apps/wear-watchface/build/
 apps/wear-watchface/app/build/
+apps/wear-watchface/watchface/build/
 apps/wear-watchface/logcat.txt
