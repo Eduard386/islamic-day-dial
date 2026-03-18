@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useIslamicDay } from './hooks/useIslamicDay';
 import { IslamicRing } from './components/IslamicRing';
 import { CenterInfo } from './components/CenterInfo';
@@ -10,6 +11,7 @@ const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
 export default function App() {
   const state = useIslamicDay();
   const { snapshot, location, timezone, timeMode, selectedPreset, effectiveNow } = state;
+  const [debugHijriDay, setDebugHijriDay] = useState<number | undefined>();
 
   return (
     <div className="app">
@@ -21,7 +23,7 @@ export default function App() {
       <main className="app-main">
         <div className="dial-section">
           <div className="dial-wrapper">
-            <IslamicRing snapshot={snapshot} size={420} />
+            <IslamicRing snapshot={snapshot} size={420} debugHijriDay={!IS_DEMO ? debugHijriDay : undefined} />
             <div className="center-overlay">
               <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
             </div>
@@ -39,6 +41,8 @@ export default function App() {
             onTimeModeChange={state.setTimeMode}
             onPresetSelect={state.setSelectedPreset}
             onCurrentCity={state.applyCurrentCity}
+            debugHijriDay={!IS_DEMO ? debugHijriDay : undefined}
+            onDebugHijriDayChange={!IS_DEMO ? setDebugHijriDay : undefined}
           />
           {!IS_DEMO && (
             <DebugPanel
@@ -46,6 +50,8 @@ export default function App() {
               location={location}
               timezone={timezone}
               now={effectiveNow}
+              debugHijriDay={debugHijriDay}
+              onDebugHijriDayChange={setDebugHijriDay}
             />
           )}
         </div>

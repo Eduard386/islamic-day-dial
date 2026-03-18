@@ -2,10 +2,14 @@ import type { ComputedIslamicDay, IslamicPhaseId, RingSegment } from '@islamic-d
 import { describeArc, polarToXY } from '../lib/geometry';
 import { COLORS } from '../lib/colors';
 import { SEGMENT_GRADIENTS, SEGMENT_GRADIENTS_ACTIVE } from '../lib/segment-gradients';
+import { getCurrentMarkerVisualState } from '../lib/current-marker';
+import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 
 type Props = {
   snapshot: ComputedIslamicDay;
   size?: number;
+  /** Debug: override hijri day for moon phase (1–30). Only when !IS_DEMO. */
+  debugHijriDay?: number;
 };
 
 /** Primary: Fajr, Dhuhr, Asr, Maghrib, Isha — short ticks */
@@ -29,12 +33,7 @@ const LIGHT_GLOW_SEGMENTS = new Set<string>([
   'last_third_to_fajr',
 ]);
 
-/** Night phases: show moon instead of black pearl */
-const NIGHT_PHASES = new Set<IslamicPhaseId>([
-  'isha_to_midnight',
-  'midnight_to_last_third',
-  'last_third_to_fajr',
-]);
+const MARKER_R = 11.5;
 
 function getDisplaySegments(
   segments: RingSegment[],
@@ -59,7 +58,7 @@ function getDisplaySegments(
   });
 }
 
-export function IslamicRing({ snapshot, size = 420 }: Props) {
+export function IslamicRing({ snapshot, size = 420, debugHijriDay }: Props) {
   const cx = size / 2;
   const cy = size / 2;
   const ringR = size * 0.38;
@@ -84,16 +83,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <radialGradient id="pearl" cx="40%" cy="35%" r="60%">
-          <stop offset="0%" stopColor="#505068" />
-          <stop offset="50%" stopColor="#1a1a2e" />
-          <stop offset="100%" stopColor="#08080e" />
-        </radialGradient>
-        <radialGradient id="moon" cx="35%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#f5e6c8" />
-          <stop offset="40%" stopColor="#e8c878" />
-          <stop offset="100%" stopColor="#d4a04a" />
-        </radialGradient>
+        <CurrentMarkerDefs r={MARKER_R} />
         {/* Segment gradients — direction from start to end of arc */}
         {displaySegments
           .filter((s) => !s.isGap)
@@ -206,28 +196,21 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         return null;
       })}
 
-      {/* Current position — moon at night, black pearl by day */}
+      {/* Current position — minimal disk, moon phase at night */}
       {(() => {
         const pos = polarToXY(cx, cy, ringR, progressAngle);
-        const isNight = NIGHT_PHASES.has(currentPhase);
+        const markerState = getCurrentMarkerVisualState(
+          currentPhase,
+          snapshot.hijriDate,
+          debugHijriDay,
+        );
         return (
-          <>
-            <circle
-              cx={pos.x}
-              cy={pos.y}
-              r={11.5}
-              fill={isNight ? 'url(#moon)' : 'url(#pearl)'}
-              stroke={isNight ? '#c9a04a' : '#404060'}
-              strokeWidth={1.5}
-            />
-            <circle
-              cx={pos.x - 2.2}
-              cy={pos.y - 2.2}
-              r={2.8}
-              fill={isNight ? '#f0d8a0' : '#606080'}
-              opacity={isNight ? 0.9 : 0.6}
-            />
-          </>
+          <CurrentMarker
+            x={pos.x}
+            y={pos.y}
+            r={MARKER_R}
+            state={markerState}
+          />
         );
       })()}
     </svg>

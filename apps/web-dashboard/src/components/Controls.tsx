@@ -16,6 +16,9 @@ type Props = {
   onTimeModeChange: (mode: TimeMode) => void;
   onPresetSelect: (name: string) => void;
   onCurrentCity: () => void;
+  /** Debug: override hijri day (1–30) for moon phase */
+  debugHijriDay?: number;
+  onDebugHijriDayChange?: (day: number | undefined) => void;
 };
 
 const PRESETS: Record<string, { location: Location; timezone: string }> = {
@@ -41,6 +44,8 @@ export function Controls({
   onTimeModeChange,
   onPresetSelect,
   onCurrentCity,
+  debugHijriDay,
+  onDebugHijriDayChange,
 }: Props) {
   const [latInput, setLatInput] = useState(String(location.latitude));
   const [lonInput, setLonInput] = useState(String(location.longitude));
@@ -147,6 +152,27 @@ export function Controls({
             />
             <span className="offset-value">{offsetHours >= 0 ? '+' : ''}{offsetHours}h</span>
           </label>
+        </div>
+      </section>
+      )}
+
+      {!IS_DEMO && onDebugHijriDayChange && (
+      <section>
+        <h4>Debug: Date</h4>
+        <p className="hint">Override Hijri day (1–30) for moon phase</p>
+        <div className="input-row">
+          <label>
+            Hijri day (1–30)
+            <input
+              type="range"
+              min={1}
+              max={30}
+              value={debugHijriDay ?? 15}
+              onChange={e => onDebugHijriDayChange(parseInt(e.target.value, 10))}
+            />
+            <span className="offset-value">{debugHijriDay ?? 'auto'}</span>
+          </label>
+          <button onClick={() => onDebugHijriDayChange(undefined)}>Auto</button>
         </div>
       </section>
       )}
