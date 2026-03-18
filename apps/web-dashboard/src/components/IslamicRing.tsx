@@ -59,9 +59,9 @@ function getDisplaySegments(
 export function IslamicRing({ snapshot, size = 420 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
-  const ringR = size * 0.38;
-  const ringStroke = size * 0.09;
-  const ringInner = ringR - ringStroke / 2;
+  const ringStroke = size * 0.081;
+  const ringInner = size * 0.25125;
+  const ringR = ringInner + ringStroke / 2;
 
   const { ring, currentPhase } = snapshot;
   const progressAngle = ring.progress * 360;
@@ -132,6 +132,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
             </g>
           );
         })}
+
 
       {/* Segments — gradients, inactive dimmer, gaps darkest */}
       {displaySegments.map((seg) => {

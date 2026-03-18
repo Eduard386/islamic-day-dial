@@ -101,7 +101,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   min-height: 1.2em;
-  margin-top: 45px;
+  margin-top: 15px;
 }
 
 .current-period-empty {
@@ -129,7 +129,7 @@ body {
   font-weight: 600;
   color: rgba(232, 232, 240, 0.85);
   font-variant-numeric: tabular-nums;
-  margin-top: 35px;
+  margin-top: 8px;
 }
 
 /* ---------- Controls Section ---------- */
