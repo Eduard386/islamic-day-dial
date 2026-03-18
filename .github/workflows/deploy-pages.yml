@@ -32,6 +32,9 @@ jobs:
         env:
           VITE_DEMO_MODE: true
 
+      - name: List build output
+        run: ls -la apps/web-dashboard/dist/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
