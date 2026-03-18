@@ -75,8 +75,8 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
       style={{ display: 'block' }}
     >
       <defs>
-        <filter id="glow-active" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
+        <filter id="glow-active" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+          <feGaussianBlur stdDeviation="4" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
@@ -114,14 +114,15 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         .filter((s) => s.isActive)
         .map((seg) => {
           const grad = SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId];
-          const midColor = grad.stops[Math.floor(grad.stops.length / 2)]?.color ?? grad.stops[0]!.color;
-          const glowColor = LIGHT_GLOW_SEGMENTS.has(seg.id)
-            ? 'rgba(230, 210, 255, 0.85)'
-            : midColor;
+          const isNightSegment = LIGHT_GLOW_SEGMENTS.has(seg.id) || seg.isGap || !grad;
+          const glowColor = isNightSegment
+            ? 'rgba(180, 160, 220, 1)'
+            : grad.stops[Math.floor(grad.stops.length / 2)]?.color ?? grad.stops[0]!.color;
+          const glowOpacity = isNightSegment ? 0.45 : 0.28;
           const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
           if (!path) return null;
           return (
-            <g key={`glow-${seg.id}`} filter="url(#glow-active)" opacity={0.28}>
+            <g key={`glow-${seg.id}`} filter="url(#glow-active)" opacity={glowOpacity}>
               <path
                 d={path}
                 fill="none"
