@@ -31,6 +31,8 @@ jobs:
         run: npm run build:demo --workspace=@islamic-day-dial/web-dashboard
         env:
           VITE_DEMO_MODE: true
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: List build output
         run: ls -la apps/web-dashboard/dist/

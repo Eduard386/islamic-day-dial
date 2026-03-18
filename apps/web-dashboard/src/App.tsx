@@ -1,11 +1,17 @@
+import { useEffect } from 'react';
 import { useIslamicDay } from './hooks/useIslamicDay';
 import { IslamicRing } from './components/IslamicRing';
 import { CenterInfo } from './components/CenterInfo';
 import { Controls } from './components/Controls';
+import { trackVisit } from './lib/analytics';
 import './App.css';
 
 export default function App() {
   const state = useIslamicDay();
+
+  useEffect(() => {
+    trackVisit();
+  }, []);
   const { snapshot, timezone, timeMode, selectedPreset, effectiveNow } = state;
 
   return (
