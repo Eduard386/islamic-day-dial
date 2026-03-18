@@ -124,6 +124,14 @@ body {
   flex-shrink: 0;
 }
 
+.eid-date {
+  color: #10b981;
+  text-shadow: 
+    0 0 8px rgba(16, 185, 129, 0.6),
+    0 0 16px rgba(16, 185, 129, 0.4),
+    0 0 24px rgba(16, 185, 129, 0.2);
+}
+
 .local-time {
   font-size: 1.05rem;
   font-weight: 600;

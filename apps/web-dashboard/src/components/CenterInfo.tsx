@@ -25,8 +25,8 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
       <div className={`current-period${!periodLabel ? ' current-period-empty' : ''}`}>
         {periodLabel || '\u00A0'}
       </div>
-      <div className="hijri-date">{dateParts.dayMonth}</div>
-      <div className="hijri-year">{dateParts.year}</div>
+      <div className={`hijri-date${dateParts.isEid ? ' eid-date' : ''}`}>{dateParts.dayMonth}</div>
+      <div className={`hijri-year${dateParts.isEid ? ' eid-date' : ''}`}>{dateParts.year}</div>
       <div className="local-time">{localTime}</div>
     </div>
   );
