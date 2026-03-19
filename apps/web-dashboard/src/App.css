@@ -238,12 +238,13 @@ body {
   text-transform: uppercase;
 }
 
+/* Glow: adjust blur radius (8/16/24) and opacity (0.6/0.4/0.2) to change intensity */
 .eid-date {
   color: #10b981;
-  text-shadow: 
-    0 0 8px rgba(16, 185, 129, 0.6),
-    0 0 16px rgba(16, 185, 129, 0.4),
-    0 0 24px rgba(16, 185, 129, 0.2);
+  text-shadow:
+    0 0 8px rgba(8, 185, 129, 0.2),
+    0 0 16px rgba(8, 185, 129, 0.2),
+    0 0 24px rgba(8, 185, 129, 0.2);
 }
 
 /* Isha in last third of night — deep blue neon glow (like eid highlight, but blue) */
