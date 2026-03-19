@@ -161,7 +161,8 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
             const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
             if (!path) return null;
             const isLastThird = seg.id === 'last_third_to_fajr';
-            if (isLastThird) {
+            const markerInLastThird = currentPhase === 'last_third_to_fajr';
+            if (isLastThird && markerInLastThird) {
               return (
                 <g
                   key={`glow-ish-${seg.id}`}

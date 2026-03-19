@@ -3,6 +3,9 @@ import {
   computeIslamicDaySnapshot,
   getCountdown,
   getCountdownTarget,
+  getCurrentPhase,
+  getNextTransition,
+  getIslamicDayProgress,
   type UserContext,
   type ComputedIslamicDay,
   type Location,
@@ -44,7 +47,7 @@ const CURRENT_CITY = 'Current city';
 const DEFAULT_PRESET = CURRENT_CITY;
 
 const SNAPSHOT_INTERVAL_MS = 60_000;
-const TICK_INTERVAL_MS = 1_000;
+const TICK_INTERVAL_MS = 60_000;
 
 export function useIslamicDay(): DashboardState {
   const [location, setLocation] = useState<Location>(FALLBACK_LOCATION);
@@ -88,7 +91,7 @@ export function useIslamicDay(): DashboardState {
     return () => clearInterval(timer);
   }, [computeSnapshot]);
 
-  // Lightweight tick every 1s — only updates the clock and countdown
+  // Lightweight tick every 1s — updates phase, marker, countdown
   useEffect(() => {
     const tick = () => setLiveNow(getEffectiveNow(timeMode));
     tick();
@@ -96,13 +99,45 @@ export function useIslamicDay(): DashboardState {
     return () => clearInterval(timer);
   }, [timeMode]);
 
+  // Safari iOS: when returning to tab (after lock/switch), timers may have been throttled — force refresh
+  useEffect(() => {
+    const tick = () => setLiveNow(getEffectiveNow(timeMode));
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') tick();
+    };
+    const onPageshow = (e: PageTransitionEvent) => {
+      if (e.persisted) tick();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pageshow', onPageshow);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pageshow', onPageshow);
+    };
+  }, [timeMode]);
+
   const liveCountdownMs = getCountdown(
     liveNow,
     getCountdownTarget(liveNow, snapshot.timeline),
   );
 
+  const liveSnapshot: ComputedIslamicDay = {
+    ...snapshot,
+    currentPhase: getCurrentPhase(liveNow, snapshot.timeline),
+    nextTransition: getNextTransition(liveNow, snapshot.timeline),
+    countdownMs: liveCountdownMs,
+    ring: {
+      ...snapshot.ring,
+      progress: getIslamicDayProgress(
+        liveNow,
+        snapshot.timeline.lastMaghrib,
+        snapshot.timeline.nextMaghrib,
+      ),
+    },
+  };
+
   return {
-    snapshot: { ...snapshot, countdownMs: liveCountdownMs },
+    snapshot: liveSnapshot,
     location,
     timezone,
     timeMode,
