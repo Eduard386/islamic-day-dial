@@ -11,19 +11,23 @@ struct ContentView: View {
                 ZStack {
                     RingView(snapshot: snap)
                     VStack(spacing: 2) {
+                        currentPeriodView(snapshot: snap, now: now)
                         let parts = formatHijriDateParts(snap.hijriDate)
                         Text(parts.dayMonth)
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : .primary)
+                            .offset(y: 2)
                         Text(parts.year)
                             .font(.system(size: 10))
                             .foregroundColor(Colors.ivory)
-                        currentPeriodView(snapshot: snap, now: now)
+                            .offset(y: 2)
                         Text(formatCountdown(countdownMs(snapshot: snap)))
                             .font(.system(size: 9, design: .monospaced))
                             .foregroundColor(Colors.ivory)
-                            .padding(.top, 2)
+                            .padding(.top, 14)
                     }
+                    .padding(.vertical, 18)
+                    .offset(y: -6)
                 }
             } else {
                 ProgressView()

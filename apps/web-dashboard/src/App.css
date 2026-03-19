@@ -72,7 +72,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - 10px));
   text-align: center;
   pointer-events: none;
 }
@@ -85,7 +85,47 @@ body {
   gap: 2px;
   align-items: center;
   justify-content: center;
-  min-height: 140px;
+  padding: 58px 0;
+  min-height: 0;
+}
+
+.center-info-abs {
+  --sector-top: 55px;
+  --date-top: 100px;
+  --countdown-top: 165px;
+  position: relative;
+  width: 220px;
+  height: 212px; /* inner diameter for 420 dial: 0.25125 * 420 * 2 ≈ 211 */
+  padding: 0;
+}
+
+.center-info-abs > .current-period,
+.center-info-abs > .countdown {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.center-date {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+
+.sector-block {
+  top: var(--sector-top);
+}
+
+.date-block {
+  top: var(--date-top);
+}
+
+.countdown-block {
+  top: var(--countdown-top);
 }
 
 .center-info-bottom {
@@ -96,13 +136,13 @@ body {
 }
 
 .current-period {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: var(--ivory);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   min-height: 1.2em;
-  margin-top: 15px;
+  margin-top: 0;
 }
 
 .current-period-main {
@@ -133,20 +173,48 @@ body {
   color: transparent;
 }
 
+.center-info-first {
+  margin-top: 0;
+}
+
 .hijri-date {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--accent);
   flex-shrink: 0;
   line-height: 1.2;
-  margin-top: 8px;
+  white-space: nowrap;
+}
+
+.hijri-date-sector-style {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ivory);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hijri-date-compact {
+  font-size: 1.00rem;
+}
+
+.current-period.center-info-first {
+  margin-top: 0;
 }
 
 .hijri-year {
-  font-size: 1.1rem;
+  font-size: 1.0rem;
   font-weight: 600;
   color: var(--accent);
   flex-shrink: 0;
+}
+
+.hijri-year-sector-style {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ivory);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .eid-date {
@@ -169,11 +237,12 @@ body {
 .local-time,
 .countdown {
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 300;
   color: var(--ivory);
   font-variant-numeric: tabular-nums;
-  margin-top: 8px;
+  margin-top: 0;
 }
+
 
 /* ---------- Controls Section ---------- */
 

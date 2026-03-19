@@ -94,9 +94,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         {displaySegments
           .filter((s) => !s.isGap)
           .map((seg) => {
-            const grad = seg.isActive
-              ? SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId]
-              : SEGMENT_GRADIENTS[seg.id as IslamicPhaseId];
+            const grad = SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId];
             const start = polarToXY(cx, cy, ringR, seg.startAngleDeg);
             const end = polarToXY(cx, cy, ringR, seg.endAngleDeg);
             return (
@@ -148,7 +146,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
         if (!path) return null;
         const useDarkColor = seg.isGap;
-        const opacity = useDarkColor ? 1 : seg.isActive ? 1 : 0.65;
+        const opacity = 1;
         const stroke = useDarkColor ? COLORS.ringGap : `url(#grad-${seg.id}-${seg.isActive})`;
         return (
           <path
