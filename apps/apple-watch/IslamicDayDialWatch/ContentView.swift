@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var snapshot: ComputedIslamicDay?
     @State private var now = Date()
+    @State private var location: Location = .mecca
 
     var body: some View {
         Group {
@@ -29,10 +30,13 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            snapshot = computeIslamicDaySnapshot()
+            Task {
+                location = await resolveLocation()
+                snapshot = computeIslamicDaySnapshot(location: location)
+            }
         }
         .onReceive(Timer.publish(every: 60, on: .main, in: .common).autoconnect()) { _ in
-            snapshot = computeIslamicDaySnapshot()
+            snapshot = computeIslamicDaySnapshot(location: location)
         }
         .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
             now = Date()

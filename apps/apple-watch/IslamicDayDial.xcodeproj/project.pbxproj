@@ -23,6 +23,7 @@
 		E9CB8398821E7DB7C1403BAC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F87FA27B91FD24BFD5E996 /* ContentView.swift */; };
 		F90BFD32DE8B324951AF7CB8 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539BD8D8A54274C6B53853BE /* Formatting.swift */; };
 		FA71A797EA9E5AFFA412C369 /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79B56F348C4ADA801BAF7367 /* Snapshot.swift */; };
+		A1B2C3D4E5F60718293A4B5C6D /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6D7E /* GeoResolver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		E227165691AC83CDEE71442D /* IslamicDayDial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IslamicDayDial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F59AB0259162CFF8E8BFF885 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		F5FC7B4E3A74A600017506DB /* IslamicDayDialWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWatchApp.swift; sourceTree = "<group>"; };
+		B2C3D4E5F60718293A4B5C6D7E /* GeoResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -92,6 +94,7 @@
 			children = (
 				926DDF68987C449EA796E817 /* DayBounds.swift */,
 				539BD8D8A54274C6B53853BE /* Formatting.swift */,
+				B2C3D4E5F60718293A4B5C6D7E /* GeoResolver.swift */,
 				989E92A33AE03F1F7B667BB3 /* HijriCalendar.swift */,
 				E1E5667D030F7E223C0843AA /* NightMarkers.swift */,
 				07ABDBDD6F4BE7BCF35137A3 /* Phases.swift */,
@@ -183,6 +186,7 @@
 				E9CB8398821E7DB7C1403BAC /* ContentView.swift in Sources */,
 				86402B0A62962DD834292878 /* DayBounds.swift in Sources */,
 				F90BFD32DE8B324951AF7CB8 /* Formatting.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C6D /* GeoResolver.swift in Sources */,
 				099F50D9EB750B651DE02908 /* Geometry.swift in Sources */,
 				24A21DD3C075F6A397DBECA8 /* HijriCalendar.swift in Sources */,
 				4C1A78CC44DEFFEC04293568 /* IslamicDayDialWatchApp.swift in Sources */,

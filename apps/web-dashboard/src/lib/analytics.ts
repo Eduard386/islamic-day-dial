@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { resolveGeo } from './geo.js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -62,29 +63,6 @@ function detectDeviceType(ua: string): string {
   return 'desktop';
 }
 
-interface GeoData {
-  country?: string;
-  city?: string;
-  region?: string;
-  timezone?: string;
-}
-
-async function getGeoData(): Promise<GeoData> {
-  try {
-    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return {};
-    const data = await res.json();
-    return {
-      country: data.country_name || data.country,
-      city: data.city,
-      region: data.region,
-      timezone: data.timezone,
-    };
-  } catch {
-    return {};
-  }
-}
-
 export async function trackVisit(): Promise<void> {
   checkUrlForOwner();
   
@@ -100,7 +78,7 @@ export async function trackVisit(): Promise<void> {
 
   try {
     const ua = navigator.userAgent;
-    const geo = await getGeoData();
+    const geo = await resolveGeo();
     
     const { error } = await supabase.from('visits').insert({
       visitor_id: getVisitorId(),
