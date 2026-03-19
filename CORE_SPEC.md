@@ -7,9 +7,8 @@ Single source of truth for `packages/core` (TypeScript) and `apps/apple-watch` (
 | ID | Start | End | Label |
 |----|-------|-----|-------|
 | maghrib_to_isha | lastMaghrib | isha | Maghrib |
-| isha_to_midnight | isha | islamicMidnight | Isha |
-| midnight_to_last_third | islamicMidnight | lastThirdStart | Isha 1/2 |
-| last_third_to_fajr | lastThirdStart | fajr | Isha 2/3 |
+| isha_to_midnight | isha | lastThirdStart | Isha |
+| last_third_to_fajr | lastThirdStart | fajr | Isha (neon blue) |
 | fajr_to_sunrise | fajr | sunrise | Fajr |
 | sunrise_to_dhuhr | sunrise | dhuhr | Duha |
 | dhuhr_to_asr | dhuhr | asr | Dhuhr |
@@ -21,6 +20,14 @@ Single source of truth for `packages/core` (TypeScript) and `apps/apple-watch` (
 - **Last third start**: `fajr - (nightDuration / 3)` where `nightDuration = fajr - lastMaghrib`
 - **Progress**: `(now - lastMaghrib) / (nextMaghrib - lastMaghrib)`, clamped 0–1
 - **Angle**: `progress * 360` (0° = top = lastMaghrib, clockwise)
+- **Countdown** (вместо текущего времени): целевое время зависит от фазы:
+  - Fajr → до появления надписи DUHA (sunrise + 20 min)
+  - Sunrise_to_dhuhr, до DUHA → до появления DUHA
+  - Sunrise_to_dhuhr, DUHA видна → до Dhuhr
+  - Dhuhr → до Asr
+  - Asr → до Maghrib
+  - Maghrib → до Isha
+  - Isha → до Fajr
 
 ## Special Dates (Eid)
 
@@ -37,6 +44,7 @@ Single source of truth for `packages/core` (TypeScript) and `apps/apple-watch` (
 ## Dependencies
 
 - **Prayer times**: Umm al-Qura method (Adhan)
+  - **Isha**: по исчезновению вечерней зари (хадис) — угол 15°, Shafaq.Ahmer (красная заря), не фиксированный интервал
 - **Hijri calendar**: Umm al-Qura (Swift: `Calendar.islamicUmmAlQura`)
 
 ## Checklist

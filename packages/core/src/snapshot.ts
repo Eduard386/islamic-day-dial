@@ -3,7 +3,7 @@ import { getIslamicDayHijriDate } from './calendar.js';
 import { getPrayerTimesForDate, addDays } from './prayer-times.js';
 import { buildTimeline } from './day-bounds.js';
 import { getCurrentPhase, getNextTransition } from './phases.js';
-import { getCountdown } from './countdown.js';
+import { getCountdown, getCountdownTarget } from './countdown.js';
 import { getIslamicDayProgress, getMarkers, getRingSegments } from './ring.js';
 
 /**
@@ -23,7 +23,8 @@ export function computeIslamicDaySnapshot(input: UserContext): ComputedIslamicDa
 
   const currentPhase = getCurrentPhase(now, timeline);
   const nextTransition = getNextTransition(now, timeline);
-  const countdownMs = getCountdown(now, nextTransition.at);
+  const countdownTarget = getCountdownTarget(now, timeline);
+  const countdownMs = getCountdown(now, countdownTarget);
 
   const progress = getIslamicDayProgress(now, timeline.lastMaghrib, timeline.nextMaghrib);
   const markers = getMarkers(timeline);

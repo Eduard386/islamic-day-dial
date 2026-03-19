@@ -14,26 +14,18 @@ type Props = {
 const PRIMARY_MARKER_IDS = new Set<string>(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']);
 
 /** Secondary: Sunrise, Midnight, Last 3rd — very short strokes */
-const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'islamic_midnight', 'last_third_start']);
+const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'last_third_start']);
 
 const MARKER_STROKE = 'rgba(200, 198, 220, 0.8)';
 
 /** Gap segments + Isha group: all use same dark color */
-const GAP_SEGMENT_IDS = new Set<string>(['midnight_to_last_third', 'last_third_to_fajr']);
+const GAP_SEGMENT_IDS = new Set<string>(['last_third_to_fajr']);
 
-/** All 3 Isha arcs use same dark color (ringGap) */
-const ISHA_DARK_SEGMENT_IDS = new Set<string>([
-  'isha_to_midnight',
-  'midnight_to_last_third',
-  'last_third_to_fajr',
-]);
+/** Both Isha arcs use same dark color (ringGap) */
+const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
 
-/** When in any of these 3 night sectors, highlight all 3 */
-const NIGHT_SECTORS_GROUP = new Set<string>([
-  'isha_to_midnight',
-  'midnight_to_last_third',
-  'last_third_to_fajr',
-]);
+/** When in any of these 2 night sectors, highlight both */
+const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
 
 /** Segments needing fixed light glow (dark gradients or gap) — otherwise midColor is too dark */
 const LIGHT_GLOW_SEGMENTS = new Set<string>([
@@ -41,7 +33,6 @@ const LIGHT_GLOW_SEGMENTS = new Set<string>([
   'isha_to_midnight',
   'fajr_to_sunrise',
   'asr_to_maghrib',
-  'midnight_to_last_third',
   'last_third_to_fajr',
 ]);
 

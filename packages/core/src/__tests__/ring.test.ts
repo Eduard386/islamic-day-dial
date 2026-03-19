@@ -58,9 +58,9 @@ describe('getMarkers', () => {
     nextMaghrib: new Date('2025-03-16T15:30:00.000Z'),
   };
 
-  it('returns 8 markers', () => {
+  it('returns 7 markers', () => {
     const markers = getMarkers(timeline);
-    expect(markers).toHaveLength(8);
+    expect(markers).toHaveLength(7);
   });
 
   it('first marker is maghrib at 0°', () => {
@@ -77,10 +77,10 @@ describe('getMarkers', () => {
     }
   });
 
-  it('secondary markers are islamic_midnight and last_third_start', () => {
+  it('secondary marker is last_third_start', () => {
     const markers = getMarkers(timeline);
     const secondary = markers.filter(m => m.kind === 'secondary');
-    expect(secondary.map(m => m.id)).toEqual(['islamic_midnight', 'last_third_start']);
+    expect(secondary.map(m => m.id)).toEqual(['last_third_start']);
   });
 });
 
@@ -97,9 +97,9 @@ describe('getRingSegments', () => {
     nextMaghrib: new Date('2025-03-16T15:30:00.000Z'),
   };
 
-  it('returns 8 segments', () => {
+  it('returns 7 segments', () => {
     const segments = getRingSegments(timeline);
-    expect(segments).toHaveLength(8);
+    expect(segments).toHaveLength(7);
   });
 
   it('first segment starts at 0°', () => {

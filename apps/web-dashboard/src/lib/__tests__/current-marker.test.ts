@@ -11,10 +11,6 @@ describe('isNightPeriod', () => {
     expect(isNightPeriod('isha_to_midnight')).toBe(true);
   });
 
-  it('returns true for midnight_to_last_third', () => {
-    expect(isNightPeriod('midnight_to_last_third')).toBe(true);
-  });
-
   it('returns true for last_third_to_fajr', () => {
     expect(isNightPeriod('last_third_to_fajr')).toBe(true);
   });

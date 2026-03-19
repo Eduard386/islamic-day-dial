@@ -1,9 +1,9 @@
 import SwiftUI
 
-private let GAP_SEGMENT_IDS: Set<IslamicPhaseId> = [.midnight_to_last_third, .last_third_to_fajr]
-private let NIGHT_SECTORS_GROUP: Set<IslamicPhaseId> = [.isha_to_midnight, .midnight_to_last_third, .last_third_to_fajr]
+private let GAP_SEGMENT_IDS: Set<IslamicPhaseId> = [.last_third_to_fajr]
+private let NIGHT_SECTORS_GROUP: Set<IslamicPhaseId> = [.isha_to_midnight, .last_third_to_fajr]
 private let PRIMARY_MARKER_IDS: Set<String> = ["fajr", "dhuhr", "asr", "maghrib", "isha"]
-private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "islamic_midnight", "last_third_start"]
+private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "last_third_start"]
 
 struct RingView: View {
     let snapshot: ComputedIslamicDay

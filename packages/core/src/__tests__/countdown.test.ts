@@ -1,5 +1,58 @@
 import { describe, it, expect } from 'vitest';
-import { getCountdown } from '../countdown.js';
+import { getCountdown, getCountdownTarget } from '../countdown.js';
+import type { ComputedTimeline } from '../types.js';
+
+function makeTimeline(entries: Record<string, number>): ComputedTimeline {
+  const toDate = (ms: number) => new Date(ms);
+  return {
+    lastMaghrib: toDate(entries.lastMaghrib ?? 0),
+    isha: toDate(entries.isha ?? 0),
+    islamicMidnight: toDate(entries.islamicMidnight ?? 0),
+    lastThirdStart: toDate(entries.lastThirdStart ?? 0),
+    fajr: toDate(entries.fajr ?? 0),
+    sunrise: toDate(entries.sunrise ?? 0),
+    dhuhr: toDate(entries.dhuhr ?? 0),
+    asr: toDate(entries.asr ?? 0),
+    nextMaghrib: toDate(entries.nextMaghrib ?? 0),
+  };
+}
+
+describe('getCountdownTarget', () => {
+  it('Fajr sector: target is DUHA label (sunrise + 20 min)', () => {
+    const sunrise = 100000;
+    const dhuhr = 200000;
+    const tl = makeTimeline({
+      fajr: 80000, sunrise, dhuhr,
+      lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+      asr: 250000, nextMaghrib: 300000,
+    });
+    const now = new Date(90000); // in fajr_to_sunrise
+    const target = getCountdownTarget(now, tl);
+    expect(target.getTime()).toBe(sunrise + 20 * 60 * 1000);
+  });
+
+  it('Maghrib sector: target is Isha', () => {
+    const isha = 50000;
+    const tl = makeTimeline({
+      lastMaghrib: 0, isha, islamicMidnight: 60000, lastThirdStart: 70000,
+      fajr: 80000, sunrise: 100000, dhuhr: 150000, asr: 200000, nextMaghrib: 300000,
+    });
+    const now = new Date(25000); // in maghrib_to_isha
+    const target = getCountdownTarget(now, tl);
+    expect(target.getTime()).toBe(isha);
+  });
+
+  it('Isha sectors: target is Fajr', () => {
+    const fajr = 80000;
+    const tl = makeTimeline({
+      lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+      fajr, sunrise: 100000, dhuhr: 150000, asr: 200000, nextMaghrib: 300000,
+    });
+    const now = new Date(25000); // in isha_to_midnight
+    const target = getCountdownTarget(now, tl);
+    expect(target.getTime()).toBe(fajr);
+  });
+});
 
 describe('getCountdown', () => {
   it('returns positive ms when transition is in the future', () => {

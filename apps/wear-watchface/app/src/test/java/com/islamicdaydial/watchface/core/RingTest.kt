@@ -55,7 +55,7 @@ class RingTest {
     }
 
     @Test
-    fun getMarkers_returns8Markers() {
+    fun getMarkers_returns7Markers() {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
@@ -68,7 +68,7 @@ class RingTest {
             nextMaghrib = nextMaghrib
         )
         val markers = getMarkers(timeline)
-        assertEquals(8, markers.size)
+        assertEquals(7, markers.size)
     }
 
     @Test
@@ -110,7 +110,7 @@ class RingTest {
     }
 
     @Test
-    fun getMarkers_secondaryMarkersAreIslamicMidnightAndLastThirdStart() {
+    fun getMarkers_secondaryMarkerIsLastThirdStart() {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
@@ -124,7 +124,7 @@ class RingTest {
         )
         val markers = getMarkers(timeline)
         val secondary = markers.filter { it.kind == "secondary" }
-        assertEquals(listOf("islamic_midnight", "last_third_start"), secondary.map { it.id })
+        assertEquals(listOf("last_third_start"), secondary.map { it.id })
     }
 
     @Test

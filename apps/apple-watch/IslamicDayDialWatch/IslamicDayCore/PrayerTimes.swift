@@ -18,7 +18,11 @@ func getPrayerTimesForDate(date: Date, location: Location) -> PrayerTimesData? {
     
     let dateComponents = DateComponents(year: year, month: month, day: day)
     let coordinates = Coordinates(latitude: location.latitude, longitude: location.longitude)
-    let params = CalculationMethod.ummAlQura.params
+    var params = CalculationMethod.ummAlQura.params
+    // Isha by twilight disappearance (per hadith), not fixed interval
+    params.ishaInterval = 0
+    params.ishaAngle = 15
+    params.shafaq = .ahmer
     
     guard let prayerTimes = PrayerTimes(
         coordinates: coordinates,

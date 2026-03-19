@@ -24,8 +24,8 @@ function assertValidSnapshot(snapshot: ComputedIslamicDay) {
 
   expect(snapshot.ring.progress).toBeGreaterThanOrEqual(0);
   expect(snapshot.ring.progress).toBeLessThanOrEqual(1);
-  expect(snapshot.ring.markers).toHaveLength(8);
-  expect(snapshot.ring.segments).toHaveLength(8);
+  expect(snapshot.ring.markers).toHaveLength(7);
+  expect(snapshot.ring.segments).toHaveLength(7);
 
   expect(snapshot.countdownMs).toBeGreaterThanOrEqual(0);
   expect(snapshot.nextTransition.id.length).toBeGreaterThan(0);

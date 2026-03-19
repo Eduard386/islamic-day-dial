@@ -20,7 +20,7 @@ export { getPrayerTimesForDate, addDays } from './prayer-times.js';
 export { getIslamicDayBounds, buildTimeline } from './day-bounds.js';
 export { getIslamicMidnight, getLastThirdStart } from './night-markers.js';
 export { getCurrentPhase, getNextTransition } from './phases.js';
-export { getCountdown } from './countdown.js';
+export { getCountdown, getCountdownTarget } from './countdown.js';
 export {
   getIslamicDayProgress,
   timestampToAngle,

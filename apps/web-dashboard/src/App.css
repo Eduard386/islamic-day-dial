@@ -104,6 +104,30 @@ body {
   margin-top: 15px;
 }
 
+.current-period-main {
+  font-weight: 600;
+  font-size: inherit;
+}
+
+/* Duha and Isha 1/2, 2/3 suffixes — lighter, less prominent than main sector names */
+.current-period-secondary {
+  font-size: 0.85em;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Isha 1/2, 2/3: keep "Isha" centered, suffix to the right */
+.current-period-isha-split {
+  display: inline-flex;
+  justify-content: center;
+  align-items: baseline;
+}
+.current-period-balance {
+  visibility: hidden;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
 .current-period-empty {
   color: transparent;
 }
@@ -132,7 +156,17 @@ body {
     0 0 24px rgba(16, 185, 129, 0.2);
 }
 
-.local-time {
+/* Isha in last third of night — deep blue neon glow (like eid highlight, but blue) */
+.current-period-isha-neon {
+  color: #3b82f6;
+  text-shadow:
+    0 0 8px rgba(59, 130, 246, 0.7),
+    0 0 16px rgba(37, 99, 235, 0.5),
+    0 0 24px rgba(30, 58, 138, 0.4);
+}
+
+.local-time,
+.countdown {
   font-size: 1.05rem;
   font-weight: 600;
   color: rgba(232, 232, 240, 0.85);

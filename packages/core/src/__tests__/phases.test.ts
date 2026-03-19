@@ -25,9 +25,9 @@ describe('getCurrentPhase', () => {
     expect(getCurrentPhase(now, timeline)).toBe('isha_to_midnight');
   });
 
-  it('returns midnight_to_last_third after Islamic midnight', () => {
-    const now = new Date('2025-03-15T21:00:00.000Z');
-    expect(getCurrentPhase(now, timeline)).toBe('midnight_to_last_third');
+  it('returns isha_to_midnight until last third start (sector Isha 1/2 removed)', () => {
+    const now = new Date('2025-03-15T21:00:00.000Z'); // between islamic midnight and last third
+    expect(getCurrentPhase(now, timeline)).toBe('isha_to_midnight');
   });
 
   it('returns last_third_to_fajr after last third start', () => {

@@ -41,7 +41,6 @@ const MARKER_DEFS: ReadonlyArray<{
 }> = [
   { id: 'maghrib', timelineKey: 'lastMaghrib', kind: 'primary' },
   { id: 'isha', timelineKey: 'isha', kind: 'primary' },
-  { id: 'islamic_midnight', timelineKey: 'islamicMidnight', kind: 'secondary' },
   { id: 'last_third_start', timelineKey: 'lastThirdStart', kind: 'secondary' },
   { id: 'fajr', timelineKey: 'fajr', kind: 'primary' },
   { id: 'sunrise', timelineKey: 'sunrise', kind: 'primary' },

@@ -46,7 +46,6 @@ data class ComputedTimeline(
 enum class IslamicPhaseId {
     MAGHRIB_TO_ISHA,
     ISHA_TO_MIDNIGHT,
-    MIDNIGHT_TO_LAST_THIRD,
     LAST_THIRD_TO_FAJR,
     FAJR_TO_SUNRISE,
     SUNRISE_TO_DHUHR,
@@ -89,8 +88,7 @@ private val MONTH_NAMES_EN = arrayOf(
 
 private val PHASE_BOUNDARIES = listOf(
     Triple(IslamicPhaseId.MAGHRIB_TO_ISHA, "lastMaghrib", "isha"),
-    Triple(IslamicPhaseId.ISHA_TO_MIDNIGHT, "isha", "islamicMidnight"),
-    Triple(IslamicPhaseId.MIDNIGHT_TO_LAST_THIRD, "islamicMidnight", "lastThirdStart"),
+    Triple(IslamicPhaseId.ISHA_TO_MIDNIGHT, "isha", "lastThirdStart"),
     Triple(IslamicPhaseId.LAST_THIRD_TO_FAJR, "lastThirdStart", "fajr"),
     Triple(IslamicPhaseId.FAJR_TO_SUNRISE, "fajr", "sunrise"),
     Triple(IslamicPhaseId.SUNRISE_TO_DHUHR, "sunrise", "dhuhr"),
@@ -101,7 +99,6 @@ private val PHASE_BOUNDARIES = listOf(
 private val MARKER_DEFS = listOf(
     Triple("maghrib", "lastMaghrib", "primary"),
     Triple("isha", "isha", "primary"),
-    Triple("islamic_midnight", "islamicMidnight", "secondary"),
     Triple("last_third_start", "lastThirdStart", "secondary"),
     Triple("fajr", "fajr", "primary"),
     Triple("sunrise", "sunrise", "primary"),
@@ -112,7 +109,11 @@ private val MARKER_DEFS = listOf(
 fun getPrayerTimesForDate(date: Date, location: Location): PrayerTimesData {
     val cal = Calendar.getInstance(TimeZone.getDefault()).apply { time = date }
     val coords = Coordinates(location.latitude, location.longitude)
-    val params = CalculationMethod.UMM_AL_QURA.getParameters()
+    val params = CalculationMethod.UMM_AL_QURA.getParameters().apply {
+        // Isha by twilight disappearance (per hadith), not fixed 90-min interval
+        ishaInterval = 0
+        ishaAngle = 15.0
+    }
     val dateComponents = com.batoulapps.adhan.data.DateComponents(
         cal.get(Calendar.YEAR),
         cal.get(Calendar.MONTH) + 1,
@@ -233,6 +234,35 @@ fun getNextTransition(now: Date, timeline: ComputedTimeline): Pair<String, Date>
     return "maghrib" to timeline.nextMaghrib
 }
 
+/** DUHA label visibility: hidden first 20 min and last 5 min of sunrise_to_dhuhr */
+private const val DUHA_LABEL_FIRST_MS = 20L * 60 * 1000
+
+/** Target for countdown based on current phase and DUHA visibility. Mirrors packages/core countdown.ts */
+fun getCountdownTarget(now: Date, timeline: ComputedTimeline): Date {
+    val t = now.time
+    val phase = getCurrentPhase(now, timeline)
+    val duhaLabelAt = timeline.sunrise.time + DUHA_LABEL_FIRST_MS
+
+    return when (phase) {
+        IslamicPhaseId.MAGHRIB_TO_ISHA -> timeline.isha
+        IslamicPhaseId.ISHA_TO_MIDNIGHT, IslamicPhaseId.LAST_THIRD_TO_FAJR ->
+            timeline.fajr
+        IslamicPhaseId.FAJR_TO_SUNRISE -> Date(duhaLabelAt)
+        IslamicPhaseId.SUNRISE_TO_DHUHR -> if (t < duhaLabelAt) Date(duhaLabelAt) else timeline.dhuhr
+        IslamicPhaseId.DHUHR_TO_ASR -> timeline.asr
+        IslamicPhaseId.ASR_TO_MAGHRIB -> timeline.nextMaghrib
+    }
+}
+
+fun formatCountdown(ms: Long): String {
+    if (ms <= 0) return "00:00:00"
+    val totalSeconds = (ms / 1000).toInt()
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return "%02d:%02d:%02d".format(hours, minutes, seconds)
+}
+
 fun getIslamicDayProgress(now: Date, lastMaghrib: Date, nextMaghrib: Date): Double {
     val total = nextMaghrib.time - lastMaghrib.time
     if (total <= 0) return 0.0
@@ -307,7 +337,8 @@ fun computeIslamicDaySnapshot(
     val hijriDate = getIslamicDayHijriDate(now, todayPT.maghrib)
     val currentPhase = getCurrentPhase(now, timeline)
     val (nextId, nextAt) = getNextTransition(now, timeline)
-    val countdownMs = (nextAt.time - now.time).coerceAtLeast(0L)
+    val countdownTarget = getCountdownTarget(now, timeline)
+    val countdownMs = (countdownTarget.time - now.time).coerceAtLeast(0L)
     val progress = getIslamicDayProgress(now, timeline.lastMaghrib, timeline.nextMaghrib)
     val markers = getMarkers(timeline)
     val segments = getRingSegments(timeline)

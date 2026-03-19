@@ -7,7 +7,6 @@ import { getMoonPhaseByHijriDay as getMoonPhase, type MoonPhaseParams } from './
 const NIGHT_PHASES: Set<IslamicPhaseId> = new Set([
   'maghrib_to_isha',
   'isha_to_midnight',
-  'midnight_to_last_third',
   'last_third_to_fajr',
 ]);
 

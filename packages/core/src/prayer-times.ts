@@ -1,12 +1,11 @@
-import { Coordinates, PrayerTimes, CalculationMethod } from 'adhan';
+import { Coordinates, PrayerTimes, CalculationMethod, Shafaq } from 'adhan';
 import type { Location, PrayerTimesData } from './types.js';
 
 /**
  * Compute prayer times for a given Gregorian date and location.
- * Uses Umm al-Qura calculation method for consistency with the Hijri calendar.
- *
- * The `date` parameter determines which day's prayers to compute —
- * adhan extracts year/month/day using local-timezone Date methods.
+ * Uses Umm al-Qura for Dhuhr/Asr/Maghrib and Hijri calendar consistency.
+ * Isha: computed by twilight disappearance (15° sun angle, Shafaq.Ahmer),
+ * per hadith: "Perform Isha when the evening twilight disappears".
  */
 export function getPrayerTimesForDate(
   date: Date,
@@ -14,6 +13,10 @@ export function getPrayerTimesForDate(
 ): PrayerTimesData {
   const coords = new Coordinates(location.latitude, location.longitude);
   const params = CalculationMethod.UmmAlQura();
+  // Isha by twilight disappearance instead of fixed 90-min interval
+  params.ishaInterval = 0;
+  params.ishaAngle = 15;
+  params.shafaq = Shafaq.Ahmer;
   const pt = new PrayerTimes(coords, date, params);
 
   return {

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   computeIslamicDaySnapshot,
+  getCountdown,
+  getCountdownTarget,
   type UserContext,
   type ComputedIslamicDay,
   type Location,
@@ -119,9 +121,9 @@ export function useIslamicDay(): DashboardState {
     return () => clearInterval(timer);
   }, [timeMode]);
 
-  const liveCountdownMs = Math.max(
-    0,
-    snapshot.nextTransition.at.getTime() - liveNow.getTime(),
+  const liveCountdownMs = getCountdown(
+    liveNow,
+    getCountdownTarget(liveNow, snapshot.timeline),
   );
 
   return {

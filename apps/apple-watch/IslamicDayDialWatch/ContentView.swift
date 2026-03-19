@@ -2,7 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var snapshot: ComputedIslamicDay?
-    
+    @State private var now = Date()
+
     var body: some View {
         Group {
             if let snap = snapshot {
@@ -16,20 +17,8 @@ struct ContentView: View {
                         Text(parts.year)
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
-                        let period = currentPeriodLabel(snapshot: snap, now: Date())
-                        if !period.isEmpty {
-                            Text(period)
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        } else {
-                            // Preserve layout height
-                            Text(" ")
-                                .font(.system(size: 9))
-                                .foregroundColor(.secondary)
-                        }
-                            .font(.system(size: 9))
-                            .foregroundColor(.secondary)
-                        Text(localTimeString)
+                        currentPeriodView(snapshot: snap, now: now)
+                        Text(formatCountdown(countdownMs(snapshot: snap)))
                             .font(.system(size: 9, design: .monospaced))
                             .foregroundColor(.secondary)
                             .padding(.top, 2)
@@ -45,29 +34,51 @@ struct ContentView: View {
         .onReceive(Timer.publish(every: 60, on: .main, in: .common).autoconnect()) { _ in
             snapshot = computeIslamicDaySnapshot()
         }
-    }
-    
-    private var localTimeString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        formatter.timeZone = TimeZone.current
-        return formatter.string(from: Date())
-    }
-    
-    private func currentPeriodLabel(snapshot: ComputedIslamicDay, now: Date) -> String {
-        if snapshot.currentPhase != .sunrise_to_dhuhr {
-            return formatCurrentPeriod(snapshot.currentPhase)
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            now = Date()
         }
-        let t = now.timeIntervalSince1970
-        let start = snapshot.timeline.sunrise.timeIntervalSince1970
-        let end = snapshot.timeline.dhuhr.timeIntervalSince1970
-        
-        let hideFirst: TimeInterval = 20 * 60
-        let hideLast: TimeInterval = 5 * 60
-        
-        if t < start + hideFirst { return "" }
-        if t > end - hideLast { return "" }
-        return formatCurrentPeriod(snapshot.currentPhase)
+    }
+
+    private func countdownMs(snapshot snap: ComputedIslamicDay) -> Int64 {
+        let target = getCountdownTarget(now: now, timeline: snap.timeline)
+        return Int64(max(0, target.timeIntervalSince(now) * 1000))
+    }
+    
+    @ViewBuilder
+    private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date) -> some View {
+        let baseFont = Font.system(size: 9)
+        let lightFont = Font.system(size: 7)
+        let baseColor = Color.secondary
+        let lightColor = Color.secondary.opacity(0.7)
+
+        if snap.currentPhase == .sunrise_to_dhuhr {
+            let t = now.timeIntervalSince1970
+            let start = snap.timeline.sunrise.timeIntervalSince1970
+            let end = snap.timeline.dhuhr.timeIntervalSince1970
+            let hideFirst: TimeInterval = 20 * 60
+            let hideLast: TimeInterval = 5 * 60
+            if t < start + hideFirst || t > end - hideLast {
+                Text(" ")
+                    .font(baseFont)
+                    .foregroundColor(baseColor)
+            } else {
+                Text("Duha")
+                    .font(lightFont)
+                    .foregroundColor(lightColor)
+            }
+        } else {
+            switch snap.currentPhase {
+            case .last_third_to_fajr:
+                Text("Isha")
+                    .font(baseFont)
+                    .foregroundColor(Color(red: 0.22, green: 0.74, blue: 0.97))
+                    .shadow(color: Color(red: 0.22, green: 0.74, blue: 0.97).opacity(0.7), radius: 4)
+            default:
+                Text(formatCurrentPeriod(snap.currentPhase))
+                    .font(baseFont)
+                    .foregroundColor(baseColor)
+            }
+        }
     }
 }
 

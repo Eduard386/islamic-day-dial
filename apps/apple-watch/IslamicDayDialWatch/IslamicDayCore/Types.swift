@@ -47,7 +47,6 @@ public struct ComputedTimeline {
 public enum IslamicPhaseId: String, CaseIterable {
     case maghrib_to_isha
     case isha_to_midnight
-    case midnight_to_last_third
     case last_third_to_fajr
     case fajr_to_sunrise
     case sunrise_to_dhuhr

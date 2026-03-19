@@ -23,7 +23,6 @@ export const SEGMENT_GRADIENTS: Record<IslamicPhaseId, GradientDef> = {
   asr_to_maghrib: g(YELLOW, BLUE_MID),
   maghrib_to_isha: g(BLUE_MID, NIGHT),
   isha_to_midnight: g(NIGHT, NIGHT),
-  midnight_to_last_third: g(NIGHT, NIGHT),
   last_third_to_fajr: g(NIGHT, NIGHT),
 };
 
@@ -38,6 +37,5 @@ export const SEGMENT_GRADIENTS_ACTIVE: Record<IslamicPhaseId, GradientDef> = {
   asr_to_maghrib: g(YELLOW_ACTIVE, BLUE_MID_ACTIVE),
   maghrib_to_isha: g(BLUE_MID_ACTIVE, NIGHT),
   isha_to_midnight: g(NIGHT, NIGHT),
-  midnight_to_last_third: g(NIGHT, NIGHT),
   last_third_to_fajr: g(NIGHT, NIGHT),
 };

@@ -31,9 +31,9 @@ class PhasesTest {
     }
 
     @Test
-    fun getCurrentPhase_returnsMidnightToLastThirdAfterIslamicMidnight() {
-        val now = Date(1742070000000L) // 21:00
-        assertEquals(IslamicPhaseId.MIDNIGHT_TO_LAST_THIRD, getCurrentPhase(now, timeline))
+    fun getCurrentPhase_returnsIshaToMidnightUntilLastThirdStart() {
+        val now = Date(1742070000000L) // 21:00 — between islamic midnight and last third
+        assertEquals(IslamicPhaseId.ISHA_TO_MIDNIGHT, getCurrentPhase(now, timeline))
     }
 
     @Test

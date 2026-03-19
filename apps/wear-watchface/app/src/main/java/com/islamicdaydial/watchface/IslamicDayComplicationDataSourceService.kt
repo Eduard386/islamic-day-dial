@@ -6,6 +6,8 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.islamicdaydial.watchface.core.Location
 import com.islamicdaydial.watchface.core.computeIslamicDaySnapshot
+import com.islamicdaydial.watchface.core.formatCountdown
+import com.islamicdaydial.watchface.core.getCountdownTarget
 import java.util.Date
 import java.util.TimeZone
 import kotlinx.coroutines.Dispatchers
@@ -44,11 +46,15 @@ class IslamicDayComplicationDataSourceService : SuspendingComplicationDataSource
     private fun buildHijriShortText(location: Location, now: java.util.Date, tz: String): ComplicationData {
         val snapshot = computeIslamicDaySnapshot(now, location, tz)
         val h = snapshot.hijriDate
-        val text = "${h.day} ${h.monthNameEn}"
+        val countdownTarget = getCountdownTarget(now, snapshot.timeline)
+        val countdownMs = (countdownTarget.time - now.time).coerceAtLeast(0L)
+        val countdownStr = formatCountdown(countdownMs)
         return androidx.wear.watchface.complications.data.ShortTextComplicationData.Builder(
-            text = androidx.wear.watchface.complications.data.PlainComplicationText.Builder(text).build(),
-            contentDescription = androidx.wear.watchface.complications.data.PlainComplicationText.Builder("Hijri date: $text").build()
-        ).build()
+            text = androidx.wear.watchface.complications.data.PlainComplicationText.Builder(countdownStr).build(),
+            contentDescription = androidx.wear.watchface.complications.data.PlainComplicationText.Builder("Countdown: $countdownStr").build()
+        )
+            .setTitle(androidx.wear.watchface.complications.data.PlainComplicationText.Builder("${h.day} ${h.monthNameEn}").build())
+            .build()
     }
 
     private fun buildRingProgress(location: Location, now: java.util.Date, tz: String): ComplicationData {
