@@ -16,7 +16,7 @@ const PRIMARY_MARKER_IDS = new Set<string>(['fajr', 'dhuhr', 'asr', 'maghrib', '
 /** Secondary: Sunrise, Midnight, Last 3rd — very short strokes */
 const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'last_third_start']);
 
-const MARKER_STROKE = 'rgba(200, 198, 220, 0.8)';
+const MARKER_STROKE = '#FFF8E7';
 
 /** Gap segments + Isha group: all use same dark color */
 const GAP_SEGMENT_IDS = new Set<string>(['last_third_to_fajr']);
@@ -167,23 +167,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
         const isSecondary = SECONDARY_MARKER_IDS.has(m.id);
         const inner = polarToXY(cx, cy, ringInner, m.angleDeg);
 
-        if (isPrimary) {
-          const tickLen = size * 0.032;
-          const outer = polarToXY(cx, cy, ringInner - tickLen, m.angleDeg);
-          return (
-            <line
-              key={m.id}
-              x1={inner.x}
-              y1={inner.y}
-              x2={outer.x}
-              y2={outer.y}
-              stroke={MARKER_STROKE}
-              strokeWidth={1.8}
-              strokeLinecap="round"
-            />
-          );
-        }
-        if (isSecondary) {
+        if (isPrimary || isSecondary) {
           const tickLen = size * 0.014;
           const outer = polarToXY(cx, cy, ringInner - tickLen, m.angleDeg);
           return (
