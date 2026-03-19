@@ -27,15 +27,6 @@ const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_midnight', 'last_third_t
 /** When in any of these 2 night sectors, highlight both */
 const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
 
-/** Segments needing fixed light glow (dark gradients or gap) — otherwise midColor is too dark */
-const LIGHT_GLOW_SEGMENTS = new Set<string>([
-  'maghrib_to_isha',
-  'isha_to_midnight',
-  'fajr_to_sunrise',
-  'asr_to_maghrib',
-  'last_third_to_fajr',
-]);
-
 const MARKER_R = 11.5;
 
 function getDisplaySegments(
@@ -74,6 +65,7 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
   const { ring, currentPhase } = snapshot;
   const progressAngle = ring.progress * 360;
   const displaySegments = getDisplaySegments(ring.segments, currentPhase);
+  const inIshaSector = NIGHT_SECTORS_GROUP.has(currentPhase);
 
   return (
     <svg
@@ -83,13 +75,13 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
       style={{ display: 'block' }}
     >
       <defs>
-        <filter id="glow-active" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <CurrentMarkerDefs r={MARKER_R} />
+        <filter id="glow-ish" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation="4" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <CurrentMarkerDefs r={MARKER_R} />
         {/* Segment gradients — direction from start to end of arc (Isha arcs use solid dark) */}
         {displaySegments
           .filter((s) => !s.isGap)
@@ -115,31 +107,25 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           })}
       </defs>
 
-      {/* Halo — active segment; use fixed light color for dark/gap segments */}
-      {displaySegments
-        .filter((s) => s.isActive)
-        .map((seg) => {
-          const grad = SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId];
-          const isNightSegment = LIGHT_GLOW_SEGMENTS.has(seg.id) || seg.isGap || !grad;
-          const glowColor = isNightSegment
-            ? 'rgba(180, 160, 220, 1)'
-            : grad.stops[Math.floor(grad.stops.length / 2)]?.color ?? grad.stops[0]!.color;
-          const glowOpacity = isNightSegment ? 0.45 : 0.28;
-          const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
-          if (!path) return null;
-          return (
-            <g key={`glow-${seg.id}`} filter="url(#glow-active)" opacity={glowOpacity}>
-              <path
-                d={path}
-                fill="none"
-                stroke={glowColor}
-                strokeWidth={ringStroke + 6}
-                strokeLinecap="butt"
-              />
-            </g>
-          );
-        })}
-
+      {/* Isha glow only: keep ring bright, but add neon halo when marker is inside Isha sectors */}
+      {inIshaSector &&
+        displaySegments
+          .filter((seg) => NIGHT_SECTORS_GROUP.has(seg.id))
+          .map((seg) => {
+            const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
+            if (!path) return null;
+            return (
+              <g key={`glow-ish-${seg.id}`} filter="url(#glow-ish)" opacity={0.35}>
+                <path
+                  d={path}
+                  fill="none"
+                  stroke="rgba(59, 130, 246, 1)"
+                  strokeWidth={ringStroke + 6}
+                  strokeLinecap="butt"
+                />
+              </g>
+            );
+          })}
 
       {/* Segments — gradients, inactive dimmer; Isha arcs + gaps = same dark color */}
       {displaySegments.map((seg) => {
