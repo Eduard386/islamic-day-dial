@@ -16,11 +16,11 @@ struct ContentView: View {
                             .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : .primary)
                         Text(parts.year)
                             .font(.system(size: 10))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Colors.ivory)
                         currentPeriodView(snapshot: snap, now: now)
                         Text(formatCountdown(countdownMs(snapshot: snap)))
                             .font(.system(size: 9, design: .monospaced))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Colors.ivory)
                             .padding(.top, 2)
                     }
                 }
@@ -47,9 +47,6 @@ struct ContentView: View {
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date) -> some View {
         let baseFont = Font.system(size: 9)
-        let lightFont = Font.system(size: 7)
-        let baseColor = Color.secondary
-        let lightColor = Color.secondary.opacity(0.7)
 
         if snap.currentPhase == .sunrise_to_dhuhr {
             let t = now.timeIntervalSince1970
@@ -60,11 +57,11 @@ struct ContentView: View {
             if t < start + hideFirst || t > end - hideLast {
                 Text(" ")
                     .font(baseFont)
-                    .foregroundColor(baseColor)
+                    .foregroundColor(Colors.ivory)
             } else {
                 Text("Duha")
-                    .font(lightFont)
-                    .foregroundColor(lightColor)
+                    .font(baseFont.weight(.light))
+                    .foregroundColor(Colors.ivory)
             }
         } else {
             switch snap.currentPhase {
@@ -76,7 +73,7 @@ struct ContentView: View {
             default:
                 Text(formatCurrentPeriod(snap.currentPhase))
                     .font(baseFont)
-                    .foregroundColor(baseColor)
+                    .foregroundColor(Colors.ivory)
             }
         }
     }

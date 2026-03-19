@@ -11,6 +11,11 @@ let YELLOW = Color(red: 0.92, green: 0.70, blue: 0.03)
 
 let MARKER_STROKE = Color(red: 0.78, green: 0.78, blue: 0.86)
 
+/// Ivory for sector names and countdown
+enum Colors {
+    static let ivory = Color(red: 0.96, green: 0.94, blue: 0.88)
+}
+
 /// Segment colors for watch (simplified). All 3 Isha arcs = same dark color.
 func segmentColor(phase: IslamicPhaseId, isActive: Bool) -> Color {
     let ishaDark: Set<IslamicPhaseId> = [.isha_to_midnight, .last_third_to_fajr]
