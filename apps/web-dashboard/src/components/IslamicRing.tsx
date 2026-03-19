@@ -16,7 +16,7 @@ const PRIMARY_MARKER_IDS = new Set<string>(['fajr', 'dhuhr', 'asr', 'maghrib', '
 /** Secondary: Sunrise, Midnight, Last 3rd — very short strokes */
 const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'last_third_start']);
 
-const MARKER_STROKE = '#FFF8E7';
+const MARKER_STROKE = '#fbeccb';
 
 /** Gap segments + Isha group: all use same dark color */
 const GAP_SEGMENT_IDS = new Set<string>(['last_third_to_fajr']);

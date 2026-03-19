@@ -93,10 +93,31 @@ body {
   --sector-top: 55px;
   --date-top: 100px;
   --countdown-top: 165px;
+  --ring-text: #fbeccb;
   position: relative;
   width: 220px;
   height: 212px; /* inner diameter for 420 dial: 0.25125 * 420 * 2 ≈ 211 */
   padding: 0;
+}
+
+.center-info-abs .current-period:not(.current-period-empty) {
+  color: var(--ring-text);
+}
+
+.center-info-abs .current-period-secondary {
+  color: var(--ring-text);
+}
+
+.center-info-abs .hijri-date-sector-style {
+  color: var(--ring-text);
+}
+
+.center-info-abs .hijri-year-sector-style {
+  color: var(--ring-text);
+}
+
+.center-info-abs .countdown {
+  color: var(--ring-text);
 }
 
 .center-info-abs > .current-period,
