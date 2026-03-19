@@ -100,7 +100,7 @@ body {
   padding: 0;
 }
 
-.center-info-abs .current-period:not(.current-period-empty) {
+.center-info-abs .current-period:not(.current-period-empty):not(.current-period-isha-neon) {
   color: var(--ring-text);
 }
 
@@ -108,11 +108,11 @@ body {
   color: var(--ring-text);
 }
 
-.center-info-abs .hijri-date-sector-style {
+.center-info-abs .hijri-date-sector-style:not(.eid-date) {
   color: var(--ring-text);
 }
 
-.center-info-abs .hijri-year-sector-style {
+.center-info-abs .hijri-year-sector-style:not(.eid-date) {
   color: var(--ring-text);
 }
 
