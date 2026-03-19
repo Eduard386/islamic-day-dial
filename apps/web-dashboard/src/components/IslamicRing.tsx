@@ -29,6 +29,21 @@ const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_midnight', 'last_third_to_
 
 const MARKER_R = 11.5;
 
+/** Last third breathing: 2 cycles per 10s = 5s per cycle */
+const LAST_THIRD_BREATHE = {
+  duration: 5,
+  blur: 10,
+  strokeWidth: 45,
+  color: 'rgba(3, 99, 255, 0.9)',
+};
+
+/** Glow: blur (сила), strokeWidth (ширина), opacity, color */
+const ISHA_GLOW = { blur: 4, opacity: 0.35, strokeWidth: 6, color: 'rgba(59, 130, 246, 1)' };
+/** Last third: peakOpacity — максимальная яркость при нарастании (0–1) */
+const LAST_THIRD_GLOW = { blur: 6, opacity: 0.35, strokeWidth: 10, color: 'rgba(59, 130, 246, 1)', peakOpacity: 0.7 };
+/** Скорость мерцания glow Last 3rd (секунды на полный цикл ISHA→ярко→ISHA) */
+const LAST_THIRD_GLOW_PULSE_DURATION = 3;
+
 function getDisplaySegments(
   segments: RingSegment[],
   currentPhase: IslamicPhaseId,
@@ -77,7 +92,13 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
       <defs>
         <CurrentMarkerDefs r={MARKER_R} />
         <filter id="glow-ish" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
-          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feGaussianBlur stdDeviation={ISHA_GLOW.blur} result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+          </feMerge>
+        </filter>
+        <filter id="glow-last-third" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+          <feGaussianBlur stdDeviation={LAST_THIRD_GLOW.blur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
@@ -107,6 +128,31 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           })}
       </defs>
 
+      {/* Last third: soft breathing halo when marker is in this sector */}
+      {currentPhase === 'last_third_to_fajr' &&
+        (() => {
+          const seg = displaySegments.find((s) => s.id === 'last_third_to_fajr');
+          if (!seg) return null;
+          const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
+          if (!path) return null;
+          return (
+            <g
+              key="breathing-last-third"
+              filter="url(#glow-last-third)"
+              className="last-third-breathe"
+              style={{ ['--last-third-breathe-duration' as string]: `${LAST_THIRD_BREATHE.duration}s` }}
+            >
+              <path
+                d={path}
+                fill="none"
+                stroke={LAST_THIRD_BREATHE.color}
+                strokeWidth={LAST_THIRD_BREATHE.strokeWidth}
+                strokeLinecap="butt"
+              />
+            </g>
+          );
+        })()}
+
       {/* Isha glow only: keep ring bright, but add neon halo when marker is inside Isha sectors */}
       {inIshaSector &&
         displaySegments
@@ -114,15 +160,29 @@ export function IslamicRing({ snapshot, size = 420 }: Props) {
           .map((seg) => {
             const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
             if (!path) return null;
+            const isLastThird = seg.id === 'last_third_to_fajr';
+            if (isLastThird) {
+              return (
+                <g
+                  key={`glow-ish-${seg.id}`}
+                  className="last-third-glow-pulse"
+                  style={{
+                    ['--last-third-glow-pulse-duration' as string]: `${LAST_THIRD_GLOW_PULSE_DURATION}s`,
+                    ['--last-third-glow-peak-opacity' as string]: String(LAST_THIRD_GLOW.peakOpacity ?? 0.7),
+                  }}
+                >
+                  <g filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity} className="last-third-glow-base">
+                    <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
+                  </g>
+                  <g filter="url(#glow-last-third)" className="last-third-glow-peak">
+                    <path d={path} fill="none" stroke={LAST_THIRD_GLOW.color} strokeWidth={ringStroke + LAST_THIRD_GLOW.strokeWidth} strokeLinecap="butt" />
+                  </g>
+                </g>
+              );
+            }
             return (
-              <g key={`glow-ish-${seg.id}`} filter="url(#glow-ish)" opacity={0.35}>
-                <path
-                  d={path}
-                  fill="none"
-                  stroke="rgba(59, 130, 246, 1)"
-                  strokeWidth={ringStroke + 6}
-                  strokeLinecap="butt"
-                />
+              <g key={`glow-ish-${seg.id}`} filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity}>
+                <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
               </g>
             );
           })}

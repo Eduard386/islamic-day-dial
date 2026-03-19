@@ -37,7 +37,7 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
       return <span className="current-period-secondary">{periodLabel}</span>;
     }
     if (phase === 'last_third_to_fajr') {
-      return <span className="current-period-isha-neon">{periodLabel}</span>;
+      return <span className="current-period-main">{periodLabel}</span>;
     }
     return <span className="current-period-main">{periodLabel}</span>;
   })();
