@@ -2,12 +2,13 @@ import type { IslamicPhaseId, HijriDate } from '@islamic-day-dial/core';
 import { getMoonPhaseByHijriDay as getMoonPhase, type MoonPhaseParams } from './moon-phases.js';
 
 /**
- * Night period: between Maghrib and Fajr (sunset to dawn).
+ * Night period: Maghrib→Fajr + Fajr sector (moon shown instead of black marker).
  */
 const NIGHT_PHASES: Set<IslamicPhaseId> = new Set([
   'maghrib_to_isha',
   'isha_to_midnight',
   'last_third_to_fajr',
+  'fajr_to_sunrise',
 ]);
 
 export function isNightPeriod(currentPhase: IslamicPhaseId): boolean {

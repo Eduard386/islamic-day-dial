@@ -22,6 +22,7 @@ const MOON_ONLY_PHASES = new Set<IslamicPhaseId>([
   'maghrib_to_isha',
   'isha_to_midnight',
   'last_third_to_fajr',
+  'fajr_to_sunrise',
 ]);
 
 export function CurrentMarker({ x, y, r, state, currentPhase }: Props) {

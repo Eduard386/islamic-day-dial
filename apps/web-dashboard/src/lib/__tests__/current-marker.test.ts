@@ -15,8 +15,8 @@ describe('isNightPeriod', () => {
     expect(isNightPeriod('last_third_to_fajr')).toBe(true);
   });
 
-  it('returns false for fajr_to_sunrise', () => {
-    expect(isNightPeriod('fajr_to_sunrise')).toBe(false);
+  it('returns true for fajr_to_sunrise (moon shown instead of black marker)', () => {
+    expect(isNightPeriod('fajr_to_sunrise')).toBe(true);
   });
 
   it('returns false for sunrise_to_dhuhr', () => {
