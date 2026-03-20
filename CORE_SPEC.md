@@ -1,6 +1,6 @@
 # Islamic Day Dial — Core Specification
 
-Single source of truth for `packages/core` (TypeScript) and `apps/apple-watch` (Swift). When changing core logic, update both and verify web + watch.
+**Source of truth for visual behavior**: `apps/web-dashboard` (Vite + React). Android (Wear OS) and iOS (Apple Watch) apps should match the web dashboard. When changing core logic or ring visuals, update web first, then sync to other platforms.
 
 ## Phases (Islamic Day Segments)
 
@@ -29,17 +29,26 @@ Single source of truth for `packages/core` (TypeScript) and `apps/apple-watch` (
   - Maghrib → до Isha
   - Isha → до Fajr
 
+## Mirror Segment (Web)
+
+From Fajr, a segment of the same **angular span** as Asr→Isha uses a mirrored gradient: black → yellow → blue. This creates visual symmetry: evening (Asr→Isha) fades red→black; morning (Fajr→Fajr+span) fades black→yellow→blue. Span in degrees: `(360 - asrAngle) + ishaAngle`.
+
 ## Special Dates (Eid)
 
 - **1 Shawwal (10/1)**: display "EID AL-FITR"
 - **10 Dhul Hijjah (12/10)**: display "EID AL-ADHA"
 
-## Colors (Web)
+## Ring Colors (Web Dashboard — Source of Truth)
 
-- Gap segments: `#0a0a18`
-- Night: `#0a0a12`
-- Blue mid: `#3b82a8` / active `#5ba3d4`
-- Yellow: `#eab308` / active `#fde047`
+Defined in `apps/web-dashboard/src/lib/segment-gradients.ts`.
+
+- **Night** (isha_to_midnight, last_third_to_fajr): `#000000`
+- **Maghrib → Isha**: red sunset `#C84A3A` → black (smooth gradient)
+- **Asr → Maghrib**: blue `#7CB8E8` → red sunset
+- **Mirror segment** (from Fajr, same angular span as Asr→Isha): black → yellow → blue (smooth fade out of night)
+- **Fajr → Sunrise** (fallback when outside mirror): black → dark blue → `#7CB8E8`
+- **Sunrise → Dhuhr**: flat blue `#7CB8E8`
+- **Dhuhr → Asr**: flat blue `#7CB8E8`
 
 ## Dependencies
 

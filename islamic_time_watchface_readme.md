@@ -1278,17 +1278,25 @@ islamic-day-dial/
 
 ### 27.2. Кольцо (IslamicRing)
 
+**Source of truth**: `apps/web-dashboard`. Android и iOS должны соответствовать веб-морде.
+
 - **Maghrib** сверху (0°), направление по часовой стрелке.
-- **8 сегментов**: Maghrib→Isha, Isha→Midnight, Midnight→Last 3rd, Last 3rd→Fajr, Fajr→Sunrise, Sunrise→Dhuhr, Dhuhr→Asr, Asr→Maghrib.
-- **Gap-сегменты** (Midnight→Last 3rd, Last 3rd→Fajr) — тёмный цвет `#0a0a18`, без градиента.
-- **Градиенты** — плавный переход по кругу: каждый сегмент начинается цветом конца предыдущего.
-- **Цветовая схема**: Isha→Midnight тёмнеет до DARK; Fajr DARK→голубой→Sunrise; Sunrise голубой→жёлтый→Dhuhr; Dhuhr жёлтый→зелёный→Asr; Asr зелёный→пыльно-розовый→Maghrib; Maghrib пыльно-розовый→mauve→Isha.
-- **Halo** — только у активного сегмента, opacity 0.4.
+- **7 сегментов**: maghrib_to_isha, isha_to_midnight, last_third_to_fajr, fajr_to_sunrise, sunrise_to_dhuhr, dhuhr_to_asr, asr_to_maghrib.
+- **Рендер**: 480 sub-arcs с solid цветами (sweep), без полос и швов.
+- **Цветовая схема** (`segment-gradients.ts`):
+  - **Ночь** (isha_to_midnight, last_third_to_fajr): чёрный `#000000`.
+  - **Maghrib → Isha**: красный закат `#C84A3A` → чёрный (плавный градиент).
+  - **Asr → Maghrib**: голубой `#7CB8E8` → красный закат.
+  - **Mirror segment** (от Fajr, та же угловая длина что Asr→Isha): чёрный → жёлтый → голубой (зеркало вечернего перехода).
+  - **Fajr → Sunrise** (fallback): чёрный → тёмно-голубой → `#7CB8E8`.
+  - **Sunrise → Dhuhr**: ровный голубой `#7CB8E8`.
+  - **Dhuhr → Asr**: ровный голубой.
+- **Jumu'ah glow** (пятница): подсветка DUHA + MIDDAY + DHUHR при маркере в этих секторах.
 
 ### 27.3. Маркеры на кольце
 
 - **Primary** (короткие штрихи): Fajr, Dhuhr, Asr, Maghrib, Isha.
-- **Secondary** (очень короткие штрихи): Sunrise, Midnight, Last 3rd.
+- **Secondary** (короткие штрихи): Sunrise, Last Third Start, Duha Start, Duha End.
 - Цвет приглушённый: `rgba(200, 198, 220, 0.8)`.
 - Все от внутреннего края кольца внутрь круга.
 - Подписей на кольце нет.
@@ -1309,8 +1317,7 @@ islamic-day-dial/
 
 - `apps/web-dashboard/src/components/IslamicRing.tsx` — рендер кольца, сегментов, маркеров, шара.
 - `apps/web-dashboard/src/components/CenterInfo.tsx` — центр: период, дата, время.
-- `apps/web-dashboard/src/lib/segment-gradients.ts` — градиенты и anchor-цвета.
-- `apps/web-dashboard/src/lib/colors.ts` — COLORS, ringGap.
+- `apps/web-dashboard/src/lib/segment-gradients.ts` — палитры градиентов, mirror segment, `getSweepSubArcs`, `getSegmentGradientStops`.
 - `packages/core/` — типы, Hijri, prayer times, day bounds, phases, ring geometry, `computeIslamicDaySnapshot()`.
 
 ### 27.7. Запуск
