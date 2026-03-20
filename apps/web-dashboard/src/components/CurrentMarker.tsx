@@ -7,9 +7,9 @@ type Props = {
   state: CurrentMarkerState;
 };
 
-/** Minimal colors: muted, no heavy 3D */
-const DISK_FILL = '#1a1a2e';
-const DISK_STROKE = '#2a2a4a';
+/** Absolutely black — blends with night segments; only moon visible Maghrib→Fajr */
+const DISK_FILL = '#000000';
+const DISK_STROKE = '#000000';
 const MOON_FILL = '#e8dcc8';
 const MOON_INNER_R = 0.82; /** Moon circles radius as fraction of disk r */
 
