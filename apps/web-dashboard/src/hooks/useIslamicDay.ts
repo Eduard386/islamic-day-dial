@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   computeIslamicDaySnapshot,
   getCountdown,
@@ -75,27 +75,25 @@ export function useIslamicDay(): DashboardState {
     return () => { cancelled = true; };
   }, []);
 
-  const computeSnapshot = useCallback((): ComputedIslamicDay => {
-    const now = getEffectiveNow(timeMode);
-    const ctx: UserContext = { now, location, timezone };
-    return computeIslamicDaySnapshot(ctx);
-  }, [location, timezone, timeMode]);
-
-  const [snapshot, setSnapshot] = useState(computeSnapshot);
+  const effectiveNow = useMemo(() => getEffectiveNow(timeMode), [timeMode]);
   const [liveNow, setLiveNow] = useState(() => getEffectiveNow(timeMode));
 
-  // Full snapshot recompute every 60s (prayer times via adhan are the heavy part)
-  useEffect(() => {
-    setSnapshot(computeSnapshot());
-    const timer = setInterval(() => setSnapshot(computeSnapshot()), SNAPSHOT_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [computeSnapshot]);
+  // Snapshot: sync when timeMode changes (Days slider), interval for live mode
+  const snapshot = useMemo(() => {
+    const now = timeMode.kind === 'live' ? liveNow : effectiveNow;
+    const ctx: UserContext = { now, location, timezone };
+    return computeIslamicDaySnapshot(ctx);
+  }, [location, timezone, timeMode, effectiveNow, liveNow]);
 
-  // Lightweight tick every 1s — updates phase, marker, countdown
+  // When timeMode changes (e.g. Days slider), sync liveNow immediately
   useEffect(() => {
-    const tick = () => setLiveNow(getEffectiveNow(timeMode));
-    tick();
-    const timer = setInterval(tick, TICK_INTERVAL_MS);
+    setLiveNow(getEffectiveNow(timeMode));
+  }, [timeMode]);
+
+  // Live mode: tick every 60s to refresh progress, phase, countdown
+  useEffect(() => {
+    if (timeMode.kind !== 'live') return;
+    const timer = setInterval(() => setLiveNow(getEffectiveNow(timeMode)), TICK_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [timeMode]);
 

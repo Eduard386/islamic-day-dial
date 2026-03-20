@@ -33,7 +33,7 @@ const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_midnight', 'last_third_t
 /** When in any of these 2 night sectors, highlight both */
 const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
 
-const MARKER_R = 11.5;
+const MARKER_R = 14;
 
 /** Last third breathing: 2 cycles per 10s = 5s per cycle */
 const LAST_THIRD_BREATHE = {
@@ -383,6 +383,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             y={pos.y}
             r={MARKER_R}
             state={markerState}
+            currentPhase={currentPhase}
           />
         );
       })()}
