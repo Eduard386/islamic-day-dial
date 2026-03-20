@@ -5,8 +5,7 @@ import {
   type RingSegment,
 } from '@islamic-day-dial/core';
 import { describeArc, polarToXY } from '../lib/geometry';
-import { COLORS } from '../lib/colors';
-import { SEGMENT_GRADIENTS, SEGMENT_GRADIENTS_ACTIVE } from '../lib/segment-gradients';
+import { getSegmentGradientStops, getSweepSubArcs, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 
@@ -90,20 +89,14 @@ function getDisplaySegments(
   id: string;
   startAngleDeg: number;
   endAngleDeg: number;
-  isActive: boolean;
   isGap: boolean;
 }> {
-  const inNightGroup = NIGHT_SECTORS_GROUP.has(currentPhase);
   return segments.map((seg) => {
     const isGap = GAP_SEGMENT_IDS.has(seg.id) || ISHA_DARK_SEGMENT_IDS.has(seg.id);
-    const isActive =
-      seg.id === currentPhase ||
-      (inNightGroup && NIGHT_SECTORS_GROUP.has(seg.id));
     return {
       id: seg.id,
       startAngleDeg: seg.startAngleDeg,
       endAngleDeg: seg.endAngleDeg,
-      isActive,
       isGap,
     };
   });
@@ -117,9 +110,22 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
   const ringR = ringInner + ringStroke / 2;
 
   const { ring, currentPhase } = snapshot;
+  const { timeline } = snapshot;
   const progressAngle = ring.progress * 360;
   const displaySegments = getDisplaySegments(ring.segments, currentPhase);
   const inIshaSector = NIGHT_SECTORS_GROUP.has(currentPhase);
+
+  const mirrorSegment: MirrorSegment | null = (() => {
+    const asrMarker = ring.markers.find((m) => m.id === 'asr');
+    const ishaMarker = ring.markers.find((m) => m.id === 'isha');
+    const fajrMarker = ring.markers.find((m) => m.id === 'fajr');
+    if (!asrMarker || !ishaMarker || !fajrMarker) return null;
+    const asrAngle = asrMarker.angleDeg;
+    const ishaAngle = ishaMarker.angleDeg;
+    const fajrAngle = fajrMarker.angleDeg;
+    const asrToIshaSpanDeg = (360 - asrAngle) + ishaAngle;
+    return { startAngleDeg: fajrAngle, spanDeg: asrToIshaSpanDeg };
+  })();
 
   const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase);
   const duhaStartMarker = ring.markers.find((m) => m.id === 'duha_start');
@@ -128,9 +134,9 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
   const sunriseToDhuhrSeg = displaySegments.find((s) => s.id === 'sunrise_to_dhuhr');
   const dhuhrToAsrSeg = displaySegments.find((s) => s.id === 'dhuhr_to_asr');
   const jumuGradSunriseDhuhr =
-    sunriseToDhuhrSeg != null ? `grad-sunrise_to_dhuhr-${sunriseToDhuhrSeg.isActive}` : null;
+    sunriseToDhuhrSeg != null ? 'grad-sunrise_to_dhuhr' : null;
   const jumuGradDhuhrAsr =
-    dhuhrToAsrSeg != null ? `grad-dhuhr_to_asr-${dhuhrToAsrSeg.isActive}` : null;
+    dhuhrToAsrSeg != null ? 'grad-dhuhr_to_asr' : null;
 
   return (
     <svg
@@ -165,24 +171,24 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        {/* Segment gradients — direction from start to end of arc (Isha arcs use solid dark) */}
+        {/* Gradients for Jumu'ah glow only */}
         {displaySegments
-          .filter((s) => !s.isGap)
+          .filter((s) => s.id === 'sunrise_to_dhuhr' || s.id === 'dhuhr_to_asr')
           .map((seg) => {
-            const grad = SEGMENT_GRADIENTS_ACTIVE[seg.id as IslamicPhaseId];
+            const stops = getSegmentGradientStops(seg.id as IslamicPhaseId);
             const start = polarToXY(cx, cy, ringR, seg.startAngleDeg);
             const end = polarToXY(cx, cy, ringR, seg.endAngleDeg);
             return (
               <linearGradient
-                key={`grad-${seg.id}-${seg.isActive}`}
-                id={`grad-${seg.id}-${seg.isActive}`}
+                key={`grad-${seg.id}`}
+                id={`grad-${seg.id}`}
                 x1={start.x}
                 y1={start.y}
                 x2={end.x}
                 y2={end.y}
                 gradientUnits="userSpaceOnUse"
               >
-                {grad.stops.map((s, i) => (
+                {stops.map((s, i) => (
                   <stop key={i} offset={`${s.offset}%`} stopColor={s.color} />
                 ))}
               </linearGradient>
@@ -320,22 +326,18 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
           );
         })()}
 
-      {/* Segments — gradients, inactive dimmer; Isha arcs + gaps = same dark color */}
-      {displaySegments.map((seg) => {
-        const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
+      {/* Sweep: sub-arcs with solid colors — follows the arc, no triangle, no seams */}
+      {getSweepSubArcs(displaySegments, mirrorSegment).map((sub, i) => {
+        const path = describeArc(cx, cy, ringR, sub.startAngleDeg, sub.endAngleDeg);
         if (!path) return null;
-        const useDarkColor = seg.isGap;
-        const opacity = 1;
-        const stroke = useDarkColor ? COLORS.ringGap : `url(#grad-${seg.id}-${seg.isActive})`;
         return (
           <path
-            key={seg.id}
+            key={`sweep-${i}`}
             d={path}
             fill="none"
-            stroke={stroke}
+            stroke={sub.color}
             strokeWidth={ringStroke}
             strokeLinecap="butt"
-            opacity={opacity}
           />
         );
       })}

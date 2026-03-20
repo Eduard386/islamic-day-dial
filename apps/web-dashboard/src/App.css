@@ -307,16 +307,14 @@ body {
 
 /* ---------- Controls ---------- */
 
-.controls,
-.debug-panel {
+.controls {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px;
 }
 
-.controls h3,
-.debug-panel h3 {
+.controls h3 {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--accent);
@@ -325,8 +323,7 @@ body {
   margin-bottom: 12px;
 }
 
-.controls h4,
-.debug-panel h4 {
+.controls h4 {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
@@ -428,33 +425,3 @@ body {
   min-width: 4em;
 }
 
-/* ---------- Debug Panel ---------- */
-
-.debug-panel {
-  font-size: 0.75rem;
-}
-
-.debug-panel section {
-  margin-bottom: 10px;
-}
-
-.debug-panel dl {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 2px 12px;
-}
-
-.debug-panel dt {
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.debug-panel dd {
-  color: var(--text);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.debug-panel span {
-  display: contents;
-}

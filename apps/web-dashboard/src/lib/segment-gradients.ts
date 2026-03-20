@@ -1,41 +1,207 @@
 import type { IslamicPhaseId } from '@islamic-day-dial/core';
 
-type GradientDef = { stops: Array<{ offset: number; color: string }> };
+export type GradientStop = { offset: number; color: string };
 
-function g(start: string, end: string): GradientDef {
-  return { stops: [{ offset: 0, color: start }, { offset: 100, color: end }] };
+/**
+ * Sky colors for Islamic day ring.
+ * Asr, Maghrib, Isha — unchanged.
+ * Mirror segment: from Fajr for (Asr→Isha) duration, gradient red→blue (reverse of Asr→Isha).
+ * Rest of Fajr/Sunrise/Duha: black→blue then flat blue.
+ */
+const NIGHT_BLACK = '#000000';
+const SUNSET_RED = '#C84A3A';
+const DHUHR_END_BLUE = '#7CB8E8';
+
+/** Mirror of Asr→Isha: black → yellow → blue (smooth fade out of night) */
+export const MIRROR_GRADIENT_PALETTE = [
+  NIGHT_BLACK,
+  '#080808',
+  '#181408',
+  '#282008',
+  '#383008',
+  '#484018',
+  '#585028',
+  '#706038',
+  '#887040',
+  '#A08048',
+  '#B89050',
+  '#D0A858',
+  '#E8C060',
+  '#E8D070',
+  '#D8D080',
+  '#C8D090',
+  '#B8D0A0',
+  '#A8D0B0',
+  '#98D0C0',
+  '#88D0D0',
+  '#78D0E0',
+  '#70C8E4',
+  '#74C4E8',
+  DHUHR_END_BLUE,
+];
+
+/** Maghrib → Isha: red sunset → black night (unchanged) */
+const MAGHRIB_PALETTE = [
+  SUNSET_RED,
+  '#B04038',
+  '#983634',
+  '#802C30',
+  '#68242C',
+  '#501C28',
+  '#381420',
+  '#200C18',
+  '#080408',
+  NIGHT_BLACK,
+];
+
+/** Fajr → Sunrise: black → dark blue → DHUHR_END_BLUE (pure blue path, no purple) */
+const FAJR_SUNRISE_PALETTE = [
+  NIGHT_BLACK,
+  '#000810',
+  '#001020',
+  '#081830',
+  '#102040',
+  '#183050',
+  '#204060',
+  '#285070',
+  '#306080',
+  '#387090',
+  '#4080A0',
+  '#4890B0',
+  '#50A0C0',
+  '#58B0D0',
+  '#60B8E0',
+  DHUHR_END_BLUE,
+];
+
+/** Sunrise → Duha → Midday → Dhuhr: flat blue */
+const SUNRISE_TO_DHUHR_PALETTE = [DHUHR_END_BLUE];
+
+/** Dhuhr → Asr: blue bridge */
+const DHUHR_ASR_PALETTE = [DHUHR_END_BLUE];
+
+/** Asr: blue (as Dhuhr end) → red sunset Maghrib */
+const ASR_PALETTE = [
+  DHUHR_END_BLUE,
+  '#78B0E0',
+  '#80A8D8',
+  '#88A0D0',
+  '#9098C8',
+  '#9890C0',
+  '#A088B8',
+  '#A880A8',
+  '#B07898',
+  '#B87088',
+  '#C06878',
+  '#C86068',
+  '#D05858',
+  '#D85048',
+  SUNSET_RED,
+];
+
+function getPaletteForSegment(id: IslamicPhaseId): string[] {
+  switch (id) {
+    case 'maghrib_to_isha':
+      return MAGHRIB_PALETTE;
+    case 'isha_to_midnight':
+      return [NIGHT_BLACK];
+    case 'last_third_to_fajr':
+      return [NIGHT_BLACK];
+    case 'fajr_to_sunrise':
+      return FAJR_SUNRISE_PALETTE;
+    case 'sunrise_to_dhuhr':
+      return SUNRISE_TO_DHUHR_PALETTE;
+    case 'dhuhr_to_asr':
+      return DHUHR_ASR_PALETTE;
+    case 'asr_to_maghrib':
+      return ASR_PALETTE;
+    default:
+      return [NIGHT_BLACK];
+  }
 }
 
 /**
- * Dark blue ↔ Yellow, with black night at Isha and Fajr:
- * - Fajr: gradient from black night
- * - Isha: gradient into black night
+ * Per-segment gradient stops. Used for Jumu'ah glow.
  */
-const NIGHT = '#0a0a12';
-const BLUE_MID = '#3b82a8';
-const YELLOW = '#eab308';
+export function getSegmentGradientStops(
+  segmentId: IslamicPhaseId,
+): GradientStop[] {
+  const palette = getPaletteForSegment(segmentId);
+  if (palette.length === 0) {
+    return [{ offset: 0, color: NIGHT_BLACK }, { offset: 100, color: NIGHT_BLACK }];
+  }
+  if (palette.length === 1) {
+    return [{ offset: 0, color: palette[0] }, { offset: 100, color: palette[0] }];
+  }
+  return palette.map((color, i) => ({
+    offset: (i / (palette.length - 1)) * 100,
+    color,
+  }));
+}
 
-/** Day segments: night→blue→yellow | yellow→blue→night */
-export const SEGMENT_GRADIENTS: Record<IslamicPhaseId, GradientDef> = {
-  fajr_to_sunrise: g(NIGHT, BLUE_MID),
-  sunrise_to_dhuhr: g(BLUE_MID, YELLOW),
-  dhuhr_to_asr: g(YELLOW, YELLOW),
-  asr_to_maghrib: g(YELLOW, BLUE_MID),
-  maghrib_to_isha: g(BLUE_MID, NIGHT),
-  isha_to_midnight: g(NIGHT, NIGHT),
-  last_third_to_fajr: g(NIGHT, NIGHT),
+/** Sub-arc for sweep rendering: solid color along the arc */
+export type SweepSubArc = { startAngleDeg: number; endAngleDeg: number; color: string };
+
+const SUB_ARCS_PER_RING = 480;
+
+function lerpColor(a: string, b: string, t: number): string {
+  const parse = (hex: string) => {
+    const n = parseInt(hex.slice(1), 16);
+    return { r: (n >> 16) & 0xff, g: (n >> 8) & 0xff, b: n & 0xff };
+  };
+  const ca = parse(a);
+  const cb = parse(b);
+  return `rgb(${Math.round(ca.r + (cb.r - ca.r) * t)},${Math.round(ca.g + (cb.g - ca.g) * t)},${Math.round(ca.b + (cb.b - ca.b) * t)})`;
+}
+
+function isInAngleRange(angle: number, startDeg: number, spanDeg: number): boolean {
+  const diff = (angle - startDeg + 360) % 360;
+  return diff < spanDeg;
+}
+
+export type MirrorSegment = {
+  startAngleDeg: number;
+  spanDeg: number;
 };
 
-/** Active variants — slightly brighter */
-const YELLOW_ACTIVE = '#fde047';
-const BLUE_MID_ACTIVE = '#5ba3d4';
+/**
+ * Returns sub-arcs for the full ring. Color varies along the arc (sweep), no triangle, no seams.
+ * If mirrorSegment is provided, sub-arcs within that range use the mirror gradient (red→blue).
+ */
+export function getSweepSubArcs(
+  segments: Array<{ id: string; startAngleDeg: number; endAngleDeg: number }>,
+  mirrorSegment?: MirrorSegment | null,
+): SweepSubArc[] {
+  const result: SweepSubArc[] = [];
+  const step = 360 / SUB_ARCS_PER_RING;
+  for (let i = 0; i < SUB_ARCS_PER_RING; i++) {
+    const startAngle = i * step;
+    const endAngle = (i + 1) * step;
+    const midAngle = (startAngle + endAngle) / 2;
 
-export const SEGMENT_GRADIENTS_ACTIVE: Record<IslamicPhaseId, GradientDef> = {
-  fajr_to_sunrise: g(NIGHT, BLUE_MID_ACTIVE),
-  sunrise_to_dhuhr: g(BLUE_MID_ACTIVE, YELLOW_ACTIVE),
-  dhuhr_to_asr: g(YELLOW_ACTIVE, YELLOW_ACTIVE),
-  asr_to_maghrib: g(YELLOW_ACTIVE, BLUE_MID_ACTIVE),
-  maghrib_to_isha: g(BLUE_MID_ACTIVE, NIGHT),
-  isha_to_midnight: g(NIGHT, NIGHT),
-  last_third_to_fajr: g(NIGHT, NIGHT),
-};
+    let color: string;
+    if (mirrorSegment && isInAngleRange(midAngle, mirrorSegment.startAngleDeg, mirrorSegment.spanDeg)) {
+      const t = mirrorSegment.spanDeg > 0
+        ? ((midAngle - mirrorSegment.startAngleDeg + 360) % 360) / mirrorSegment.spanDeg
+        : 0;
+      const clampedT = Math.max(0, Math.min(1, t));
+      const palette = MIRROR_GRADIENT_PALETTE;
+      const idx = clampedT * (palette.length - 1);
+      const i0 = Math.floor(idx);
+      const i1 = Math.min(i0 + 1, palette.length - 1);
+      color = lerpColor(palette[i0], palette[i1], idx - i0);
+    } else {
+      const seg = segments.find((s) => midAngle >= s.startAngleDeg && midAngle < s.endAngleDeg);
+      const palette = seg ? getPaletteForSegment(seg.id as IslamicPhaseId) : [NIGHT_BLACK];
+      const span = seg ? seg.endAngleDeg - seg.startAngleDeg : 360;
+      const t = seg && span > 0 ? Math.max(0, Math.min(1, (midAngle - seg.startAngleDeg) / span)) : 0;
+      const idx = t * (palette.length - 1);
+      const i0 = Math.floor(idx);
+      const i1 = Math.min(i0 + 1, palette.length - 1);
+      color = palette.length === 1 ? palette[0] : lerpColor(palette[i0], palette[i1], idx - i0);
+    }
+    result.push({ startAngleDeg: startAngle, endAngleDeg: endAngle, color });
+  }
+  return result;
+}
+
