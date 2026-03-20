@@ -377,6 +377,14 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
           currentPhase,
           snapshot.hijriDate,
         );
+        const sunriseMarker = ring.markers.find((m) => m.id === 'sunrise');
+        const maghribMarker = ring.markers.find((m) => m.id === 'maghrib');
+        const sunriseBoundary = sunriseMarker
+          ? polarToXY(cx, cy, ringR, sunriseMarker.angleDeg)
+          : null;
+        const maghribBoundary = maghribMarker
+          ? polarToXY(cx, cy, ringR, maghribMarker.angleDeg)
+          : null;
         return (
           <CurrentMarker
             x={pos.x}
@@ -384,6 +392,13 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             r={MARKER_R}
             state={markerState}
             currentPhase={currentPhase}
+            progressAngle={progressAngle}
+            sunriseAngleDeg={sunriseMarker?.angleDeg ?? 0}
+            maghribAngleDeg={maghribMarker?.angleDeg ?? 0}
+            centerX={cx}
+            centerY={cy}
+            sunriseBoundary={sunriseBoundary}
+            maghribBoundary={maghribBoundary}
           />
         );
       })()}

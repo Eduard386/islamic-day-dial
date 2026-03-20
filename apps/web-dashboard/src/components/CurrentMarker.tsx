@@ -7,7 +7,22 @@ type Props = {
   r: number;
   state: CurrentMarkerState;
   currentPhase: IslamicPhaseId;
+  /** Угол маркера (0–360). Для roll-out/roll-in у границ Sunrise и Maghrib */
+  progressAngle: number;
+  sunriseAngleDeg: number;
+  maghribAngleDeg: number;
+  /** Центр циферблата — чтобы срез маски шёл по radial (риска Sunrise/Maghrib) */
+  centerX: number;
+  centerY: number;
+  /** Точка границы на кольце — отрез по уровню риски */
+  sunriseBoundary?: { x: number; y: number } | null;
+  maghribBoundary?: { x: number; y: number } | null;
 };
+
+/** Зона перехода в градусах */
+const ROLL_ZONE_DEG = 10;
+/** Минимальная видимая доля — чтобы маркер не исчезал полностью на границе */
+const MIN_REVEAL = 0.12;
 
 /** Absolutely black — blends with night segments; only moon visible Maghrib→Fajr */
 const DISK_FILL = '#000000';
@@ -25,11 +40,64 @@ const MOON_ONLY_PHASES = new Set<IslamicPhaseId>([
   'fajr_to_sunrise',
 ]);
 
-export function CurrentMarker({ x, y, r, state, currentPhase }: Props) {
+/**
+ * Маркер = солнце: вылазит в начале Sunrise, залазит в конце Asr (Maghrib).
+ * reveal, boundaryAngle, isRollIn (направление градиента).
+ *
+ * ⚠️ ASR (roll-in, isRollIn=true): НЕ МЕНЯТЬ. Отрез по уровню риски (maghribBoundary),
+ * исчезает часть за риской. GradStops: white 0..reveal. Сдвиг градиента через bound.
+ */
+function getBlackDiskReveal(
+  progressAngle: number,
+  sunriseAngleDeg: number,
+  maghribAngleDeg: number,
+  isMoonOnlySector: boolean,
+): { reveal: number; boundaryAngle: number; isRollIn: boolean } {
+  const norm = (a: number) => ((a % 360) + 360) % 360;
+  const pa = norm(progressAngle);
+  const sun = norm(sunriseAngleDeg);
+  const mag = norm(maghribAngleDeg);
+
+  /* В Fajr — только луна, без чёрного фона. Солнце появляется только в sunrise_to_dhuhr */
+  if (isMoonOnlySector) {
+    return { reveal: 0, boundaryAngle: 0, isRollIn: false };
+  }
+
+  const rollOutEndRaw = sun + ROLL_ZONE_DEG;
+  if (rollOutEndRaw <= 360) {
+    if (pa >= sun && pa <= rollOutEndRaw) {
+      const raw = (pa - sun) / ROLL_ZONE_DEG;
+      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false };
+    }
+  } else {
+    if (pa >= sun) {
+      const raw = (pa - sun) / ROLL_ZONE_DEG;
+      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false };
+    }
+    if (pa <= rollOutEndRaw - 360) {
+      const raw = (pa + 360 - sun) / ROLL_ZONE_DEG;
+      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false };
+    }
+  }
+  const rollInStart = norm(mag - ROLL_ZONE_DEG);
+  if (rollInStart > mag && pa >= rollInStart) {
+    const raw = (360 - pa) / ROLL_ZONE_DEG;
+    return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: mag, isRollIn: true };
+  }
+  if (rollInStart <= mag && pa >= rollInStart && pa <= mag) {
+    const raw = (mag - pa) / ROLL_ZONE_DEG;
+    return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: mag, isRollIn: true };
+  }
+  return { reveal: 1, boundaryAngle: 0, isRollIn: false };
+}
+
+
+export function CurrentMarker({ x, y, r, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary }: Props) {
   const { isNight, moonPhase, hijriDayUsed } = state;
   const innerR = r * MOON_INNER_R;
   const isMoonOnlySector = MOON_ONLY_PHASES.has(currentPhase);
   const crescentMaskId = `crescent-mask-${hijriDayUsed}`;
+  const { reveal, boundaryAngle, isRollIn } = getBlackDiskReveal(progressAngle, sunriseAngleDeg, maghribAngleDeg, isMoonOnlySector);
 
   return (
     <g transform={`translate(${x}, ${y})`}>
@@ -42,16 +110,70 @@ export function CurrentMarker({ x, y, r, state, currentPhase }: Props) {
         </defs>
       )}
       <g clipPath="url(#marker-disk-clip)">
-        {/* Base disk — skip at night so ring gradient shows through */}
-        {!isMoonOnlySector && (
-          <circle
-            r={r}
-            fill={DISK_FILL}
-            stroke={DISK_STROKE}
-            strokeWidth={1}
-          />
+        {/* Base disk: пред-roll-out, roll-out, roll-in — солнце с самого начала Sunrise */}
+        {reveal > 0 && (
+          (() => {
+            if (reveal >= 1) {
+              return (
+                <circle r={r} fill={DISK_FILL} stroke={DISK_STROKE} strokeWidth={1} />
+              );
+            }
+            const degToRad = (d: number) => ((d - 90) * Math.PI) / 180;
+            /* Градиент по boundaryAngle — отрез по уровню риски. Asr: без flip. Sunrise: поменять видимый/невидимый */
+            const tangentDeg = boundaryAngle + 90;
+            const tanX = Math.cos(degToRad(tangentDeg));
+            const tanY = Math.sin(degToRad(tangentDeg));
+            const k = r * 2;
+            const maskId = `black-disk-mask-${hijriDayUsed}-${reveal.toFixed(2)}`;
+            const gradStops = isRollIn
+              ? /* ASR: не менять — откус по риске, скрывается часть за Maghrib */
+                [
+                  <stop key="0" offset={0} stopColor="white" />,
+                  <stop key="1" offset={reveal} stopColor="white" />,
+                  <stop key="2" offset={reveal} stopColor="black" />,
+                  <stop key="3" offset={1} stopColor="black" />,
+                ]
+              : /* SUNRISE roll-out: НЕ МЕНЯТЬ — откус по риске, видна часть за ней */
+                [
+                  <stop key="0" offset={0} stopColor="black" />,
+                  <stop key="1" offset={1 - reveal} stopColor="black" />,
+                  <stop key="2" offset={1 - reveal} stopColor="white" />,
+                  <stop key="3" offset={1} stopColor="white" />,
+                ];
+            /* SUNRISE roll-out: НЕ МЕНЯТЬ. Срез через центр циферблата (локальные coord маркера).
+             * Видна только та часть маркера, которая визуально пересекла риску Sunrise по часовой. */
+            const bound = isRollIn ? maghribBoundary : null;
+            const lenSq = tanX * tanX + tanY * tanY;
+            const shift = lenSq > 0.001
+              ? isRollIn && bound
+                ? (tanX * (bound.x - x) + tanY * (bound.y - y) - k * (2 * reveal - 1)) / lenSq
+                : (tanX * (centerX - x) + tanY * (centerY - y)) / lenSq - k * (1 - 2 * reveal)
+              : 0;
+            const dx = shift * tanX;
+            const dy = shift * tanY;
+            return (
+              <>
+                <defs>
+                  <mask id={maskId} maskContentUnits="userSpaceOnUse">
+                    <linearGradient
+                      id={`${maskId}-grad`}
+                      x1={-tanX * k + dx}
+                      y1={-tanY * k + dy}
+                      x2={tanX * k + dx}
+                      y2={tanY * k + dy}
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      {gradStops}
+                    </linearGradient>
+                    <rect x={-k} y={-k} width={k * 2} height={k * 2} fill={`url(#${maskId}-grad)`} />
+                  </mask>
+                </defs>
+                <circle r={r} fill={DISK_FILL} stroke={DISK_STROKE} strokeWidth={1} mask={`url(#${maskId})`} />
+              </>
+            );
+          })()
         )}
-        {/* Night: moon phase from hijri day */}
+        {/* Night: луна всегда, даже если торчит за риску Sunrise */}
         {isNight && moonPhase && (
           <g>
             {isMoonOnlySector ? (
@@ -107,8 +229,8 @@ export function CurrentMarkerDefs({ r }: { r: number }) {
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <clipPath id="marker-disk-clip" clipPathUnits="userSpaceOnUse">
-        <circle cx={0} cy={0} r={r} />
+      <clipPath id="marker-disk-clip" clipPathUnits="objectBoundingBox">
+        <circle cx="0.5" cy="0.5" r="0.5" />
       </clipPath>
     </>
   );
