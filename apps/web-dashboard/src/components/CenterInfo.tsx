@@ -12,8 +12,16 @@ type Props = {
   timezone: string;
 };
 
+/** Пятница: DUHA / MIDDAY / DHUHR → одно имя латиницей */
+const JUMU_LABEL = "Jumu'ah";
+
 export function CenterInfo({ snapshot, now, timezone }: Props) {
+  const isFriday = now.getDay() === 5;
+
   const periodLabel = (() => {
+    if (snapshot.currentPhase === 'dhuhr_to_asr' && isFriday) {
+      return JUMU_LABEL;
+    }
     if (snapshot.currentPhase !== 'sunrise_to_dhuhr') {
       return formatCurrentPeriod(snapshot.currentPhase);
     }
@@ -22,19 +30,14 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
       snapshot.timeline.sunrise,
       snapshot.timeline.dhuhr,
     );
-    return sub === 'sunrise' ? 'Sunrise' : sub === 'duha' ? 'Duha' : 'Midday';
+    if (sub === 'sunrise') return 'Sunrise';
+    if (isFriday && (sub === 'duha' || sub === 'midday')) return JUMU_LABEL;
+    return sub === 'duha' ? 'Duha' : 'Midday';
   })();
 
   const periodContent = (() => {
     if (!periodLabel) return null;
-    const phase = snapshot.currentPhase;
-    if (phase === 'sunrise_to_dhuhr') {
-      return <span className="current-period-subsectors">{periodLabel}</span>;
-    }
-    if (phase === 'last_third_to_fajr') {
-      return <span className="current-period-main">{periodLabel}</span>;
-    }
-    return <span className="current-period-main">{periodLabel}</span>;
+    return <span className="current-period-subsectors">{periodLabel}</span>;
   })();
 
   const dateParts = formatHijriDateParts(snapshot.hijriDate);
