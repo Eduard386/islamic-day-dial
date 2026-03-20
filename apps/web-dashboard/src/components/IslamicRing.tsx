@@ -171,9 +171,9 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        {/* Gradients for Jumu'ah glow only */}
+        {/* Gradients for Jumu'ah glow + sun neon */}
         {displaySegments
-          .filter((s) => s.id === 'sunrise_to_dhuhr' || s.id === 'dhuhr_to_asr')
+          .filter((s) => s.id === 'sunrise_to_dhuhr' || s.id === 'dhuhr_to_asr' || s.id === 'asr_to_maghrib')
           .map((seg) => {
             const stops = getSegmentGradientStops(seg.id as IslamicPhaseId);
             const start = polarToXY(cx, cy, ringR, seg.startAngleDeg);
@@ -390,6 +390,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             x={pos.x}
             y={pos.y}
             r={MARKER_R}
+            size={size}
             state={markerState}
             currentPhase={currentPhase}
             progressAngle={progressAngle}

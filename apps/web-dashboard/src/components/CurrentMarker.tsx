@@ -5,6 +5,7 @@ type Props = {
   x: number;
   y: number;
   r: number;
+  size: number;
   state: CurrentMarkerState;
   currentPhase: IslamicPhaseId;
   /** Угол маркера (0–360). Для roll-out/roll-in у границ Sunrise и Maghrib */
@@ -32,12 +33,36 @@ const MOON_FILL = '#e8dcc8';
 const MOON_LUNAR_FILL = '#B0B0A8';
 const MOON_INNER_R = 0.82; /** Moon circles radius as fraction of disk r */
 
+/** Солнце: glow — здесь настраивать силу и охват свечения */
+const SUN_GLOW = {
+  stdDeviation: 14,    /** размытие (↑ = шире/мягче ореол) */
+  filterSize: 700,    /** % относительно маркера (x/y/width/height) */
+};
+
+/** = JUMU_GLOW (IslamicRing) — неон солнца идентичен дню джума */
+const SUN_NEON = {
+  pulseDuration: 3,
+  baseBlur: 3,
+  peakBlur: 5,
+  baseOpacity: 0.35,
+  peakOpacity: 1.4,
+  baseStrokeExtra: 6,
+  peakStrokeExtra: 7,
+};
+
 /** Sectors where only moon is visible, ring background shows through */
 const MOON_ONLY_PHASES = new Set<IslamicPhaseId>([
   'maghrib_to_isha',
   'isha_to_midnight',
   'last_third_to_fajr',
   'fajr_to_sunrise',
+]);
+
+/** Sunrise, Duha, Midday, Dhuhr, Asr — яркое солнце с пульсирующей волной */
+const SUN_PHASES = new Set<IslamicPhaseId>([
+  'sunrise_to_dhuhr',
+  'dhuhr_to_asr',
+  'asr_to_maghrib',
 ]);
 
 /**
@@ -92,7 +117,7 @@ function getBlackDiskReveal(
 }
 
 
-export function CurrentMarker({ x, y, r, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary }: Props) {
+export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary }: Props) {
   const { isNight, moonPhase, hijriDayUsed } = state;
   const innerR = r * MOON_INNER_R;
   const isMoonOnlySector = MOON_ONLY_PHASES.has(currentPhase);
@@ -113,9 +138,37 @@ export function CurrentMarker({ x, y, r, state, currentPhase, progressAngle, sun
         {/* Base disk: пред-roll-out, roll-out, roll-in — солнце с самого начала Sunrise */}
         {reveal > 0 && (
           (() => {
+            const isBrightSun = SUN_PHASES.has(currentPhase);
             if (reveal >= 1) {
+              const diskFill = isBrightSun ? 'url(#sun-fill)' : DISK_FILL;
+              const diskStroke = isBrightSun ? '#ffa000' : DISK_STROKE;
+              const diskFilter = isBrightSun ? 'url(#sun-glow)' : undefined;
               return (
-                <circle r={r} fill={DISK_FILL} stroke={DISK_STROKE} strokeWidth={1} />
+                <>
+                  {isBrightSun && (() => {
+                    const ringStroke = size * 0.081;
+                    const wBase = ringStroke + SUN_NEON.baseStrokeExtra;
+                    const wPeak = ringStroke + SUN_NEON.peakStrokeExtra;
+                    const gradId = `grad-${currentPhase}`;
+                    return (
+                      <g
+                        className="last-third-glow-pulse"
+                        style={{
+                          ['--last-third-glow-pulse-duration' as string]: `${SUN_NEON.pulseDuration}s`,
+                          ['--last-third-glow-peak-opacity' as string]: String(SUN_NEON.peakOpacity),
+                        }}
+                      >
+                        <g filter="url(#glow-jumu-base)" opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
+                          <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wBase} />
+                        </g>
+                        <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
+                          <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wPeak} />
+                        </g>
+                      </g>
+                    );
+                  })()}
+                  <circle r={r} fill={diskFill} stroke={diskStroke} strokeWidth={isBrightSun ? 0.5 : 1} filter={diskFilter} />
+                </>
               );
             }
             const degToRad = (d: number) => ((d - 90) * Math.PI) / 180;
@@ -151,6 +204,9 @@ export function CurrentMarker({ x, y, r, state, currentPhase, progressAngle, sun
               : 0;
             const dx = shift * tanX;
             const dy = shift * tanY;
+            const diskFill = isBrightSun ? 'url(#sun-fill)' : DISK_FILL;
+            const diskStroke = isBrightSun ? '#ffa000' : DISK_STROKE;
+            const diskFilter = isBrightSun ? 'url(#sun-glow)' : undefined;
             return (
               <>
                 <defs>
@@ -168,7 +224,29 @@ export function CurrentMarker({ x, y, r, state, currentPhase, progressAngle, sun
                     <rect x={-k} y={-k} width={k * 2} height={k * 2} fill={`url(#${maskId}-grad)`} />
                   </mask>
                 </defs>
-                <circle r={r} fill={DISK_FILL} stroke={DISK_STROKE} strokeWidth={1} mask={`url(#${maskId})`} />
+                {isBrightSun && (() => {
+                  const ringStroke = size * 0.081;
+                  const wBase = ringStroke + SUN_NEON.baseStrokeExtra;
+                  const wPeak = ringStroke + SUN_NEON.peakStrokeExtra;
+                  const gradId = `grad-${currentPhase}`;
+                  return (
+                    <g
+                      className="last-third-glow-pulse"
+                      style={{
+                        ['--last-third-glow-pulse-duration' as string]: `${SUN_NEON.pulseDuration}s`,
+                        ['--last-third-glow-peak-opacity' as string]: String(SUN_NEON.peakOpacity),
+                      }}
+                    >
+                      <g filter="url(#glow-jumu-base)" opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
+                        <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wBase} mask={`url(#${maskId})`} />
+                      </g>
+                      <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
+                        <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wPeak} mask={`url(#${maskId})`} />
+                      </g>
+                    </g>
+                  );
+                })()}
+                <circle r={r} fill={diskFill} stroke={diskStroke} strokeWidth={isBrightSun ? 0.5 : 1} mask={`url(#${maskId})`} filter={diskFilter} />
               </>
             );
           })()
@@ -229,6 +307,25 @@ export function CurrentMarkerDefs({ r }: { r: number }) {
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      <filter
+        id="sun-glow"
+        x={`-${(SUN_GLOW.filterSize - 100) / 2}%`}
+        y={`-${(SUN_GLOW.filterSize - 100) / 2}%`}
+        width={`${SUN_GLOW.filterSize}%`}
+        height={`${SUN_GLOW.filterSize}%`}
+      >
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_GLOW.stdDeviation} result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <radialGradient id="sun-fill" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stopColor="#ffffff" />
+        <stop offset="0.3" stopColor="#fffde7" />
+        <stop offset="0.6" stopColor="#fff59d" />
+        <stop offset="1" stopColor="#ffca28" />
+      </radialGradient>
       <clipPath id="marker-disk-clip" clipPathUnits="objectBoundingBox">
         <circle cx="0.5" cy="0.5" r="0.5" />
       </clipPath>
