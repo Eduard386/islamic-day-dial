@@ -9,6 +9,8 @@ const timeline: ComputedTimeline = {
   lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
   fajr: new Date('2025-03-16T02:00:00.000Z'),
   sunrise: new Date('2025-03-16T03:15:00.000Z'),
+  duhaStart: new Date('2025-03-16T03:35:00.000Z'),
+  duhaEnd: new Date('2025-03-16T09:10:00.000Z'),
   dhuhr: new Date('2025-03-16T09:15:00.000Z'),
   asr: new Date('2025-03-16T12:30:00.000Z'),
   nextMaghrib: new Date('2025-03-16T15:30:00.000Z'),

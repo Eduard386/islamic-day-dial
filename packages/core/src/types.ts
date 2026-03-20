@@ -49,6 +49,8 @@ export type RingMarkerId =
   | 'last_third_start'
   | 'fajr'
   | 'sunrise'
+  | 'duha_start'
+  | 'duha_end'
   | 'dhuhr'
   | 'asr';
 
@@ -78,6 +80,8 @@ export type ComputedTimeline = {
   lastThirdStart: Date;
   fajr: Date;
   sunrise: Date;
+  duhaStart: Date;
+  duhaEnd: Date;
   dhuhr: Date;
   asr: Date;
   nextMaghrib: Date;

@@ -44,6 +44,8 @@ const MARKER_DEFS: ReadonlyArray<{
   { id: 'last_third_start', timelineKey: 'lastThirdStart', kind: 'secondary' },
   { id: 'fajr', timelineKey: 'fajr', kind: 'primary' },
   { id: 'sunrise', timelineKey: 'sunrise', kind: 'primary' },
+  { id: 'duha_start', timelineKey: 'duhaStart', kind: 'secondary' },
+  { id: 'duha_end', timelineKey: 'duhaEnd', kind: 'secondary' },
   { id: 'dhuhr', timelineKey: 'dhuhr', kind: 'primary' },
   { id: 'asr', timelineKey: 'asr', kind: 'primary' },
 ];

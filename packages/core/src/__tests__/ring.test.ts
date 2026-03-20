@@ -53,14 +53,16 @@ describe('getMarkers', () => {
     lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
     fajr: new Date('2025-03-16T02:00:00.000Z'),
     sunrise: new Date('2025-03-16T03:15:00.000Z'),
+    duhaStart: new Date('2025-03-16T03:35:00.000Z'),
+    duhaEnd: new Date('2025-03-16T09:10:00.000Z'),
     dhuhr: new Date('2025-03-16T09:15:00.000Z'),
     asr: new Date('2025-03-16T12:30:00.000Z'),
     nextMaghrib: new Date('2025-03-16T15:30:00.000Z'),
   };
 
-  it('returns 7 markers', () => {
+  it('returns 9 markers', () => {
     const markers = getMarkers(timeline);
-    expect(markers).toHaveLength(7);
+    expect(markers).toHaveLength(9);
   });
 
   it('first marker is maghrib at 0°', () => {
@@ -77,10 +79,10 @@ describe('getMarkers', () => {
     }
   });
 
-  it('secondary marker is last_third_start', () => {
+  it('secondary markers are last_third_start, duha_start, duha_end', () => {
     const markers = getMarkers(timeline);
     const secondary = markers.filter(m => m.kind === 'secondary');
-    expect(secondary.map(m => m.id)).toEqual(['last_third_start']);
+    expect(secondary.map(m => m.id)).toEqual(['last_third_start', 'duha_start', 'duha_end']);
   });
 });
 
@@ -92,6 +94,8 @@ describe('getRingSegments', () => {
     lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
     fajr: new Date('2025-03-16T02:00:00.000Z'),
     sunrise: new Date('2025-03-16T03:15:00.000Z'),
+    duhaStart: new Date('2025-03-16T03:35:00.000Z'),
+    duhaEnd: new Date('2025-03-16T09:10:00.000Z'),
     dhuhr: new Date('2025-03-16T09:15:00.000Z'),
     asr: new Date('2025-03-16T12:30:00.000Z'),
     nextMaghrib: new Date('2025-03-16T15:30:00.000Z'),

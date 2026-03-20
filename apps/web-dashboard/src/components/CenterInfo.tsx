@@ -2,6 +2,7 @@ import {
   formatHijriDateParts,
   formatCurrentPeriod,
   formatCountdown,
+  getSunriseToDhuhrSubPeriod,
   type ComputedIslamicDay,
 } from '@islamic-day-dial/core';
 
@@ -16,25 +17,19 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
     if (snapshot.currentPhase !== 'sunrise_to_dhuhr') {
       return formatCurrentPeriod(snapshot.currentPhase);
     }
-
-    const t = now.getTime();
-    const start = snapshot.timeline.sunrise.getTime();
-    const end = snapshot.timeline.dhuhr.getTime();
-
-    // Hide DUHA at the start/end of its sector.
-    const hideFirstMs = 20 * 60 * 1000;
-    const hideLastMs = 5 * 60 * 1000;
-
-    if (t < start + hideFirstMs) return '';
-    if (t > end - hideLastMs) return '';
-    return formatCurrentPeriod(snapshot.currentPhase);
+    const sub = getSunriseToDhuhrSubPeriod(
+      now,
+      snapshot.timeline.sunrise,
+      snapshot.timeline.dhuhr,
+    );
+    return sub === 'sunrise' ? 'Sunrise' : sub === 'duha' ? 'Duha' : 'Midday';
   })();
 
   const periodContent = (() => {
     if (!periodLabel) return null;
     const phase = snapshot.currentPhase;
     if (phase === 'sunrise_to_dhuhr') {
-      return <span className="current-period-secondary">{periodLabel}</span>;
+      return <span className="current-period-subsectors">{periodLabel}</span>;
     }
     if (phase === 'last_third_to_fajr') {
       return <span className="current-period-main">{periodLabel}</span>;

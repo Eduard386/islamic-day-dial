@@ -24,7 +24,7 @@ export default function App() {
       <main className="app-main">
         <div className="dial-section">
           <div className="dial-wrapper">
-            <IslamicRing snapshot={snapshot} size={420} />
+            <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} />
             <div className="center-overlay">
               <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
             </div>

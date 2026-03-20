@@ -66,6 +66,22 @@ export function formatCurrentPeriod(phase: IslamicPhaseId): string {
   return PERIOD_NAMES[phase];
 }
 
+export type SunriseToDhuhrSubPeriod = 'sunrise' | 'duha' | 'midday';
+
+/** Sub-period within sunrise_to_dhuhr: SUNRISE (0–20 min), DUHA (20 min–5 min before Dhuhr), MIDDAY (last 5 min) */
+export function getSunriseToDhuhrSubPeriod(
+  now: Date,
+  sunrise: Date,
+  dhuhr: Date,
+): SunriseToDhuhrSubPeriod {
+  const t = now.getTime();
+  const duhaStart = sunrise.getTime() + 20 * 60 * 1000;
+  const duhaEnd = dhuhr.getTime() - 5 * 60 * 1000;
+  if (t < duhaStart) return 'sunrise';
+  if (t >= duhaEnd) return 'midday';
+  return 'duha';
+}
+
 const TRANSITION_LABELS: Record<string, string> = {
   isha: 'Isha',
   islamic_midnight: 'Islamic Midnight',

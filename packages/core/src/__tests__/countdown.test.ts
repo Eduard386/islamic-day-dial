@@ -4,14 +4,18 @@ import type { ComputedTimeline } from '../types.js';
 
 function makeTimeline(entries: Record<string, number>): ComputedTimeline {
   const toDate = (ms: number) => new Date(ms);
+  const sunrise = entries.sunrise ?? 0;
+  const dhuhr = entries.dhuhr ?? 0;
   return {
     lastMaghrib: toDate(entries.lastMaghrib ?? 0),
     isha: toDate(entries.isha ?? 0),
     islamicMidnight: toDate(entries.islamicMidnight ?? 0),
     lastThirdStart: toDate(entries.lastThirdStart ?? 0),
     fajr: toDate(entries.fajr ?? 0),
-    sunrise: toDate(entries.sunrise ?? 0),
-    dhuhr: toDate(entries.dhuhr ?? 0),
+    sunrise: toDate(sunrise),
+    duhaStart: toDate(sunrise + 20 * 60 * 1000),
+    duhaEnd: toDate(dhuhr - 5 * 60 * 1000),
+    dhuhr: toDate(dhuhr),
     asr: toDate(entries.asr ?? 0),
     nextMaghrib: toDate(entries.nextMaghrib ?? 0),
   };

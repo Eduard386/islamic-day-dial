@@ -130,8 +130,11 @@ body {
   color: var(--ring-text);
 }
 
-.center-info-abs .current-period-secondary {
+/* Sunrise / Duha / Midday — один размер, тонкий начертание */
+.center-info-abs .current-period-subsectors {
   color: var(--ring-text);
+  font-size: 0.85em;
+  font-weight: 300;
 }
 
 .center-info-abs .hijri-date-sector-style:not(.eid-date) {
@@ -197,10 +200,10 @@ body {
   font-size: inherit;
 }
 
-/* Duha — same ivory, slightly lighter weight */
+/* Legacy: subsectors use .current-period-subsectors in dial overlay */
 .current-period-secondary {
   font-size: 0.85em;
-  font-weight: 400;
+  font-weight: 300;
   color: var(--ivory);
 }
 

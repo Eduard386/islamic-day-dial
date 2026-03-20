@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatHijriDate, formatCountdown, formatPhase } from '../formatting.js';
+import { formatHijriDate, formatCountdown, formatPhase, getSunriseToDhuhrSubPeriod } from '../formatting.js';
 
 describe('formatHijriDate', () => {
   it('formats day monthName year', () => {
@@ -46,5 +46,22 @@ describe('formatCountdown', () => {
 describe('formatPhase', () => {
   it('returns human-readable label', () => {
     expect(formatPhase('fajr_to_sunrise')).toBe('Fajr → Sunrise');
+  });
+});
+
+describe('getSunriseToDhuhrSubPeriod', () => {
+  const sunrise = new Date('2025-03-16T03:15:00.000Z');
+  const dhuhr = new Date('2025-03-16T09:15:00.000Z');
+
+  it('returns sunrise before duha_start', () => {
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:20:00.000Z'), sunrise, dhuhr)).toBe('sunrise');
+  });
+
+  it('returns duha in the middle', () => {
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T06:00:00.000Z'), sunrise, dhuhr)).toBe('duha');
+  });
+
+  it('returns midday in last 5 min', () => {
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T09:12:00.000Z'), sunrise, dhuhr)).toBe('midday');
   });
 });

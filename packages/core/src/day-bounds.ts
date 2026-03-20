@@ -51,14 +51,21 @@ export function buildTimeline(
   const nextMaghrib = dayPT.maghrib;
   const fajr = dayPT.fajr;
 
+  const sunrise = dayPT.sunrise;
+  const dhuhr = dayPT.dhuhr;
+  const duhaStart = new Date(sunrise.getTime() + 20 * 60 * 1000);
+  const duhaEnd = new Date(dhuhr.getTime() - 5 * 60 * 1000);
+
   return {
     lastMaghrib,
     isha: nightPT.isha,
     islamicMidnight: getIslamicMidnight(lastMaghrib, fajr),
     lastThirdStart: getLastThirdStart(lastMaghrib, fajr),
     fajr,
-    sunrise: dayPT.sunrise,
-    dhuhr: dayPT.dhuhr,
+    sunrise,
+    duhaStart,
+    duhaEnd,
+    dhuhr,
     asr: dayPT.asr,
     nextMaghrib,
   };

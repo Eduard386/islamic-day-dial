@@ -34,6 +34,8 @@ export {
   formatPhase,
   formatCurrentPeriod,
   formatTransition,
+  getSunriseToDhuhrSubPeriod,
   type HijriDateParts,
+  type SunriseToDhuhrSubPeriod,
 } from './formatting.js';
 export { computeIslamicDaySnapshot } from './snapshot.js';
