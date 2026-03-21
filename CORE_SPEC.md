@@ -50,6 +50,47 @@ Defined in `apps/web-dashboard/src/lib/segment-gradients.ts`.
 - **Sunrise → Dhuhr**: flat blue `#7CB8E8`
 - **Dhuhr → Asr**: flat blue `#7CB8E8`
 
+## Sun Marker Visual States (Web Dashboard — Source of Truth)
+
+Defined in `apps/web-dashboard/src/components/CurrentMarker.tsx`. Implement in Apple Watch to match.
+
+### Sub-periods within sunrise_to_dhuhr
+
+`getSunriseToDhuhrSubPeriod(now, sunrise, dhuhr)` → `'sunrise' | 'duha' | 'midday'` (from `packages/core`):
+- **sunrise**: first 20 min after sunrise — sun is **orange**
+- **duha**: from 20 min after sunrise until 5 min before Dhuhr — sun is **normal** (yellow)
+- **midday**: last 5 min before Dhuhr — sun is normal
+
+### Sun color by state
+
+| Condition | Sun color | Outer glow |
+|-----------|-----------|------------|
+| `currentPhase === 'sunrise_to_dhuhr'` and sub-period `'sunrise'` | Orange (#ff6f00) | Orange halo |
+| `asr_to_maghrib` and sun within 8° of Maghrib boundary | Red (#c62828) | Red halo |
+| Otherwise | Normal yellow (#ffca28) | Light yellow halo |
+
+### Roll zones (degrees)
+
+- **ROLL_ZONE_DEG** = 10 — mask/reveal zone at Sunrise (roll-out) and Maghrib (roll-in)
+- **RED_SUN_ZONE_DEG** = 8 — sun turns red only when within 8° of Maghrib (visually touching)
+
+### Outer glow
+
+**Orange/red sun:**
+- strokeWidth: 24, blur: 8
+- Colors: orange `rgba(255, 111, 0, 0.85)`, red `rgba(198, 40, 40, 0.9)`
+
+**Normal yellow sun** (light glow):
+- strokeWidth: 16, blur: 5
+- Color: `rgba(255, 202, 40, 0.35)`
+
+Rendered as separate circle with thick stroke, blurred (like last third glow)
+
+### Neon ring (all day phases)
+
+- Orange/red sun: use `grad-sunrise-neon` / `grad-maghrib-neon` gradients
+- Normal sun: use segment gradient (`grad-${currentPhase}`)
+
 ## Dependencies
 
 - **Prayer times**: Umm al-Qura method (Adhan)
@@ -65,3 +106,4 @@ When changing core:
 3. [ ] Run `npm test` (web)
 4. [ ] Build and verify watch app in Xcode
 5. [ ] Update this spec if formulas/phases changed
+6. [ ] When porting visuals: `apps/web-dashboard` is source of truth — match sun marker colors, roll zones, outer glow

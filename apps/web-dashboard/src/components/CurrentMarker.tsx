@@ -60,6 +60,13 @@ const SUN_OUTER_GLOW = {
   red: 'rgba(198, 40, 40, 0.9)',
 };
 
+/** Лёгкий glow для обычного жёлтого солнца */
+const SUN_OUTER_GLOW_NORMAL = {
+  strokeWidth: 16,
+  blur: 5,
+  yellow: 'rgba(255, 202, 40, 0.35)',
+};
+
 /** = JUMU_GLOW (IslamicRing) — неон солнца идентичен дню джума */
 const SUN_NEON = {
   pulseDuration: 3,
@@ -156,7 +163,7 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
 
   return (
     <g transform={`translate(${x}, ${y})`}>
-      {/* Наружный glow (как last third) — до clipPath, чтобы не обрезался */}
+      {/* Наружный glow — до clipPath, чтобы не обрезался */}
       {isBrightSun && (useOrange || useRed) && (
         <g filter={`url(#sun-outer-glow-${useOrange ? 'orange' : 'red'}${suffix})`}>
           <circle
@@ -164,6 +171,16 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
             fill="none"
             stroke={useOrange ? SUN_OUTER_GLOW.orange : SUN_OUTER_GLOW.red}
             strokeWidth={SUN_OUTER_GLOW.strokeWidth}
+          />
+        </g>
+      )}
+      {isBrightSun && !useOrange && !useRed && (
+        <g filter={`url(#sun-outer-glow-normal${suffix})`}>
+          <circle
+            r={r}
+            fill="none"
+            stroke={SUN_OUTER_GLOW_NORMAL.yellow}
+            strokeWidth={SUN_OUTER_GLOW_NORMAL.strokeWidth}
           />
         </g>
       )}
@@ -453,6 +470,18 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
         height="400%"
       >
         <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_OUTER_GLOW.blur} result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+        </feMerge>
+      </filter>
+      <filter
+        id={`sun-outer-glow-normal${suffix}`}
+        x="-120%"
+        y="-120%"
+        width="340%"
+        height="340%"
+      >
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_OUTER_GLOW_NORMAL.blur} result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
         </feMerge>

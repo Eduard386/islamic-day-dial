@@ -39,3 +39,12 @@ xcodebuild -scheme IslamicDayDialWatch -destination 'platform=watchOS Simulator,
 brew install xcodegen  # if needed
 xcodegen generate
 ```
+
+## Porting from web (source of truth)
+
+`apps/web-dashboard` defines visuals. When porting sun marker changes:
+
+1. **Sun colors**: Orange in Sunrise sub-period (first 20 min), red when within 8° of Maghrib. See `CORE_SPEC.md` → Sun Marker Visual States.
+2. **getSunriseToDhuhrSubPeriod**: Port from `packages/core` (TypeScript) to `IslamicDayCore/Formatting.swift` or equivalent.
+3. **Roll zones**: ROLL_ZONE_DEG=10, RED_SUN_ZONE_DEG=8.
+4. **Outer glow**: Thick stroke + blur, colors `rgba(255,111,0,0.85)` / `rgba(198,40,40,0.9)`.
