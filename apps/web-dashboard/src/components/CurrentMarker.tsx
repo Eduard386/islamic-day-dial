@@ -18,12 +18,16 @@ type Props = {
   /** Точка границы на кольце — отрез по уровню риски */
   sunriseBoundary?: { x: number; y: number } | null;
   maghribBoundary?: { x: number; y: number } | null;
+  /** true = сектор "Sunrise" (первые 20 мин): солнце оранжевое */
+  isInSunriseSubPeriod?: boolean;
   /** Уникальный ID для defs при двух кольцах (maghrib/midday) — иначе mask берётся от другого кольца */
   instanceId?: string;
 };
 
-/** Зона перехода в градусах */
+/** Зона перехода в градусах (маска, reveal) */
 const ROLL_ZONE_DEG = 10;
+/** Красное солнце: когда визуально касается/пересекает Maghrib (последние N градусов) */
+const RED_SUN_ZONE_DEG = 8;
 /** Минимальная видимая доля — чтобы маркер не исчезал полностью на границе */
 const MIN_REVEAL = 0.12;
 
@@ -39,6 +43,21 @@ const MOON_INNER_R = 0.82; /** Moon circles radius as fraction of disk r */
 const SUN_GLOW = {
   stdDeviation: 14,    /** размытие (↑ = шире/мягче ореол) */
   filterSize: 700,    /** % относительно маркера (x/y/width/height) */
+};
+
+/** Оранжевое/красное солнце: усиленный ореол */
+const SUN_GLOW_SPECIAL = {
+  stdDeviation: 22,
+  filterSize: 750,
+  peakOpacity: 1.7,
+};
+
+/** Наружный glow как у last third: толстый stroke + blur */
+const SUN_OUTER_GLOW = {
+  strokeWidth: 24,
+  blur: 8,
+  orange: 'rgba(255, 111, 0, 0.85)',
+  red: 'rgba(198, 40, 40, 0.9)',
 };
 
 /** = JUMU_GLOW (IslamicRing) — неон солнца идентичен дню джума */
@@ -79,7 +98,7 @@ function getBlackDiskReveal(
   sunriseAngleDeg: number,
   maghribAngleDeg: number,
   isMoonOnlySector: boolean,
-): { reveal: number; boundaryAngle: number; isRollIn: boolean } {
+): { reveal: number; boundaryAngle: number; isRollIn: boolean; isInRedZone: boolean } {
   const norm = (a: number) => ((a % 360) + 360) % 360;
   const pa = norm(progressAngle);
   const sun = norm(sunriseAngleDeg);
@@ -87,50 +106,67 @@ function getBlackDiskReveal(
 
   /* В Fajr — только луна, без чёрного фона. Солнце появляется только в sunrise_to_dhuhr */
   if (isMoonOnlySector) {
-    return { reveal: 0, boundaryAngle: 0, isRollIn: false };
+    return { reveal: 0, boundaryAngle: 0, isRollIn: false, isInRedZone: false };
   }
 
   const rollOutEndRaw = sun + ROLL_ZONE_DEG;
   if (rollOutEndRaw <= 360) {
     if (pa >= sun && pa <= rollOutEndRaw) {
       const raw = (pa - sun) / ROLL_ZONE_DEG;
-      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false };
+      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false, isInRedZone: false };
     }
   } else {
     if (pa >= sun) {
       const raw = (pa - sun) / ROLL_ZONE_DEG;
-      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false };
+      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false, isInRedZone: false };
     }
     if (pa <= rollOutEndRaw - 360) {
       const raw = (pa + 360 - sun) / ROLL_ZONE_DEG;
-      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false };
+      return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: sun, isRollIn: false, isInRedZone: false };
     }
   }
   const rollInStart = norm(mag - ROLL_ZONE_DEG);
+  const distToMag = norm(mag - pa);
+  const inRedZone = distToMag <= RED_SUN_ZONE_DEG;
   if (rollInStart > mag && pa >= rollInStart) {
     const raw = (360 - pa) / ROLL_ZONE_DEG;
-    return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: mag, isRollIn: true };
+    return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: mag, isRollIn: true, isInRedZone: inRedZone };
   }
   if (rollInStart <= mag && pa >= rollInStart && pa <= mag) {
     const raw = (mag - pa) / ROLL_ZONE_DEG;
-    return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: mag, isRollIn: true };
+    return { reveal: Math.max(MIN_REVEAL, Math.min(1, raw)), boundaryAngle: mag, isRollIn: true, isInRedZone: inRedZone };
   }
-  return { reveal: 1, boundaryAngle: 0, isRollIn: false };
+  return { reveal: 1, boundaryAngle: 0, isRollIn: false, isInRedZone: false };
 }
 
 
 const idSuffix = (id?: string) => (id ? `-${id}` : '');
 
-export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary, instanceId }: Props) {
+export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary, isInSunriseSubPeriod, instanceId }: Props) {
   const { isNight, moonPhase, hijriDayUsed } = state;
   const suffix = idSuffix(instanceId);
   const innerR = r * MOON_INNER_R;
   const isMoonOnlySector = MOON_ONLY_PHASES.has(currentPhase);
   const crescentMaskId = `crescent-mask-${hijriDayUsed}${suffix}`;
-  const { reveal, boundaryAngle, isRollIn } = getBlackDiskReveal(progressAngle, sunriseAngleDeg, maghribAngleDeg, isMoonOnlySector);
+  const { reveal, boundaryAngle, isRollIn, isInRedZone } = getBlackDiskReveal(progressAngle, sunriseAngleDeg, maghribAngleDeg, isMoonOnlySector);
+
+  const isBrightSun = reveal > 0 && SUN_PHASES.has(currentPhase);
+  const useOrange = isBrightSun && !isRollIn && !!isInSunriseSubPeriod;
+  const useRed = isBrightSun && isInRedZone;
 
   return (
     <g transform={`translate(${x}, ${y})`}>
+      {/* Наружный glow (как last third) — до clipPath, чтобы не обрезался */}
+      {isBrightSun && (useOrange || useRed) && (
+        <g filter={`url(#sun-outer-glow-${useOrange ? 'orange' : 'red'}${suffix})`}>
+          <circle
+            r={r}
+            fill="none"
+            stroke={useOrange ? SUN_OUTER_GLOW.orange : SUN_OUTER_GLOW.red}
+            strokeWidth={SUN_OUTER_GLOW.strokeWidth}
+          />
+        </g>
+      )}
       {isMoonOnlySector && moonPhase && moonPhase.shadowOffset !== 0 && (
         <defs>
           <mask id={crescentMaskId}>
@@ -145,22 +181,27 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
           (() => {
             const isBrightSun = SUN_PHASES.has(currentPhase);
             if (reveal >= 1) {
-              const diskFill = isBrightSun ? `url(#sun-fill${suffix})` : DISK_FILL;
-              const diskStroke = isBrightSun ? '#ffa000' : DISK_STROKE;
-              const diskFilter = isBrightSun ? `url(#sun-glow${suffix})` : undefined;
+              const useOrange = isBrightSun && !!isInSunriseSubPeriod;
+              const useRed = false; // full disk: no red zone
+              const diskFill = isBrightSun ? (useOrange ? `url(#sun-fill-sunrise${suffix})` : `url(#sun-fill${suffix})`) : DISK_FILL;
+              const diskStroke = isBrightSun ? (useOrange ? '#ff6f00' : '#ffa000') : DISK_STROKE;
+              const diskFilter = isBrightSun
+                ? (useOrange ? `url(#sun-effect-sunrise${suffix})` : useRed ? `url(#sun-effect-maghrib${suffix})` : `url(#sun-glow${suffix})`)
+                : undefined;
+              const gradId = useOrange ? 'grad-sunrise-neon' : useRed ? 'grad-maghrib-neon' : `grad-${currentPhase}${suffix}`;
+              const peakOpacity = useOrange || useRed ? SUN_GLOW_SPECIAL.peakOpacity : SUN_NEON.peakOpacity;
               return (
                 <>
                   {isBrightSun && (() => {
                     const ringStroke = size * 0.081;
                     const wBase = ringStroke + SUN_NEON.baseStrokeExtra;
                     const wPeak = ringStroke + SUN_NEON.peakStrokeExtra;
-                    const gradId = `grad-${currentPhase}${suffix}`;
                     return (
                       <g
                         className="last-third-glow-pulse"
                         style={{
                           ['--last-third-glow-pulse-duration' as string]: `${SUN_NEON.pulseDuration}s`,
-                          ['--last-third-glow-peak-opacity' as string]: String(SUN_NEON.peakOpacity),
+                          ['--last-third-glow-peak-opacity' as string]: String(peakOpacity),
                         }}
                       >
                         <g filter={`url(#glow-jumu-base${suffix})`} opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
@@ -209,9 +250,17 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
               : 0;
             const dx = shift * tanX;
             const dy = shift * tanY;
-            const diskFill = isBrightSun ? `url(#sun-fill${suffix})` : DISK_FILL;
-            const diskStroke = isBrightSun ? '#ffa000' : DISK_STROKE;
-            const diskFilter = isBrightSun ? `url(#sun-glow${suffix})` : undefined;
+            const useRed = isBrightSun && isInRedZone;
+            const useOrange = isBrightSun && !isRollIn && !!isInSunriseSubPeriod;
+            const diskFill = isBrightSun
+              ? (useRed ? `url(#sun-fill-maghrib${suffix})` : useOrange ? `url(#sun-fill-sunrise${suffix})` : `url(#sun-fill${suffix})`)
+              : DISK_FILL;
+            const diskStroke = isBrightSun ? (useRed ? '#c62828' : useOrange ? '#ff6f00' : '#ffa000') : DISK_STROKE;
+            const diskFilter = isBrightSun
+              ? (useOrange ? `url(#sun-effect-sunrise${suffix})` : useRed ? `url(#sun-effect-maghrib${suffix})` : `url(#sun-glow${suffix})`)
+              : undefined;
+            const gradId = useOrange ? 'grad-sunrise-neon' : useRed ? 'grad-maghrib-neon' : `grad-${currentPhase}${suffix}`;
+            const peakOpacity = useOrange || useRed ? SUN_GLOW_SPECIAL.peakOpacity : SUN_NEON.peakOpacity;
             return (
               <>
                 <defs>
@@ -233,13 +282,12 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
                   const ringStroke = size * 0.081;
                   const wBase = ringStroke + SUN_NEON.baseStrokeExtra;
                   const wPeak = ringStroke + SUN_NEON.peakStrokeExtra;
-                  const gradId = `grad-${currentPhase}${suffix}`;
                   return (
                     <g
                       className="last-third-glow-pulse"
                       style={{
                         ['--last-third-glow-pulse-duration' as string]: `${SUN_NEON.pulseDuration}s`,
-                        ['--last-third-glow-peak-opacity' as string]: String(SUN_NEON.peakOpacity),
+                        ['--last-third-glow-peak-opacity' as string]: String(peakOpacity),
                       }}
                     >
                       <g filter={`url(#glow-jumu-base${suffix})`} opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
@@ -326,12 +374,89 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      {/* Orange sun: glow + colored drop shadow */}
+      <filter
+        id={`sun-effect-sunrise${suffix}`}
+        x="-40%"
+        y="-40%"
+        width="180%"
+        height="180%"
+      >
+        <feOffset in="SourceGraphic" dx="4" dy="4" result="offset" />
+        <feGaussianBlur in="offset" stdDeviation="8" result="shadowBlur" />
+        <feFlood floodColor="#ff6f00" floodOpacity="0.45" result="shadowColor" />
+        <feComposite in="shadowBlur" in2="shadowColor" operator="in" result="shadow" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_GLOW_SPECIAL.stdDeviation} result="glow" />
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      {/* Red sun: glow + colored drop shadow */}
+      <filter
+        id={`sun-effect-maghrib${suffix}`}
+        x="-40%"
+        y="-40%"
+        width="180%"
+        height="180%"
+      >
+        <feOffset in="SourceGraphic" dx="4" dy="4" result="offset" />
+        <feGaussianBlur in="offset" stdDeviation="8" result="shadowBlur" />
+        <feFlood floodColor="#c62828" floodOpacity="0.45" result="shadowColor" />
+        <feComposite in="shadowBlur" in2="shadowColor" operator="in" result="shadow" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_GLOW_SPECIAL.stdDeviation} result="glow" />
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
       <radialGradient id={`sun-fill${suffix}`} cx="0.5" cy="0.5" r="0.5">
         <stop offset="0" stopColor="#ffffff" />
         <stop offset="0.3" stopColor="#fffde7" />
         <stop offset="0.6" stopColor="#fff59d" />
         <stop offset="1" stopColor="#ffca28" />
       </radialGradient>
+      {/* Sunrise: насыщенный оранжевый */}
+      <radialGradient id={`sun-fill-sunrise${suffix}`} cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stopColor="#ffffff" />
+        <stop offset="0.15" stopColor="#ffeed9" />
+        <stop offset="0.45" stopColor="#ffb74d" />
+        <stop offset="1" stopColor="#ff6f00" />
+      </radialGradient>
+      {/* Maghrib: насыщенный красный */}
+      <radialGradient id={`sun-fill-maghrib${suffix}`} cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stopColor="#ffffff" />
+        <stop offset="0.15" stopColor="#ffd5d5" />
+        <stop offset="0.45" stopColor="#ff6b6b" />
+        <stop offset="1" stopColor="#c62828" />
+      </radialGradient>
+      {/* Наружный glow (как last third): толстый stroke + blur */}
+      <filter
+        id={`sun-outer-glow-orange${suffix}`}
+        x="-150%"
+        y="-150%"
+        width="400%"
+        height="400%"
+      >
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_OUTER_GLOW.blur} result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+        </feMerge>
+      </filter>
+      <filter
+        id={`sun-outer-glow-red${suffix}`}
+        x="-150%"
+        y="-150%"
+        width="400%"
+        height="400%"
+      >
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_OUTER_GLOW.blur} result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+        </feMerge>
+      </filter>
       <clipPath id={`marker-disk-clip${suffix}`} clipPathUnits="objectBoundingBox">
         <circle cx="0.5" cy="0.5" r="0.5" />
       </clipPath>

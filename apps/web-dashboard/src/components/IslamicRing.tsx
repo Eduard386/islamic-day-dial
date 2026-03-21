@@ -193,6 +193,38 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
               </linearGradient>
             );
           })}
+        {/* Orange/red neon gradients for sunrise and maghrib sun */}
+        {sunriseToDhuhrSeg && (
+          <linearGradient
+            key="grad-sunrise-neon"
+            id="grad-sunrise-neon"
+            x1={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.startAngleDeg).x}
+            y1={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.startAngleDeg).y}
+            x2={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.endAngleDeg).x}
+            y2={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.endAngleDeg).y}
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#ffb74d" />
+            <stop offset="100%" stopColor="#ff6f00" />
+          </linearGradient>
+        )}
+        {(() => {
+          const asrSeg = displaySegments.find((s) => s.id === 'asr_to_maghrib');
+          return asrSeg ? (
+            <linearGradient
+              key="grad-maghrib-neon"
+              id="grad-maghrib-neon"
+              x1={polarToXY(cx, cy, ringR, asrSeg.startAngleDeg).x}
+              y1={polarToXY(cx, cy, ringR, asrSeg.startAngleDeg).y}
+              x2={polarToXY(cx, cy, ringR, asrSeg.endAngleDeg).x}
+              y2={polarToXY(cx, cy, ringR, asrSeg.endAngleDeg).y}
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0%" stopColor="#ff6b6b" />
+              <stop offset="100%" stopColor="#c62828" />
+            </linearGradient>
+          ) : null;
+        })()}
       </defs>
 
       {/* Last third: soft breathing halo when marker is in this sector */}
@@ -377,6 +409,14 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         const maghribBoundary = maghribMarker
           ? polarToXY(cx, cy, ringR, maghribMarker.angleDeg)
           : null;
+        const isInSunriseSubPeriod =
+          currentPhase === 'sunrise_to_dhuhr' &&
+          snapshot.timeline &&
+          getSunriseToDhuhrSubPeriod(
+            now ?? new Date(),
+            snapshot.timeline.sunrise,
+            snapshot.timeline.dhuhr,
+          ) === 'sunrise';
         return (
           <CurrentMarker
             x={pos.x}
@@ -392,6 +432,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             centerY={cy}
             sunriseBoundary={sunriseBoundary}
             maghribBoundary={maghribBoundary}
+            isInSunriseSubPeriod={isInSunriseSubPeriod}
           />
         );
       })()}
