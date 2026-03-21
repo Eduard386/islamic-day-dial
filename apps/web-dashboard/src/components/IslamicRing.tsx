@@ -281,20 +281,14 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
         jumuGradSunriseDhuhr &&
         jumuGradDhuhrAsr &&
         (() => {
-          const pathDuhaToDhuhr = describeArc(
-            cx,
-            cy,
-            ringR,
-            toD(duhaStartMarker.angleDeg),
-            toD(dhuhrMarker.angleDeg),
-          );
-          const pathDhuhrToAsr = describeArc(
-            cx,
-            cy,
-            ringR,
-            toD(dhuhrMarker.angleDeg),
-            toD(asrMarker.angleDeg),
-          );
+          let s1 = toD(duhaStartMarker.angleDeg);
+          let e1 = toD(dhuhrMarker.angleDeg);
+          if (e1 <= s1) e1 += 360;
+          let s2 = toD(dhuhrMarker.angleDeg);
+          let e2 = toD(asrMarker.angleDeg);
+          if (e2 <= s2) e2 += 360;
+          const pathDuhaToDhuhr = describeArc(cx, cy, ringR, s1, e1);
+          const pathDhuhrToAsr = describeArc(cx, cy, ringR, s2, e2);
           if (!pathDuhaToDhuhr || !pathDhuhrToAsr) return null;
           const wBase = ringStroke + JUMU_GLOW.baseStrokeExtra;
           const wPeak = ringStroke + JUMU_GLOW.peakStrokeExtra;
