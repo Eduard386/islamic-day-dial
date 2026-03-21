@@ -23,10 +23,24 @@ export default function App() {
 
       <main className="app-main">
         <div className="dial-section">
-          <div className="dial-wrapper">
-            <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} />
-            <div className="center-overlay">
-              <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+          <div className="dials-row">
+            <div className="dial-cell">
+              <div className="dial-wrapper">
+                <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} clock12Anchor="maghrib" />
+                <div className="center-overlay">
+                  <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+                </div>
+              </div>
+              <span className="dial-label">12h = Maghrib</span>
+            </div>
+            <div className="dial-cell">
+              <div className="dial-wrapper">
+                <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} clock12Anchor="midday" />
+                <div className="center-overlay">
+                  <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+                </div>
+              </div>
+              <span className="dial-label">12h = Midday</span>
             </div>
           </div>
         </div>

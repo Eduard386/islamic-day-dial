@@ -4,16 +4,21 @@ import {
   type IslamicPhaseId,
   type RingSegment,
 } from '@islamic-day-dial/core';
+import { toDisplayAngle } from '../config/ring-anchor';
 import { describeArc, polarToXY } from '../lib/geometry';
 import { getSegmentGradientStops, getSweepSubArcs, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
+
+export type Clock12Anchor = 'maghrib' | 'midday';
 
 type Props = {
   snapshot: ComputedIslamicDay;
   /** Для джума-подсветки (пятница) и границ времени */
   now?: Date;
   size?: number;
+  /** 12 часов сверху: Maghrib (начало исламского дня) или Midday (полдень) */
+  clock12Anchor?: Clock12Anchor;
 };
 
 /** Primary: Fajr, Dhuhr, Asr, Maghrib, Isha — short ticks */
@@ -102,7 +107,7 @@ function getDisplaySegments(
   });
 }
 
-export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
+export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anchor = 'maghrib' }: Props) {
   const cx = size / 2;
   const cy = size / 2;
   const ringStroke = size * 0.081;
@@ -111,8 +116,21 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
   const { ring, currentPhase } = snapshot;
   const { timeline } = snapshot;
-  const progressAngle = ring.progress * 360;
-  const displaySegments = getDisplaySegments(ring.segments, currentPhase);
+  const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
+  const offsetDeg =
+    clock12Anchor === 'midday' && dhuhrMarker ? -dhuhrMarker.angleDeg : 0;
+  const toD = (a: number) => toDisplayAngle(a, offsetDeg);
+
+  const progressAngle = toD(ring.progress * 360);
+  const displaySegments = getDisplaySegments(ring.segments, currentPhase).map(
+    (s) => {
+      let startAngleDeg = toD(s.startAngleDeg);
+      let endAngleDeg = toD(s.endAngleDeg);
+      // Нормализация при переходе через 0° ( sunrise_to_dhuhr при anchor=midday )
+      if (endAngleDeg <= startAngleDeg) endAngleDeg += 360;
+      return { ...s, startAngleDeg, endAngleDeg };
+    },
+  );
   const inIshaSector = NIGHT_SECTORS_GROUP.has(currentPhase);
 
   const mirrorSegment: MirrorSegment | null = (() => {
@@ -120,16 +138,15 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
     const ishaMarker = ring.markers.find((m) => m.id === 'isha');
     const fajrMarker = ring.markers.find((m) => m.id === 'fajr');
     if (!asrMarker || !ishaMarker || !fajrMarker) return null;
-    const asrAngle = asrMarker.angleDeg;
-    const ishaAngle = ishaMarker.angleDeg;
-    const fajrAngle = fajrMarker.angleDeg;
-    const asrToIshaSpanDeg = (360 - asrAngle) + ishaAngle;
+    const asrAngle = toD(asrMarker.angleDeg);
+    const ishaAngle = toD(ishaMarker.angleDeg);
+    const fajrAngle = toD(fajrMarker.angleDeg);
+    const asrToIshaSpanDeg = (360 - asrAngle + ishaAngle + 360) % 360;
     return { startAngleDeg: fajrAngle, spanDeg: asrToIshaSpanDeg };
   })();
 
   const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase);
   const duhaStartMarker = ring.markers.find((m) => m.id === 'duha_start');
-  const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
   const asrMarker = ring.markers.find((m) => m.id === 'asr');
   const sunriseToDhuhrSeg = displaySegments.find((s) => s.id === 'sunrise_to_dhuhr');
   const dhuhrToAsrSeg = displaySegments.find((s) => s.id === 'dhuhr_to_asr');
@@ -268,15 +285,15 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             cx,
             cy,
             ringR,
-            duhaStartMarker.angleDeg,
-            dhuhrMarker.angleDeg,
+            toD(duhaStartMarker.angleDeg),
+            toD(dhuhrMarker.angleDeg),
           );
           const pathDhuhrToAsr = describeArc(
             cx,
             cy,
             ringR,
-            dhuhrMarker.angleDeg,
-            asrMarker.angleDeg,
+            toD(dhuhrMarker.angleDeg),
+            toD(asrMarker.angleDeg),
           );
           if (!pathDuhaToDhuhr || !pathDhuhrToAsr) return null;
           const wBase = ringStroke + JUMU_GLOW.baseStrokeExtra;
@@ -350,10 +367,11 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         const tickLen = size * 0.0125; // чуть короче, чтобы не "залезали" в сегменты
         const tickStartR = ringInner - tickStrokeWidth / 2; // начинаем строго внутри
         const tickEndR = tickStartR - tickLen;
-        const inner = polarToXY(cx, cy, tickStartR, m.angleDeg);
+        const angle = toD(m.angleDeg);
+        const inner = polarToXY(cx, cy, tickStartR, angle);
 
         if (isPrimary || isSecondary) {
-          const outer = polarToXY(cx, cy, tickEndR, m.angleDeg);
+          const outer = polarToXY(cx, cy, tickEndR, angle);
           return (
             <line
               key={m.id}
@@ -380,10 +398,10 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         const sunriseMarker = ring.markers.find((m) => m.id === 'sunrise');
         const maghribMarker = ring.markers.find((m) => m.id === 'maghrib');
         const sunriseBoundary = sunriseMarker
-          ? polarToXY(cx, cy, ringR, sunriseMarker.angleDeg)
+          ? polarToXY(cx, cy, ringR, toD(sunriseMarker.angleDeg))
           : null;
         const maghribBoundary = maghribMarker
-          ? polarToXY(cx, cy, ringR, maghribMarker.angleDeg)
+          ? polarToXY(cx, cy, ringR, toD(maghribMarker.angleDeg))
           : null;
         return (
           <CurrentMarker
@@ -394,8 +412,8 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             state={markerState}
             currentPhase={currentPhase}
             progressAngle={progressAngle}
-            sunriseAngleDeg={sunriseMarker?.angleDeg ?? 0}
-            maghribAngleDeg={maghribMarker?.angleDeg ?? 0}
+            sunriseAngleDeg={sunriseMarker ? toD(sunriseMarker.angleDeg) : 0}
+            maghribAngleDeg={maghribMarker ? toD(maghribMarker.angleDeg) : 0}
             centerX={cx}
             centerY={cy}
             sunriseBoundary={sunriseBoundary}
