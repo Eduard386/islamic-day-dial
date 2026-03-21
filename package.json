@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "build:demo": "npm run build:demo --workspace=@islamic-day-dial/web-dashboard",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint 'packages/*/src/**/*.ts'",
