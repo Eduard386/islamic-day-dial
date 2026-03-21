@@ -42,6 +42,15 @@ export default function App() {
               </div>
               <span className="dial-label">12h = Midday</span>
             </div>
+            <div className="dial-cell">
+              <div className="dial-wrapper">
+                <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} clock12Anchor="rotating" />
+                <div className="center-overlay">
+                  <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+                </div>
+              </div>
+              <span className="dial-label">Маркер фиксирован, кольцо вращается</span>
+            </div>
           </div>
         </div>
 

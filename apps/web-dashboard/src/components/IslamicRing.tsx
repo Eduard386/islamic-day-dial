@@ -10,14 +10,14 @@ import { getSegmentGradientStops, getSweepSubArcs, type MirrorSegment } from '..
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 
-export type Clock12Anchor = 'maghrib' | 'midday';
+export type Clock12Anchor = 'maghrib' | 'midday' | 'rotating';
 
 type Props = {
   snapshot: ComputedIslamicDay;
   /** Для джума-подсветки (пятница) и границ времени */
   now?: Date;
   size?: number;
-  /** 12 часов сверху: Maghrib (начало исламского дня) или Midday (полдень) */
+  /** maghrib | midday — 12h сверху. rotating — маркер фиксирован на midday, кольцо вращается против ч.с. */
   clock12Anchor?: Clock12Anchor;
 };
 
@@ -117,11 +117,17 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
   const { ring, currentPhase } = snapshot;
   const { timeline } = snapshot;
   const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
-  const offsetDeg =
-    clock12Anchor === 'midday' && dhuhrMarker ? -dhuhrMarker.angleDeg : 0;
+  /** rotating: маркер фиксирован на 0° (midday), кольцо вращается против ч.с. */
+  const isRotating = clock12Anchor === 'rotating';
+  const offsetDeg = isRotating
+    ? -ring.progress * 360
+    : clock12Anchor === 'midday' && dhuhrMarker
+      ? -dhuhrMarker.angleDeg
+      : 0;
   const toD = (a: number) => toDisplayAngle(a, offsetDeg);
 
-  const progressAngle = toD(ring.progress * 360);
+  /** rotating: маркер всегда наверху (0°). Иначе — движется по кольцу */
+  const progressAngle = isRotating ? 0 : toD(ring.progress * 360);
   const displaySegments = getDisplaySegments(ring.segments, currentPhase).map(
     (s) => {
       let startAngleDeg = toD(s.startAngleDeg);

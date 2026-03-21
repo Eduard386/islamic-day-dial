@@ -207,10 +207,28 @@ export function getSweepSubArcs(
       const i1 = Math.min(i0 + 1, palette.length - 1);
       color = lerpColor(palette[i0], palette[i1], idx - i0);
     } else {
-      const seg = segments.find((s) => midAngle >= s.startAngleDeg && midAngle < s.endAngleDeg);
+      const seg = segments.find((s) => {
+        if (s.endAngleDeg <= 360) {
+          return midAngle >= s.startAngleDeg && midAngle < s.endAngleDeg;
+        }
+        // Wrapping segment (endAngleDeg > 360): covers [start, 360) ∪ [0, end - 360)
+        return (midAngle >= s.startAngleDeg && midAngle < 360) ||
+          (midAngle >= 0 && midAngle < s.endAngleDeg - 360);
+      });
       const palette = seg ? getPaletteForSegment(seg.id as IslamicPhaseId) : [NIGHT_BLACK];
       const span = seg ? seg.endAngleDeg - seg.startAngleDeg : 360;
-      const t = seg && span > 0 ? Math.max(0, Math.min(1, (midAngle - seg.startAngleDeg) / span)) : 0;
+      let t = 0;
+      if (seg && span > 0) {
+        if (seg.endAngleDeg <= 360) {
+          t = (midAngle - seg.startAngleDeg) / span;
+        } else {
+          const wrapEnd = seg.endAngleDeg - 360;
+          t = midAngle >= seg.startAngleDeg
+            ? (midAngle - seg.startAngleDeg) / span
+            : (360 - seg.startAngleDeg + midAngle) / span;
+        }
+        t = Math.max(0, Math.min(1, t));
+      }
       const idx = t * (palette.length - 1);
       const i0 = Math.floor(idx);
       const i1 = Math.min(i0 + 1, palette.length - 1);
