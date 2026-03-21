@@ -18,6 +18,8 @@ type Props = {
   /** Точка границы на кольце — отрез по уровню риски */
   sunriseBoundary?: { x: number; y: number } | null;
   maghribBoundary?: { x: number; y: number } | null;
+  /** Уникальный ID для defs при двух кольцах (maghrib/midday) — иначе mask берётся от другого кольца */
+  instanceId?: string;
 };
 
 /** Зона перехода в градусах */
@@ -117,11 +119,14 @@ function getBlackDiskReveal(
 }
 
 
-export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary }: Props) {
+const idSuffix = (id?: string) => (id ? `-${id}` : '');
+
+export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary, instanceId }: Props) {
   const { isNight, moonPhase, hijriDayUsed } = state;
+  const suffix = idSuffix(instanceId);
   const innerR = r * MOON_INNER_R;
   const isMoonOnlySector = MOON_ONLY_PHASES.has(currentPhase);
-  const crescentMaskId = `crescent-mask-${hijriDayUsed}`;
+  const crescentMaskId = `crescent-mask-${hijriDayUsed}${suffix}`;
   const { reveal, boundaryAngle, isRollIn } = getBlackDiskReveal(progressAngle, sunriseAngleDeg, maghribAngleDeg, isMoonOnlySector);
 
   return (
@@ -134,22 +139,22 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
           </mask>
         </defs>
       )}
-      <g clipPath="url(#marker-disk-clip)">
+      <g clipPath={`url(#marker-disk-clip${suffix})`}>
         {/* Base disk: пред-roll-out, roll-out, roll-in — солнце с самого начала Sunrise */}
         {reveal > 0 && (
           (() => {
             const isBrightSun = SUN_PHASES.has(currentPhase);
             if (reveal >= 1) {
-              const diskFill = isBrightSun ? 'url(#sun-fill)' : DISK_FILL;
+              const diskFill = isBrightSun ? `url(#sun-fill${suffix})` : DISK_FILL;
               const diskStroke = isBrightSun ? '#ffa000' : DISK_STROKE;
-              const diskFilter = isBrightSun ? 'url(#sun-glow)' : undefined;
+              const diskFilter = isBrightSun ? `url(#sun-glow${suffix})` : undefined;
               return (
                 <>
                   {isBrightSun && (() => {
                     const ringStroke = size * 0.081;
                     const wBase = ringStroke + SUN_NEON.baseStrokeExtra;
                     const wPeak = ringStroke + SUN_NEON.peakStrokeExtra;
-                    const gradId = `grad-${currentPhase}`;
+                    const gradId = `grad-${currentPhase}${suffix}`;
                     return (
                       <g
                         className="last-third-glow-pulse"
@@ -158,10 +163,10 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
                           ['--last-third-glow-peak-opacity' as string]: String(SUN_NEON.peakOpacity),
                         }}
                       >
-                        <g filter="url(#glow-jumu-base)" opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
+                        <g filter={`url(#glow-jumu-base${suffix})`} opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
                           <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wBase} />
                         </g>
-                        <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
+                        <g filter={`url(#glow-jumu-peak${suffix})`} className="last-third-glow-peak">
                           <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wPeak} />
                         </g>
                       </g>
@@ -177,7 +182,7 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
             const tanX = Math.cos(degToRad(tangentDeg));
             const tanY = Math.sin(degToRad(tangentDeg));
             const k = r * 2;
-            const maskId = `black-disk-mask-${hijriDayUsed}-${reveal.toFixed(2)}`;
+            const maskId = `black-disk-mask-${hijriDayUsed}-${reveal.toFixed(2)}${suffix}`;
             const gradStops = isRollIn
               ? /* ASR: не менять — откус по риске, скрывается часть за Maghrib */
                 [
@@ -204,9 +209,9 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
               : 0;
             const dx = shift * tanX;
             const dy = shift * tanY;
-            const diskFill = isBrightSun ? 'url(#sun-fill)' : DISK_FILL;
+            const diskFill = isBrightSun ? `url(#sun-fill${suffix})` : DISK_FILL;
             const diskStroke = isBrightSun ? '#ffa000' : DISK_STROKE;
-            const diskFilter = isBrightSun ? 'url(#sun-glow)' : undefined;
+            const diskFilter = isBrightSun ? `url(#sun-glow${suffix})` : undefined;
             return (
               <>
                 <defs>
@@ -228,7 +233,7 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
                   const ringStroke = size * 0.081;
                   const wBase = ringStroke + SUN_NEON.baseStrokeExtra;
                   const wPeak = ringStroke + SUN_NEON.peakStrokeExtra;
-                  const gradId = `grad-${currentPhase}`;
+                  const gradId = `grad-${currentPhase}${suffix}`;
                   return (
                     <g
                       className="last-third-glow-pulse"
@@ -237,10 +242,10 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
                         ['--last-third-glow-peak-opacity' as string]: String(SUN_NEON.peakOpacity),
                       }}
                     >
-                      <g filter="url(#glow-jumu-base)" opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
+                      <g filter={`url(#glow-jumu-base${suffix})`} opacity={SUN_NEON.baseOpacity} className="last-third-glow-base">
                         <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wBase} mask={`url(#${maskId})`} />
                       </g>
-                      <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
+                      <g filter={`url(#glow-jumu-peak${suffix})`} className="last-third-glow-peak">
                         <circle r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={wPeak} mask={`url(#${maskId})`} />
                       </g>
                     </g>
@@ -258,20 +263,20 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
               /* Night: lunar silver-blue, ring background shows through where shadow was */
               moonPhase.shadowOffset === 0 ? (
                 <>
-                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter="url(#moon-lunar-glow)" opacity={0.85} />
+                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter={`url(#moon-lunar-glow${suffix})`} opacity={0.85} />
                   <circle r={innerR} fill={MOON_LUNAR_FILL} />
                 </>
               ) : (
                 <>
                   {/* Glow + crescent: both masked so shadow area shows ring, not moon */}
-                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter="url(#moon-lunar-glow)" opacity={0.85} mask={`url(#${crescentMaskId})`} />
+                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter={`url(#moon-lunar-glow${suffix})`} opacity={0.85} mask={`url(#${crescentMaskId})`} />
                   <circle r={innerR} fill={MOON_LUNAR_FILL} mask={`url(#${crescentMaskId})`} />
                 </>
               )
             ) : (
               /* Fallback: lit + shadow (black disk behind) */
               <>
-                <circle r={innerR} fill={MOON_FILL} filter="url(#moon-glow)" opacity={1} />
+                <circle r={innerR} fill={MOON_FILL} filter={`url(#moon-glow${suffix})`} opacity={1} />
                 <circle r={innerR} fill={MOON_FILL} />
                 {moonPhase.shadowOffset !== 0 && (
                   <circle
@@ -291,16 +296,17 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
 }
 
 /** ClipPath and glow filters for marker */
-export function CurrentMarkerDefs({ r }: { r: number }) {
+export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: string }) {
+  const suffix = idSuffix(instanceId);
   return (
     <>
-      <filter id="moon-glow" x="-80%" y="-80%" width="260%" height="260%">
+      <filter id={`moon-glow${suffix}`} x="-80%" y="-80%" width="260%" height="260%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
         </feMerge>
       </filter>
-      <filter id="moon-lunar-glow" x="-100%" y="-100%" width="300%" height="300%">
+      <filter id={`moon-lunar-glow${suffix}`} x="-100%" y="-100%" width="300%" height="300%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
@@ -308,7 +314,7 @@ export function CurrentMarkerDefs({ r }: { r: number }) {
         </feMerge>
       </filter>
       <filter
-        id="sun-glow"
+        id={`sun-glow${suffix}`}
         x={`-${(SUN_GLOW.filterSize - 100) / 2}%`}
         y={`-${(SUN_GLOW.filterSize - 100) / 2}%`}
         width={`${SUN_GLOW.filterSize}%`}
@@ -320,13 +326,13 @@ export function CurrentMarkerDefs({ r }: { r: number }) {
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <radialGradient id="sun-fill" cx="0.5" cy="0.5" r="0.5">
+      <radialGradient id={`sun-fill${suffix}`} cx="0.5" cy="0.5" r="0.5">
         <stop offset="0" stopColor="#ffffff" />
         <stop offset="0.3" stopColor="#fffde7" />
         <stop offset="0.6" stopColor="#fff59d" />
         <stop offset="1" stopColor="#ffca28" />
       </radialGradient>
-      <clipPath id="marker-disk-clip" clipPathUnits="objectBoundingBox">
+      <clipPath id={`marker-disk-clip${suffix}`} clipPathUnits="objectBoundingBox">
         <circle cx="0.5" cy="0.5" r="0.5" />
       </clipPath>
     </>

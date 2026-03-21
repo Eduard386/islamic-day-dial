@@ -151,9 +151,9 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
   const sunriseToDhuhrSeg = displaySegments.find((s) => s.id === 'sunrise_to_dhuhr');
   const dhuhrToAsrSeg = displaySegments.find((s) => s.id === 'dhuhr_to_asr');
   const jumuGradSunriseDhuhr =
-    sunriseToDhuhrSeg != null ? 'grad-sunrise_to_dhuhr' : null;
+    sunriseToDhuhrSeg != null ? `grad-sunrise_to_dhuhr-${clock12Anchor}` : null;
   const jumuGradDhuhrAsr =
-    dhuhrToAsrSeg != null ? 'grad-dhuhr_to_asr' : null;
+    dhuhrToAsrSeg != null ? `grad-dhuhr_to_asr-${clock12Anchor}` : null;
 
   return (
     <svg
@@ -163,26 +163,26 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
       style={{ display: 'block' }}
     >
       <defs>
-        <CurrentMarkerDefs r={MARKER_R} />
-        <filter id="glow-ish" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <CurrentMarkerDefs r={MARKER_R} instanceId={clock12Anchor} />
+        <filter id={`glow-ish-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={ISHA_GLOW.blur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <filter id="glow-last-third" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <filter id={`glow-last-third-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={LAST_THIRD_GLOW.blur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <filter id="glow-jumu-base" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <filter id={`glow-jumu-base-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={JUMU_GLOW.baseBlur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <filter id="glow-jumu-peak" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <filter id={`glow-jumu-peak-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={JUMU_GLOW.peakBlur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -198,7 +198,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
             return (
               <linearGradient
                 key={`grad-${seg.id}`}
-                id={`grad-${seg.id}`}
+                id={`grad-${seg.id}-${clock12Anchor}`}
                 x1={start.x}
                 y1={start.y}
                 x2={end.x}
@@ -223,7 +223,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
           return (
             <g
               key="breathing-last-third"
-              filter="url(#glow-last-third)"
+              filter={`url(#glow-last-third-${clock12Anchor})`}
               className="last-third-breathe"
               style={{ ['--last-third-breathe-duration' as string]: `${LAST_THIRD_BREATHE.duration}s` }}
             >
@@ -257,17 +257,17 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
                     ['--last-third-glow-peak-opacity' as string]: String(LAST_THIRD_GLOW.peakOpacity ?? 0.7),
                   }}
                 >
-                  <g filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity} className="last-third-glow-base">
+                  <g filter={`url(#glow-ish-${clock12Anchor})`} opacity={ISHA_GLOW.opacity} className="last-third-glow-base">
                     <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
                   </g>
-                  <g filter="url(#glow-last-third)" className="last-third-glow-peak">
+                  <g filter={`url(#glow-last-third-${clock12Anchor})`} className="last-third-glow-peak">
                     <path d={path} fill="none" stroke={LAST_THIRD_GLOW.color} strokeWidth={ringStroke + LAST_THIRD_GLOW.strokeWidth} strokeLinecap="butt" />
                   </g>
                 </g>
               );
             }
             return (
-              <g key={`glow-ish-${seg.id}`} filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity}>
+              <g key={`glow-ish-${seg.id}`} filter={`url(#glow-ish-${clock12Anchor})`} opacity={ISHA_GLOW.opacity}>
                 <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
               </g>
             );
@@ -307,7 +307,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
                 ['--last-third-glow-peak-opacity' as string]: String(JUMU_GLOW.peakOpacity),
               }}
             >
-              <g filter="url(#glow-jumu-base)" opacity={JUMU_GLOW.baseOpacity} className="last-third-glow-base">
+              <g filter={`url(#glow-jumu-base-${clock12Anchor})`} opacity={JUMU_GLOW.baseOpacity} className="last-third-glow-base">
                 <path
                   d={pathDuhaToDhuhr}
                   fill="none"
@@ -323,7 +323,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
                   strokeLinecap="butt"
                 />
               </g>
-              <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
+              <g filter={`url(#glow-jumu-peak-${clock12Anchor})`} className="last-third-glow-peak">
                 <path
                   d={pathDuhaToDhuhr}
                   fill="none"
@@ -418,6 +418,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
             centerY={cy}
             sunriseBoundary={sunriseBoundary}
             maghribBoundary={maghribBoundary}
+            instanceId={clock12Anchor}
           />
         );
       })()}
