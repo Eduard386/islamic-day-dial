@@ -4,21 +4,16 @@ import {
   type IslamicPhaseId,
   type RingSegment,
 } from '@islamic-day-dial/core';
-import { toDisplayAngle } from '../config/ring-anchor';
 import { describeArc, polarToXY } from '../lib/geometry';
 import { getSegmentGradientStops, getSweepSubArcs, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
-
-export type Clock12Anchor = 'maghrib' | 'midday' | 'rotating';
 
 type Props = {
   snapshot: ComputedIslamicDay;
   /** Для джума-подсветки (пятница) и границ времени */
   now?: Date;
   size?: number;
-  /** maghrib | midday — 12h сверху. rotating — маркер фиксирован на midday, кольцо вращается против ч.с. */
-  clock12Anchor?: Clock12Anchor;
 };
 
 /** Primary: Fajr, Dhuhr, Asr, Maghrib, Isha — short ticks */
@@ -107,7 +102,7 @@ function getDisplaySegments(
   });
 }
 
-export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anchor = 'maghrib' }: Props) {
+export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
   const cx = size / 2;
   const cy = size / 2;
   const ringStroke = size * 0.081;
@@ -115,28 +110,8 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
   const ringR = ringInner + ringStroke / 2;
 
   const { ring, currentPhase } = snapshot;
-  const { timeline } = snapshot;
-  const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
-  /** rotating: маркер фиксирован на 0° (midday), кольцо вращается против ч.с. */
-  const isRotating = clock12Anchor === 'rotating';
-  const offsetDeg = isRotating
-    ? -ring.progress * 360
-    : clock12Anchor === 'midday' && dhuhrMarker
-      ? -dhuhrMarker.angleDeg
-      : 0;
-  const toD = (a: number) => toDisplayAngle(a, offsetDeg);
-
-  /** rotating: маркер всегда наверху (0°). Иначе — движется по кольцу */
-  const progressAngle = isRotating ? 0 : toD(ring.progress * 360);
-  const displaySegments = getDisplaySegments(ring.segments, currentPhase).map(
-    (s) => {
-      let startAngleDeg = toD(s.startAngleDeg);
-      let endAngleDeg = toD(s.endAngleDeg);
-      // Нормализация при переходе через 0° ( sunrise_to_dhuhr при anchor=midday )
-      if (endAngleDeg <= startAngleDeg) endAngleDeg += 360;
-      return { ...s, startAngleDeg, endAngleDeg };
-    },
-  );
+  const progressAngle = ring.progress * 360;
+  const displaySegments = getDisplaySegments(ring.segments, currentPhase);
   const inIshaSector = NIGHT_SECTORS_GROUP.has(currentPhase);
 
   const mirrorSegment: MirrorSegment | null = (() => {
@@ -144,22 +119,23 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
     const ishaMarker = ring.markers.find((m) => m.id === 'isha');
     const fajrMarker = ring.markers.find((m) => m.id === 'fajr');
     if (!asrMarker || !ishaMarker || !fajrMarker) return null;
-    const asrAngle = toD(asrMarker.angleDeg);
-    const ishaAngle = toD(ishaMarker.angleDeg);
-    const fajrAngle = toD(fajrMarker.angleDeg);
-    const asrToIshaSpanDeg = (360 - asrAngle + ishaAngle + 360) % 360;
+    const asrAngle = asrMarker.angleDeg;
+    const ishaAngle = ishaMarker.angleDeg;
+    const fajrAngle = fajrMarker.angleDeg;
+    const asrToIshaSpanDeg = (360 - asrAngle) + ishaAngle;
     return { startAngleDeg: fajrAngle, spanDeg: asrToIshaSpanDeg };
   })();
 
   const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase);
   const duhaStartMarker = ring.markers.find((m) => m.id === 'duha_start');
+  const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
   const asrMarker = ring.markers.find((m) => m.id === 'asr');
   const sunriseToDhuhrSeg = displaySegments.find((s) => s.id === 'sunrise_to_dhuhr');
   const dhuhrToAsrSeg = displaySegments.find((s) => s.id === 'dhuhr_to_asr');
   const jumuGradSunriseDhuhr =
-    sunriseToDhuhrSeg != null ? `grad-sunrise_to_dhuhr-${clock12Anchor}` : null;
+    sunriseToDhuhrSeg != null ? 'grad-sunrise_to_dhuhr' : null;
   const jumuGradDhuhrAsr =
-    dhuhrToAsrSeg != null ? `grad-dhuhr_to_asr-${clock12Anchor}` : null;
+    dhuhrToAsrSeg != null ? 'grad-dhuhr_to_asr' : null;
 
   return (
     <svg
@@ -169,26 +145,26 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
       style={{ display: 'block' }}
     >
       <defs>
-        <CurrentMarkerDefs r={MARKER_R} instanceId={clock12Anchor} />
-        <filter id={`glow-ish-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <CurrentMarkerDefs r={MARKER_R} />
+        <filter id="glow-ish" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={ISHA_GLOW.blur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <filter id={`glow-last-third-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <filter id="glow-last-third" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={LAST_THIRD_GLOW.blur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <filter id={`glow-jumu-base-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <filter id="glow-jumu-base" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={JUMU_GLOW.baseBlur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
           </feMerge>
         </filter>
-        <filter id={`glow-jumu-peak-${clock12Anchor}`} filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
+        <filter id="glow-jumu-peak" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={JUMU_GLOW.peakBlur} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -204,7 +180,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
             return (
               <linearGradient
                 key={`grad-${seg.id}`}
-                id={`grad-${seg.id}-${clock12Anchor}`}
+                id={`grad-${seg.id}`}
                 x1={start.x}
                 y1={start.y}
                 x2={end.x}
@@ -229,7 +205,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
           return (
             <g
               key="breathing-last-third"
-              filter={`url(#glow-last-third-${clock12Anchor})`}
+              filter="url(#glow-last-third)"
               className="last-third-breathe"
               style={{ ['--last-third-breathe-duration' as string]: `${LAST_THIRD_BREATHE.duration}s` }}
             >
@@ -263,17 +239,17 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
                     ['--last-third-glow-peak-opacity' as string]: String(LAST_THIRD_GLOW.peakOpacity ?? 0.7),
                   }}
                 >
-                  <g filter={`url(#glow-ish-${clock12Anchor})`} opacity={ISHA_GLOW.opacity} className="last-third-glow-base">
+                  <g filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity} className="last-third-glow-base">
                     <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
                   </g>
-                  <g filter={`url(#glow-last-third-${clock12Anchor})`} className="last-third-glow-peak">
+                  <g filter="url(#glow-last-third)" className="last-third-glow-peak">
                     <path d={path} fill="none" stroke={LAST_THIRD_GLOW.color} strokeWidth={ringStroke + LAST_THIRD_GLOW.strokeWidth} strokeLinecap="butt" />
                   </g>
                 </g>
               );
             }
             return (
-              <g key={`glow-ish-${seg.id}`} filter={`url(#glow-ish-${clock12Anchor})`} opacity={ISHA_GLOW.opacity}>
+              <g key={`glow-ish-${seg.id}`} filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity}>
                 <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
               </g>
             );
@@ -287,12 +263,10 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
         jumuGradSunriseDhuhr &&
         jumuGradDhuhrAsr &&
         (() => {
-          let s1 = toD(duhaStartMarker.angleDeg);
-          let e1 = toD(dhuhrMarker.angleDeg);
-          if (e1 <= s1) e1 += 360;
-          let s2 = toD(dhuhrMarker.angleDeg);
-          let e2 = toD(asrMarker.angleDeg);
-          if (e2 <= s2) e2 += 360;
+          const s1 = duhaStartMarker.angleDeg;
+          const e1 = dhuhrMarker.angleDeg;
+          const s2 = dhuhrMarker.angleDeg;
+          const e2 = asrMarker.angleDeg;
           const pathDuhaToDhuhr = describeArc(cx, cy, ringR, s1, e1);
           const pathDhuhrToAsr = describeArc(cx, cy, ringR, s2, e2);
           if (!pathDuhaToDhuhr || !pathDhuhrToAsr) return null;
@@ -307,7 +281,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
                 ['--last-third-glow-peak-opacity' as string]: String(JUMU_GLOW.peakOpacity),
               }}
             >
-              <g filter={`url(#glow-jumu-base-${clock12Anchor})`} opacity={JUMU_GLOW.baseOpacity} className="last-third-glow-base">
+              <g filter="url(#glow-jumu-base)" opacity={JUMU_GLOW.baseOpacity} className="last-third-glow-base">
                 <path
                   d={pathDuhaToDhuhr}
                   fill="none"
@@ -323,7 +297,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
                   strokeLinecap="butt"
                 />
               </g>
-              <g filter={`url(#glow-jumu-peak-${clock12Anchor})`} className="last-third-glow-peak">
+              <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
                 <path
                   d={pathDuhaToDhuhr}
                   fill="none"
@@ -367,7 +341,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
         const tickLen = size * 0.0125; // чуть короче, чтобы не "залезали" в сегменты
         const tickStartR = ringInner - tickStrokeWidth / 2; // начинаем строго внутри
         const tickEndR = tickStartR - tickLen;
-        const angle = toD(m.angleDeg);
+        const angle = m.angleDeg;
         const inner = polarToXY(cx, cy, tickStartR, angle);
 
         if (isPrimary || isSecondary) {
@@ -398,10 +372,10 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
         const sunriseMarker = ring.markers.find((m) => m.id === 'sunrise');
         const maghribMarker = ring.markers.find((m) => m.id === 'maghrib');
         const sunriseBoundary = sunriseMarker
-          ? polarToXY(cx, cy, ringR, toD(sunriseMarker.angleDeg))
+          ? polarToXY(cx, cy, ringR, sunriseMarker.angleDeg)
           : null;
         const maghribBoundary = maghribMarker
-          ? polarToXY(cx, cy, ringR, toD(maghribMarker.angleDeg))
+          ? polarToXY(cx, cy, ringR, maghribMarker.angleDeg)
           : null;
         return (
           <CurrentMarker
@@ -412,13 +386,12 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420, clock12Anc
             state={markerState}
             currentPhase={currentPhase}
             progressAngle={progressAngle}
-            sunriseAngleDeg={sunriseMarker ? toD(sunriseMarker.angleDeg) : 0}
-            maghribAngleDeg={maghribMarker ? toD(maghribMarker.angleDeg) : 0}
+            sunriseAngleDeg={sunriseMarker ? sunriseMarker.angleDeg : 0}
+            maghribAngleDeg={maghribMarker ? maghribMarker.angleDeg : 0}
             centerX={cx}
             centerY={cy}
             sunriseBoundary={sunriseBoundary}
             maghribBoundary={maghribBoundary}
-            instanceId={clock12Anchor}
           />
         );
       })()}
