@@ -18,7 +18,7 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>Islamic Day Dial</h1>
-        <p className="subtitle">Islamic day visualizer — Maghrib to Maghrib</p>
+        <p className="subtitle">Maghrib to Maghrib</p>
       </header>
 
       <main className="app-main">
