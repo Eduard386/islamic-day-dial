@@ -35,8 +35,8 @@ const MIN_REVEAL = 0.12;
 const DISK_FILL = '#000000';
 const DISK_STROKE = '#000000';
 const MOON_FILL = '#e8dcc8';
-/** Lunar: bluish-yellowish, muted, full-moon glow — Maghrib, Isha, Last Third */
-const MOON_LUNAR_FILL = '#B0B0A8';
+/** Lunar: bluish-yellowish, muted, full-moon glow — Maghrib, Isha, Last Third (чуть ярче и желтее) */
+const MOON_LUNAR_FILL = '#C0B8A0';
 const MOON_INNER_R = 0.82; /** Moon circles radius as fraction of disk r */
 
 /** Солнце: glow — здесь настраивать силу и охват свечения */
@@ -65,6 +65,13 @@ const SUN_OUTER_GLOW_NORMAL = {
   strokeWidth: 16,
   blur: 5,
   yellow: 'rgba(255, 202, 40, 0.35)',
+};
+
+/** Лёгкий glow для луны (чуть меньше чем у солнца) */
+const MOON_OUTER_GLOW = {
+  strokeWidth: 18,
+  blur: 6,
+  lunar: 'rgba(192, 184, 160, 0.7)',
 };
 
 /** = JUMU_GLOW (IslamicRing) — неон солнца идентичен дню джума */
@@ -324,6 +331,16 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
         {/* Night: луна всегда, даже если торчит за риску Sunrise */}
         {isNight && moonPhase && (
           <g>
+            {/* Moon outer glow — fill + stroke для заметного ореола */}
+            <g filter={`url(#moon-outer-glow${suffix})`}>
+              <circle
+                r={innerR}
+                fill="none"
+                stroke={MOON_OUTER_GLOW.lunar}
+                strokeWidth={MOON_OUTER_GLOW.strokeWidth}
+                {...(moonPhase.shadowOffset !== 0 ? { mask: `url(#${crescentMaskId})` } : {})}
+              />
+            </g>
             {isMoonOnlySector ? (
               /* Night: lunar silver-blue, ring background shows through where shadow was */
               moonPhase.shadowOffset === 0 ? (
@@ -376,6 +393,19 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter
+        id={`moon-outer-glow${suffix}`}
+        filterUnits="userSpaceOnUse"
+        x={-r * 3}
+        y={-r * 3}
+        width={r * 6}
+        height={r * 6}
+      >
+        <feGaussianBlur in="SourceGraphic" stdDeviation={MOON_OUTER_GLOW.blur} result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
         </feMerge>
       </filter>
       <filter
