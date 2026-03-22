@@ -120,7 +120,7 @@ struct ContentView: View {
             VStack(spacing: 4) {
                 Text("Islamic Day Dial")
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(Color(red: 0.81, green: 0.67, blue: 0.33))
+                    .foregroundStyle(.white)
                     .tracking(0.5)
                 Text("Maghrib to Maghrib")
                     .font(.system(size: 14, weight: .medium))
@@ -194,7 +194,7 @@ private struct PhoneDialView: View {
                     Text(formatCountdown(countdownMs(snapshot: snapshot)))
                         .font(.system(size: 17, weight: .light))
                         .monospacedDigit()
-                        .foregroundColor(Colors.ivory)
+                        .foregroundColor(Colors.nobleIronLighter)
                         .frame(maxWidth: .infinity)
                         .offset(y: countdownTop)
                 }
@@ -232,7 +232,7 @@ private struct PhoneDialView: View {
     }
     
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
-        Colors.ivory
+        Colors.nobleIronLighter
     }
 }
 
@@ -275,10 +275,10 @@ private struct HijriDateLabels: View {
                 .font(.system(size: useCompactDayMonth ? 15 : 18, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.ivory)
+                .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.accent)
             Text(parts.year)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(Colors.ivory)
+                .foregroundColor(Colors.accent)
         }
     }
 }

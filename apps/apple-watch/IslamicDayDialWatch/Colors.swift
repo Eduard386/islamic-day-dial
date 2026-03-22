@@ -18,9 +18,13 @@ let MOON_LUNAR = Color(red: 0.75, green: 0.72, blue: 0.63) // #C0B8A0
 /// Tick marks — warm ivory, matches web #fbeccb
 let MARKER_STROKE = Color(red: 0.984, green: 0.925, blue: 0.796)
 
-/// Ivory for sector names and countdown
+/// Ivory (legacy). Sector + countdown = nobleIronLighter, date = accent.
 enum Colors {
     static let ivory = Color(red: 0.96, green: 0.94, blue: 0.88)
+    /// Sector name + countdown: between noble iron lighter and white — #bcc4cc
+    static let nobleIronLighter = Color(red: 188 / 255, green: 196 / 255, blue: 204 / 255)
+    /// Accent for Hijri date (day, month, year) — #c69214
+    static let accent = Color(red: 0.776, green: 0.576, blue: 0.078)
 }
 
 /// Segment colors for watch (simplified). All 3 Isha arcs = same dark color.

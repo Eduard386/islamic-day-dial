@@ -83,7 +83,7 @@ body {
 .app-header h1 {
   font-size: calc(var(--header-main-size) * 0.88);
   font-weight: 700;
-  color: var(--accent);
+  color: #ffffff;
   letter-spacing: 0.02em;
 }
 
@@ -166,26 +166,26 @@ body {
 }
 
 .center-info-abs .current-period:not(.current-period-empty):not(.current-period-isha-neon) {
-  color: var(--ivory);
+  color: #bcc4cc;
 }
 
 /* Sunrise / Duha / Midday — один размер, тонкий начертание */
 .center-info-abs .current-period-subsectors {
-  color: var(--ivory);
+  color: #bcc4cc;
   font-size: 0.85em;
   font-weight: 300;
 }
 
 .center-info-abs .hijri-date-sector-style:not(.eid-date) {
-  color: var(--ivory);
+  color: var(--accent);
 }
 
 .center-info-abs .hijri-year-sector-style:not(.eid-date) {
-  color: var(--ivory);
+  color: var(--accent);
 }
 
 .center-info-abs .countdown {
-  color: var(--ivory);
+  color: #bcc4cc;
 }
 
 .center-info-abs > .current-period,
@@ -230,7 +230,7 @@ body {
 .current-period {
   font-size: 1.4rem;
   font-weight: 600;
-  color: var(--ivory);
+  color: #bcc4cc;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   min-height: 1.2em;
@@ -246,7 +246,7 @@ body {
 .current-period-secondary {
   font-size: 0.85em;
   font-weight: 300;
-  color: var(--ivory);
+  color: #bcc4cc;
 }
 
 /* Isha 1/2, 2/3: keep "Isha" centered, suffix to the right */
@@ -281,7 +281,7 @@ body {
 .hijri-date-sector-style {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--ivory);
+  color: var(--accent);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -306,7 +306,7 @@ body {
 .hijri-year-sector-style {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--ivory);
+  color: var(--accent);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -333,7 +333,7 @@ body {
 .countdown {
   font-size: 1.05rem;
   font-weight: 300;
-  color: var(--ivory);
+  color: #bcc4cc;
   font-variant-numeric: tabular-nums;
   margin-top: 0;
 }
