@@ -10,6 +10,7 @@ private let NIGHT_SECTORS_GROUP: Set<IslamicPhaseId> = [.isha_to_midnight, .last
 private let PRIMARY_MARKER_IDS: Set<String> = ["fajr", "dhuhr", "asr", "maghrib", "isha"]
 private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "last_third_start", "duha_start", "duha_end"]
 private let MOON_INNER_R: Double = 0.82
+private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔peak↔base)
 
 private struct MoonPhaseParams {
     let shadowOffset: Double
@@ -166,6 +167,15 @@ struct RingView: View {
             let gradientStops = buildAngularGradientStops(segments: displaySegments, mirrorSegment: mirrorSegment)
             
             ZStack(alignment: .center) {
+                if renderVariant == .phone {
+                    PhoneNightGlowOverlay(
+                        snapshot: snapshot,
+                        now: now,
+                        size: cs,
+                        thicknessScale: thicknessScale
+                    )
+                }
+
                 // Ring: single smooth AngularGradient (no sub-arc seams). SwiftUI 0°=right; web 0°=top → startAngle -90°
                 Circle()
                     .stroke(
@@ -206,7 +216,8 @@ struct RingView: View {
                         progressAngle: progressAngle,
                         sunMarkerState: sunMarkerState(),
                         thicknessScale: thicknessScale,
-                        size: cs
+                        size: cs,
+                        renderVariant: renderVariant
                     )
                 }
             }
@@ -214,6 +225,124 @@ struct RingView: View {
         }
         .aspectRatio(1, contentMode: .fill)
         .clipped()
+    }
+}
+
+/// Phase 0→1→0 over GLOW_PULSE_DURATION; sine-wave for smooth circular fade (no sharp corners)
+private func glowPulsePhase(_ t: Date) -> (base: Double, phase: Double) {
+    let sec = t.timeIntervalSince1970.truncatingRemainder(dividingBy: GLOW_PULSE_DURATION)
+    let tNorm = sec / GLOW_PULSE_DURATION
+    let phase = (sin(tNorm * 2 * .pi) + 1) / 2  // 0→1→0 smooth sine
+    let base = 0.35 * (1 - phase)
+    return (base, phase)
+}
+
+private struct PhoneNightGlowOverlay: View {
+    let snapshot: ComputedIslamicDay
+    let now: Date
+    let size: CGFloat
+    let thicknessScale: CGFloat
+
+    private var cStroke: CGFloat { size * 0.081 * thicknessScale }
+    private var cr: CGFloat {
+        let cInner = size * 0.25125
+        return cInner + cStroke / 2
+    }
+
+    var body: some View {
+        TimelineView(.periodic(from: Date(), by: 1.0 / 30)) { timeline in
+            let (base, phase) = glowPulsePhase(timeline.date)
+            let jumuBase = base
+            let jumuPeak = phase * 1.0
+            let lastThirdBase = base
+            let lastThirdPeak = phase * 0.92  // Slightly brighter and stronger
+
+            let nightSegments = snapshot.ringSegments.filter { NIGHT_SECTORS_GROUP.contains($0.id) }
+            let isInIsha = snapshot.currentPhase == .isha_to_midnight
+            let isInLastThird = snapshot.currentPhase == .last_third_to_fajr
+            let showJumuahGlow = isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: snapshot.currentPhase)
+            let duhaStartMarker = snapshot.ringMarkers.first { $0.id == "duha_start" }
+            let dhuhrMarker = snapshot.ringMarkers.first { $0.id == "dhuhr" }
+            let asrMarker = snapshot.ringMarkers.first { $0.id == "asr" }
+
+            ZStack {
+                if showJumuahGlow,
+                   let duhaStartMarker,
+                   let dhuhrMarker,
+                   let asrMarker {
+                    let pathDuhaToDhuhr = arcPath(
+                        cx: Double(size / 2),
+                        cy: Double(size / 2),
+                        r: Double(cr),
+                        startDeg: duhaStartMarker.angleDeg,
+                        endDeg: dhuhrMarker.angleDeg
+                    )
+                    let pathDhuhrToAsr = arcPath(
+                        cx: Double(size / 2),
+                        cy: Double(size / 2),
+                        r: Double(cr),
+                        startDeg: dhuhrMarker.angleDeg,
+                        endDeg: asrMarker.angleDeg
+                    )
+                    let jumuColor = Color(red: 0.486, green: 0.722, blue: 0.910)
+                    ZStack {
+                        pathDuhaToDhuhr
+                        .stroke(
+                            jumuColor.opacity(jumuBase),
+                            style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                        )
+                        .blur(radius: size * (3 / 420))
+                        pathDhuhrToAsr
+                        .stroke(
+                            jumuColor.opacity(jumuBase),
+                            style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                        )
+                        .blur(radius: size * (3 / 420))
+                        pathDuhaToDhuhr
+                        .stroke(
+                            jumuColor.opacity(jumuPeak),
+                            style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
+                        )
+                        .blur(radius: size * (5 / 420))
+                        pathDhuhrToAsr
+                        .stroke(
+                            jumuColor.opacity(jumuPeak),
+                            style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
+                        )
+                        .blur(radius: size * (5 / 420))
+                    }
+                }
+                if isInIsha || isInLastThird {
+                    ForEach(nightSegments.filter { isInIsha || $0.id == .isha_to_midnight || $0.id == .last_third_to_fajr }, id: \.id) { seg in
+                        let path = arcPath(cx: Double(size / 2), cy: Double(size / 2), r: Double(cr), startDeg: seg.startAngleDeg, endDeg: seg.endAngleDeg)
+                        if seg.id == .last_third_to_fajr && isInLastThird {
+                            let lastThirdColor = Color(red: 0.231, green: 0.51, blue: 0.965)
+                            ZStack {
+                                path
+                                    .stroke(
+                                        lastThirdColor.opacity(lastThirdBase),
+                                        style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
+                                    )
+                                    .blur(radius: size * (4 / 420))
+                                path
+                                    .stroke(
+                                        lastThirdColor.opacity(lastThirdPeak),
+                                        style: StrokeStyle(lineWidth: cStroke + size * (8 / 420), lineCap: .butt, lineJoin: .miter)
+                                    )
+                                    .blur(radius: size * (6 / 420))
+                            }
+                        } else {
+                            path
+                                .stroke(
+                                    Color(red: 0.231, green: 0.51, blue: 0.965).opacity(0.35),
+                                    style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                                )
+                                .blur(radius: size * (4 / 420))
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -225,6 +354,7 @@ private struct CurrentMarkerOverlay: View {
     let sunMarkerState: SunMarkerStyle?
     let thicknessScale: CGFloat
     let size: CGFloat
+    let renderVariant: RingRenderVariant
 
     private var isNight: Bool { MOON_ONLY_PHASES.contains(snapshot.currentPhase) }
     private var markerR: CGFloat { size * 0.033 * thicknessScale }
@@ -299,9 +429,14 @@ private struct CurrentMarkerOverlay: View {
         let moonPhase = getMoonPhaseByHijriDay(snapshot.hijriDate.day)
         let innerMoonR = markerR * MOON_INNER_R
 
+        let moonColor = renderVariant == .phone
+            ? Color(red: 0.89, green: 0.85, blue: 0.78)
+            : MOON_LUNAR
+
         let moonContent = Circle()
-            .fill(MOON_LUNAR)
+            .fill(moonColor)
             .frame(width: innerMoonR * 2, height: innerMoonR * 2)
+            .shadow(color: moonColor.opacity(renderVariant == .phone ? 0.65 : 0.25), radius: renderVariant == .phone ? innerMoonR * 0.45 : 0)
 
         if moonPhase.shadowOffset == 0 {
             moonContent

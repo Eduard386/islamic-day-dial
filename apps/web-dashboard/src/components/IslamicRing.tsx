@@ -1,9 +1,12 @@
 import {
-  getSunriseToDhuhrSubPeriod,
   type ComputedIslamicDay,
   type IslamicPhaseId,
   type RingSegment,
 } from '@islamic-day-dial/core';
+import {
+  isJumuahGlowWindow,
+  NIGHT_SECTORS_GROUP,
+} from '../lib/glow-window';
 import { describeArc, polarToXY } from '../lib/geometry';
 import { getSegmentGradientStops, getConicGradientCss, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
@@ -29,9 +32,6 @@ const GAP_SEGMENT_IDS = new Set<string>(['last_third_to_fajr']);
 
 /** Both Isha arcs use same dark color (ringGap) */
 const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
-
-/** When in any of these 2 night sectors, highlight both */
-const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
 
 const MARKER_R = 14;
 
@@ -63,24 +63,6 @@ const JUMU_GLOW = {
   baseStrokeExtra: 6,
   peakStrokeExtra: 7,
 };
-
-/**
- * Пятница: подсветка трёх дуг только пока маркер в DUHA, MIDDAY или DHUHR.
- * Нет в SUNRISE, Fajr, ночи (Maghrib…Last 3rd), Asr→Maghrib.
- */
-function isJumuahGlowWindow(
-  now: Date,
-  timeline: ComputedIslamicDay['timeline'],
-  currentPhase: IslamicPhaseId,
-): boolean {
-  if (now.getDay() !== 5) return false;
-  if (currentPhase === 'dhuhr_to_asr') return true;
-  if (currentPhase === 'sunrise_to_dhuhr') {
-    const sub = getSunriseToDhuhrSubPeriod(now, timeline.sunrise, timeline.dhuhr);
-    return sub === 'duha' || sub === 'midday';
-  }
-  return false;
-}
 
 function getDisplaySegments(
   segments: RingSegment[],
