@@ -85,7 +85,7 @@ struct IslamicDayDialWidgetEntryView: View {
                 
                 Text(formatCountdown(countdownMs(snapshot: entry.snapshot)))
                     .font(.system(size: 16, weight: .light, design: .monospaced))
-                    .foregroundStyle(Colors.ivory)
+                    .foregroundStyle(Colors.softUtility)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .multilineTextAlignment(.center)
@@ -117,7 +117,7 @@ struct IslamicDayDialWidgetEntryView: View {
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
         snap.currentPhase == .last_third_to_fajr
             ? Color(red: 0.22, green: 0.74, blue: 0.97)
-            : Colors.nobleIronLighter
+            : Colors.coolLabel
     }
 }
 
@@ -140,10 +140,10 @@ private struct HijriWidgetLabels: View {
                 .font(.system(size: useCompactDayMonth ? 12 : 14, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .foregroundStyle(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.accent)
+                .foregroundStyle(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
             Text(parts.year)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Colors.accent)
+                .foregroundStyle(Colors.secondaryGold)
         }
     }
 }

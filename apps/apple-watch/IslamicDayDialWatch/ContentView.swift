@@ -31,7 +31,7 @@ struct ContentView: View {
                                 .offset(y: dateTop)
                             Text(formatCountdown(countdownMs(snapshot: snap)))
                                 .font(.system(size: 10, weight: .light, design: .monospaced))
-                                .foregroundColor(Colors.nobleIronLighter)
+                                .foregroundColor(Colors.softUtility)
                                 .frame(maxWidth: .infinity)
                                 .offset(y: countdownTop)
                         }
@@ -96,7 +96,7 @@ struct ContentView: View {
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
         snap.currentPhase == .last_third_to_fajr
             ? Color(red: 0.22, green: 0.74, blue: 0.97)
-            : Colors.nobleIronLighter
+            : Colors.coolLabel
     }
 }
 
@@ -131,10 +131,10 @@ private struct HijriDateLabels: View {
                 .font(.system(size: useCompactDayMonth ? 11 : 12, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.accent)
+                .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
             Text(parts.year)
                 .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(Colors.accent)
+                .foregroundColor(Colors.secondaryGold)
         }
     }
 }

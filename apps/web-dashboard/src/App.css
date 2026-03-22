@@ -4,10 +4,20 @@
   --surface-light: #1a1a3e;
   --text: #e8e8f0;
   --text-secondary: #8888aa;
-  --accent: #c69214;
-  --accent-dim: #8a6610;
+  /* Dial / sacred palette */
+  --primary-gold: #c89b2c;
+  --secondary-gold: #b88a34;
+  --cool-label: #c1c6d8;
+  --soft-utility: #ddd6c9;
+  --warm-sacred-white: #f2eee3;
+  --neutral-heading-white: #e5e7ee;
+  --cool-muted-subtitle: #aeb6c8;
+  --soft-quote-white: #d2cdc3;
+  /* UI chrome (controls): gold family aligned with palette */
+  --accent: var(--primary-gold);
+  --accent-dim: #8f6f22;
   --border: #2a2a4e;
-  --ivory: #FFF8E7;
+  --ivory: #fff8e7;
 }
 
 /* Last third breathing: adjust opacity range (0.15/0.4) and duration (5s = 2 cycles per 10s) */
@@ -65,7 +75,7 @@ body {
 
 /* Quran 9:36 — как раньше (тот же масштаб, что у заголовка до укрупнения) */
 .header-ayah {
-  color: #ffffff;
+  color: var(--warm-sacred-white);
   font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
   font-size: var(--header-main-size);
   font-weight: 500;
@@ -83,12 +93,12 @@ body {
 .app-header h1 {
   font-size: calc(var(--header-main-size) * 0.88);
   font-weight: 700;
-  color: #ffffff;
+  color: var(--neutral-heading-white);
   letter-spacing: 0.02em;
 }
 
 .app-header .subtitle {
-  color: #ffffff;
+  color: var(--cool-muted-subtitle);
   font-size: 0.85rem;
   margin-top: 4px;
 }
@@ -117,7 +127,7 @@ body {
 
 /* Quran 9:36 — English */
 .dial-ayah-translation {
-  color: #ffffff;
+  color: var(--soft-quote-white);
   text-align: center;
   font-size: clamp(0.8rem, 2.2vw, 0.95rem);
   font-weight: 400;
@@ -166,26 +176,26 @@ body {
 }
 
 .center-info-abs .current-period:not(.current-period-empty):not(.current-period-isha-neon) {
-  color: #bcc4cc;
+  color: var(--cool-label);
 }
 
 /* Sunrise / Duha / Midday — один размер, тонкий начертание */
 .center-info-abs .current-period-subsectors {
-  color: #bcc4cc;
+  color: var(--cool-label);
   font-size: 0.85em;
   font-weight: 300;
 }
 
 .center-info-abs .hijri-date-sector-style:not(.eid-date) {
-  color: var(--accent);
+  color: var(--primary-gold);
 }
 
 .center-info-abs .hijri-year-sector-style:not(.eid-date) {
-  color: var(--accent);
+  color: var(--secondary-gold);
 }
 
 .center-info-abs .countdown {
-  color: #bcc4cc;
+  color: var(--soft-utility);
 }
 
 .center-info-abs > .current-period,
@@ -230,7 +240,7 @@ body {
 .current-period {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #bcc4cc;
+  color: var(--cool-label);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   min-height: 1.2em;
@@ -246,7 +256,7 @@ body {
 .current-period-secondary {
   font-size: 0.85em;
   font-weight: 300;
-  color: #bcc4cc;
+  color: var(--cool-label);
 }
 
 /* Isha 1/2, 2/3: keep "Isha" centered, suffix to the right */
@@ -272,7 +282,7 @@ body {
 .hijri-date {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--primary-gold);
   flex-shrink: 0;
   line-height: 1.2;
   white-space: nowrap;
@@ -281,7 +291,7 @@ body {
 .hijri-date-sector-style {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--primary-gold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -299,14 +309,14 @@ body {
 .hijri-year {
   font-size: 1.0rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--secondary-gold);
   flex-shrink: 0;
 }
 
 .hijri-year-sector-style {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--secondary-gold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -333,7 +343,7 @@ body {
 .countdown {
   font-size: 1.05rem;
   font-weight: 300;
-  color: #bcc4cc;
+  color: var(--soft-utility);
   font-variant-numeric: tabular-nums;
   margin-top: 0;
 }
@@ -464,7 +474,7 @@ body {
 
 .hijri-day-display {
   font-weight: 600;
-  color: var(--accent);
+  color: var(--primary-gold);
   font-size: 0.85rem;
   min-width: 4em;
 }
