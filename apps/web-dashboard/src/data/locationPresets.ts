@@ -129,17 +129,6 @@ const PRESETS_WITH_OFFSET: LocationPreset[] = RAW_PRESETS.map((p) => ({
   utcOffsetHours: getUtcOffset(p.timezone),
 }));
 
-const NEGATIVE = PRESETS_WITH_OFFSET.filter((p) => p.utcOffsetHours < 0).sort((a, b) => a.utcOffsetHours - b.utcOffsetHours);
-const NON_NEGATIVE = PRESETS_WITH_OFFSET.filter((p) => p.utcOffsetHours >= 0).sort((a, b) => a.utcOffsetHours - b.utcOffsetHours);
-
-export const PRESETS_SORTED: LocationPreset[] = [...NEGATIVE, ...NON_NEGATIVE];
-
-export const PRESETS_BY_ID: Record<string, LocationPreset> = Object.fromEntries(PRESETS_SORTED.map((p) => [p.id, p]));
-
-export const PRESETS_BY_TITLE: Record<string, LocationPreset> = Object.fromEntries(PRESETS_SORTED.map((p) => [p.title, p]));
-
-export const MY_LOCATION_INSERT_INDEX = NEGATIVE.length;
-
 /** Debug mode (localhost): curated city list only */
 const DEBUG_RAW: Omit<LocationPreset, 'utcOffsetHours'>[] = [
   { id: 'mecca', title: 'Mecca', location: { latitude: 21.4225, longitude: 39.8262 }, timezone: 'Asia/Riyadh' },
@@ -193,6 +182,15 @@ export const DEBUG_PRESETS: LocationPreset[] = DEBUG_RAW.map((p) => ({
   ...p,
   utcOffsetHours: getUtcOffset(p.timezone),
 }));
+
+// Production should use the same curated city list and ordering as localhost debug mode.
+export const PRESETS_SORTED: LocationPreset[] = DEBUG_PRESETS;
+
+export const PRESETS_BY_ID: Record<string, LocationPreset> = Object.fromEntries(PRESETS_SORTED.map((p) => [p.id, p]));
+
+export const PRESETS_BY_TITLE: Record<string, LocationPreset> = Object.fromEntries(PRESETS_SORTED.map((p) => [p.title, p]));
+
+export const MY_LOCATION_INSERT_INDEX = 0;
 
 export const DEBUG_PRESETS_BY_TITLE: Record<string, LocationPreset> = Object.fromEntries(
   DEBUG_PRESETS.map((p) => [p.title, p]),

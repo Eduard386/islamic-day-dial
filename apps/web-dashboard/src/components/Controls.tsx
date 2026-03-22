@@ -4,8 +4,6 @@ import type { TimeMode } from '../hooks/useIslamicDay';
 import {
   PRESETS_SORTED,
   PRESETS_BY_TITLE,
-  DEBUG_PRESETS,
-  DEBUG_PRESETS_BY_TITLE,
   MY_LOCATION_TITLE,
   MY_LOCATION_INSERT_INDEX,
 } from '../data/locationPresets';
@@ -58,7 +56,7 @@ export function Controls({
 
   const displayedHijriDay = currentHijriDay;
 
-  const presetsByTitle = IS_DEBUG ? DEBUG_PRESETS_BY_TITLE : PRESETS_BY_TITLE;
+  const presetsByTitle = PRESETS_BY_TITLE;
 
   const applyPreset = (name: string) => {
     if (name === CURRENT_CITY) {
@@ -72,8 +70,8 @@ export function Controls({
     onPresetSelect(name);
   };
 
-  const presetsLeft = IS_DEBUG ? [] : PRESETS_SORTED.slice(0, MY_LOCATION_INSERT_INDEX);
-  const presetsRight = IS_DEBUG ? DEBUG_PRESETS : PRESETS_SORTED.slice(MY_LOCATION_INSERT_INDEX);
+  const presetsLeft = PRESETS_SORTED.slice(0, MY_LOCATION_INSERT_INDEX);
+  const presetsRight = PRESETS_SORTED.slice(MY_LOCATION_INSERT_INDEX);
 
   return (
     <div className="controls">
