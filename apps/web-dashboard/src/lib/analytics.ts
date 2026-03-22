@@ -28,7 +28,6 @@ function checkUrlForOwner(): void {
     const url = new URL(window.location.href);
     url.searchParams.delete('owner');
     window.history.replaceState({}, '', url.toString());
-    console.log('✅ You are now marked as owner');
   }
 }
 
@@ -66,15 +65,7 @@ function detectDeviceType(ua: string): string {
 export async function trackVisit(): Promise<void> {
   checkUrlForOwner();
   
-  if (!supabase) {
-    console.log('[Analytics] Supabase not configured');
-    return;
-  }
-
-  if (isOwner()) {
-    console.log('[Analytics] Owner excluded');
-    return;
-  }
+  if (!supabase || isOwner()) return;
 
   try {
     const ua = navigator.userAgent;
@@ -82,6 +73,7 @@ export async function trackVisit(): Promise<void> {
     
     const { error } = await supabase.from('visits').insert({
       visitor_id: getVisitorId(),
+      platform: 'web',
       path: window.location.pathname,
       referrer: document.referrer || null,
       user_agent: ua,
@@ -95,15 +87,14 @@ export async function trackVisit(): Promise<void> {
       city: geo.city || null,
       region: geo.region || null,
       timezone: geo.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+      geo_source: geo.source,
     });
 
-    if (error) {
-      console.error('[Analytics] Error:', error.message);
-    } else {
-      console.log('[Analytics] Visit tracked');
+    if (error && import.meta.env.DEV) {
+      console.error('[Analytics]', error.message);
     }
-  } catch (err) {
-    console.error('[Analytics] Failed:', err);
+  } catch {
+    if (import.meta.env.DEV) console.error('[Analytics] Failed');
   }
 }
 

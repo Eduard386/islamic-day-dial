@@ -63,7 +63,7 @@ export function useIslamicDay(): DashboardState {
     setTimezone(geo.timezone);
   }, []);
 
-  // Resolve location on mount: IP first, timezone fallback. No permission prompt.
+  // Resolve location on mount: GPS first, then IP, timezone fallback, Mecca default.
   useEffect(() => {
     let cancelled = false;
     resolveGeo().then((geo) => {

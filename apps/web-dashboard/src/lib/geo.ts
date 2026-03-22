@@ -1,13 +1,16 @@
 /**
- * Geo resolution: IP-based first, timezone fallback.
+ * Geo resolution: GPS first, IP (ipapi) fallback, timezone fallback, Mecca default.
  * Single cached fetch shared by location and analytics.
  */
 
 import type { Location } from '@islamic-day-dial/core';
 
+export type GeoSource = 'gps' | 'ip' | 'timezone' | 'default';
+
 export type GeoResult = {
   location: Location;
   timezone: string;
+  source: GeoSource;
   country?: string;
   city?: string;
   region?: string;
@@ -43,56 +46,78 @@ const FALLBACK_LOCATION: Location = { latitude: 21.4225, longitude: 39.8262 }; /
 function getTimezoneFallback(): GeoResult {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const loc = TIMEZONE_TO_LOCATION[tz] ?? FALLBACK_LOCATION;
-  return {
-    location: loc,
-    timezone: tz,
-  };
+  const source: GeoSource = TIMEZONE_TO_LOCATION[tz] ? 'timezone' : 'default';
+  return { location: loc, timezone: tz, source };
 }
 
-let geoPromise: Promise<GeoResult> | null = null;
+function getLocationFromGPS(): Promise<GeoResult | null> {
+  if (typeof navigator === 'undefined' || !navigator.geolocation) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => resolve(null), 5000);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        clearTimeout(timeout);
+        resolve({
+          location: { latitude: pos.coords.latitude, longitude: pos.coords.longitude },
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          source: 'gps',
+        });
+      },
+      () => {
+        clearTimeout(timeout);
+        resolve(null);
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+    );
+  });
+}
 
-/**
- * Resolve location: try IP (ipapi.co), fallback to timezone mapping.
- * When IP timezone conflicts with browser timezone (e.g. VPN, proxy),
- * prefer browser — user is physically in browser's timezone.
- */
-export async function resolveGeo(): Promise<GeoResult> {
-  if (geoPromise) return geoPromise;
-  const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  geoPromise = (async () => {
-    try {
-      const res = await fetch('https://ipapi.co/json/', {
-        signal: AbortSignal.timeout(3000),
-      });
-      if (!res.ok) return getTimezoneFallback();
-      const data = await res.json();
-      const lat = data.latitude;
-      const lng = data.longitude;
-      if (typeof lat !== 'number' || typeof lng !== 'number') {
-        return getTimezoneFallback();
-      }
-      const ipTimezone = data.timezone || browserTz;
-      const browserLoc = TIMEZONE_TO_LOCATION[browserTz];
-      // IP timezone ≠ browser → VPN/proxy; use browser location if we have it
-      if (ipTimezone !== browserTz && browserLoc) {
-        return {
-          location: browserLoc,
-          timezone: browserTz,
-          country: data.country_name || data.country,
-          city: data.city,
-          region: data.region,
-        };
-      }
+async function fetchFromIP(): Promise<GeoResult | null> {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
+  try {
+    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const lat = data.latitude;
+    const lng = data.longitude;
+    if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+    const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const ipTimezone = data.timezone || browserTz;
+    const browserLoc = TIMEZONE_TO_LOCATION[browserTz];
+    if (ipTimezone !== browserTz && browserLoc) {
       return {
-        location: { latitude: lat, longitude: lng },
-        timezone: ipTimezone,
+        location: browserLoc,
+        timezone: browserTz,
+        source: 'ip',
         country: data.country_name || data.country,
         city: data.city,
         region: data.region,
       };
-    } catch {
-      return getTimezoneFallback();
     }
+    return {
+      location: { latitude: lat, longitude: lng },
+      timezone: ipTimezone,
+      source: 'ip',
+      country: data.country_name || data.country,
+      city: data.city,
+      region: data.region,
+    };
+  } catch {
+    return null;
+  }
+}
+
+let geoPromise: Promise<GeoResult> | null = null;
+
+/** GPS first, then IP (ipapi.co), then timezone, Mecca default. */
+export async function resolveGeo(): Promise<GeoResult> {
+  if (geoPromise) return geoPromise;
+  geoPromise = (async () => {
+    const gps = await getLocationFromGPS();
+    if (gps) return gps;
+    const ip = await fetchFromIP();
+    if (ip) return ip;
+    return getTimezoneFallback();
   })();
   return geoPromise;
 }

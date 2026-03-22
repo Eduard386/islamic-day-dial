@@ -156,7 +156,9 @@ struct ContentView: View {
     
     private func refreshSnapshot(forceResolveLocation: Bool) async {
         if forceResolveLocation || snapshot == nil {
-            automaticLocation = await resolveLocation()
+            let result = await resolveGeoResult()
+            automaticLocation = result.location
+            if forceResolveLocation { await trackVisit(geo: result) }
         }
         
         let currentNow = Date()
