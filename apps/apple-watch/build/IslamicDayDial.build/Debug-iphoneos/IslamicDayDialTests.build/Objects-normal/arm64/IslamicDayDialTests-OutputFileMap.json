@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/IslamicDayDialTests-primary.dia",
+    "emit-module-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/IslamicDayDialTests-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/IslamicDayDialTests-primary-emit-module.dia",
+    "pch" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/IslamicDayDialTests-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/IslamicDayDialTests-primary.swiftdeps"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialTests/GeometryTests.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-iphoneos/IslamicDayDialTests.build/Objects-normal/arm64/GeometryTests~partial.swiftmodule"
+  }
+}

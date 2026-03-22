@@ -20,6 +20,8 @@ type Props = {
   maghribBoundary?: { x: number; y: number } | null;
   /** true = сектор "Sunrise" (первые 20 мин): солнце оранжевое */
   isInSunriseSubPeriod?: boolean;
+  /** true = сектор "Midday" (последние 5 мин до Dhuhr): более тёмное яркое солнце */
+  isInMiddaySubPeriod?: boolean;
   /** Уникальный ID для defs при двух кольцах (maghrib/midday) — иначе mask берётся от другого кольца */
   instanceId?: string;
 };
@@ -58,6 +60,7 @@ const SUN_OUTER_GLOW = {
   blur: 8,
   orange: 'rgba(255, 111, 0, 0.85)',
   red: 'rgba(198, 40, 40, 0.9)',
+  midday: 'rgba(245, 176, 36, 0.9)',
 };
 
 /** Лёгкий glow для обычного жёлтого солнца */
@@ -156,7 +159,7 @@ function getBlackDiskReveal(
 
 const idSuffix = (id?: string) => (id ? `-${id}` : '');
 
-export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary, isInSunriseSubPeriod, instanceId }: Props) {
+export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngle, sunriseAngleDeg, maghribAngleDeg, centerX, centerY, sunriseBoundary, maghribBoundary, isInSunriseSubPeriod, isInMiddaySubPeriod, instanceId }: Props) {
   const { isNight, moonPhase, hijriDayUsed } = state;
   const suffix = idSuffix(instanceId);
   const innerR = r * MOON_INNER_R;
@@ -167,21 +170,22 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
   const isBrightSun = reveal > 0 && SUN_PHASES.has(currentPhase);
   const useOrange = isBrightSun && !isRollIn && !!isInSunriseSubPeriod;
   const useRed = isBrightSun && isInRedZone;
+  const useMidday = isBrightSun && currentPhase === 'sunrise_to_dhuhr' && !isRollIn && !useOrange && !!isInMiddaySubPeriod;
 
   return (
     <g transform={`translate(${x}, ${y})`}>
       {/* Наружный glow — до clipPath, чтобы не обрезался */}
-      {isBrightSun && (useOrange || useRed) && (
-        <g filter={`url(#sun-outer-glow-${useOrange ? 'orange' : 'red'}${suffix})`}>
+      {isBrightSun && (useOrange || useRed || useMidday) && (
+        <g filter={`url(#sun-outer-glow-${useOrange ? 'orange' : useRed ? 'red' : 'midday'}${suffix})`}>
           <circle
             r={r}
             fill="none"
-            stroke={useOrange ? SUN_OUTER_GLOW.orange : SUN_OUTER_GLOW.red}
+            stroke={useOrange ? SUN_OUTER_GLOW.orange : useRed ? SUN_OUTER_GLOW.red : SUN_OUTER_GLOW.midday}
             strokeWidth={SUN_OUTER_GLOW.strokeWidth}
           />
         </g>
       )}
-      {isBrightSun && !useOrange && !useRed && (
+      {isBrightSun && !useOrange && !useRed && !useMidday && (
         <g filter={`url(#sun-outer-glow-normal${suffix})`}>
           <circle
             r={r}
@@ -206,14 +210,15 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
             const isBrightSun = SUN_PHASES.has(currentPhase);
             if (reveal >= 1) {
               const useOrange = isBrightSun && !!isInSunriseSubPeriod;
+              const useMidday = isBrightSun && currentPhase === 'sunrise_to_dhuhr' && !useOrange && !!isInMiddaySubPeriod;
               const useRed = false; // full disk: no red zone
-              const diskFill = isBrightSun ? (useOrange ? `url(#sun-fill-sunrise${suffix})` : `url(#sun-fill${suffix})`) : DISK_FILL;
-              const diskStroke = isBrightSun ? (useOrange ? '#ff6f00' : '#ffa000') : DISK_STROKE;
+              const diskFill = isBrightSun ? (useOrange ? `url(#sun-fill-sunrise${suffix})` : useMidday ? `url(#sun-fill-midday${suffix})` : `url(#sun-fill${suffix})`) : DISK_FILL;
+              const diskStroke = isBrightSun ? (useOrange ? '#ff6f00' : useMidday ? '#d4a017' : '#ffa000') : DISK_STROKE;
               const diskFilter = isBrightSun
-                ? (useOrange ? `url(#sun-effect-sunrise${suffix})` : useRed ? `url(#sun-effect-maghrib${suffix})` : `url(#sun-glow${suffix})`)
+                ? (useOrange ? `url(#sun-effect-sunrise${suffix})` : useMidday ? `url(#sun-effect-midday${suffix})` : useRed ? `url(#sun-effect-maghrib${suffix})` : `url(#sun-glow${suffix})`)
                 : undefined;
-              const gradId = useOrange ? 'grad-sunrise-neon' : useRed ? 'grad-maghrib-neon' : `grad-${currentPhase}${suffix}`;
-              const peakOpacity = useOrange || useRed ? SUN_GLOW_SPECIAL.peakOpacity : SUN_NEON.peakOpacity;
+              const gradId = useOrange ? 'grad-sunrise-neon' : useMidday ? 'grad-midday-neon' : useRed ? 'grad-maghrib-neon' : `grad-${currentPhase}${suffix}`;
+              const peakOpacity = useOrange || useRed || useMidday ? SUN_GLOW_SPECIAL.peakOpacity : SUN_NEON.peakOpacity;
               return (
                 <>
                   {isBrightSun && (() => {
@@ -276,15 +281,16 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
             const dy = shift * tanY;
             const useRed = isBrightSun && isInRedZone;
             const useOrange = isBrightSun && !isRollIn && !!isInSunriseSubPeriod;
+            const useMidday = isBrightSun && currentPhase === 'sunrise_to_dhuhr' && !isRollIn && !useOrange && !!isInMiddaySubPeriod;
             const diskFill = isBrightSun
-              ? (useRed ? `url(#sun-fill-maghrib${suffix})` : useOrange ? `url(#sun-fill-sunrise${suffix})` : `url(#sun-fill${suffix})`)
+              ? (useRed ? `url(#sun-fill-maghrib${suffix})` : useOrange ? `url(#sun-fill-sunrise${suffix})` : useMidday ? `url(#sun-fill-midday${suffix})` : `url(#sun-fill${suffix})`)
               : DISK_FILL;
-            const diskStroke = isBrightSun ? (useRed ? '#c62828' : useOrange ? '#ff6f00' : '#ffa000') : DISK_STROKE;
+            const diskStroke = isBrightSun ? (useRed ? '#c62828' : useOrange ? '#ff6f00' : useMidday ? '#d4a017' : '#ffa000') : DISK_STROKE;
             const diskFilter = isBrightSun
-              ? (useOrange ? `url(#sun-effect-sunrise${suffix})` : useRed ? `url(#sun-effect-maghrib${suffix})` : `url(#sun-glow${suffix})`)
+              ? (useOrange ? `url(#sun-effect-sunrise${suffix})` : useMidday ? `url(#sun-effect-midday${suffix})` : useRed ? `url(#sun-effect-maghrib${suffix})` : `url(#sun-glow${suffix})`)
               : undefined;
-            const gradId = useOrange ? 'grad-sunrise-neon' : useRed ? 'grad-maghrib-neon' : `grad-${currentPhase}${suffix}`;
-            const peakOpacity = useOrange || useRed ? SUN_GLOW_SPECIAL.peakOpacity : SUN_NEON.peakOpacity;
+            const gradId = useOrange ? 'grad-sunrise-neon' : useMidday ? 'grad-midday-neon' : useRed ? 'grad-maghrib-neon' : `grad-${currentPhase}${suffix}`;
+            const peakOpacity = useOrange || useRed || useMidday ? SUN_GLOW_SPECIAL.peakOpacity : SUN_NEON.peakOpacity;
             return (
               <>
                 <defs>
@@ -459,6 +465,25 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
+      {/* Midday: darker golden sun + stronger bright glow */}
+      <filter
+        id={`sun-effect-midday${suffix}`}
+        x="-40%"
+        y="-40%"
+        width="180%"
+        height="180%"
+      >
+        <feOffset in="SourceGraphic" dx="4" dy="4" result="offset" />
+        <feGaussianBlur in="offset" stdDeviation="8" result="shadowBlur" />
+        <feFlood floodColor="#d4a017" floodOpacity="0.45" result="shadowColor" />
+        <feComposite in="shadowBlur" in2="shadowColor" operator="in" result="shadow" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_GLOW_SPECIAL.stdDeviation} result="glow" />
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="glow" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
       <radialGradient id={`sun-fill${suffix}`} cx="0.5" cy="0.5" r="0.5">
         <stop offset="0" stopColor="#ffffff" />
         <stop offset="0.3" stopColor="#fffde7" />
@@ -479,6 +504,13 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
         <stop offset="0.45" stopColor="#ff6b6b" />
         <stop offset="1" stopColor="#c62828" />
       </radialGradient>
+      {/* Midday: darker gold core with stronger brightness */}
+      <radialGradient id={`sun-fill-midday${suffix}`} cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stopColor="#ffffff" />
+        <stop offset="0.15" stopColor="#fff4d6" />
+        <stop offset="0.45" stopColor="#ffd54f" />
+        <stop offset="1" stopColor="#d4a017" />
+      </radialGradient>
       {/* Наружный glow (как last third): толстый stroke + blur */}
       <filter
         id={`sun-outer-glow-orange${suffix}`}
@@ -494,6 +526,18 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
       </filter>
       <filter
         id={`sun-outer-glow-red${suffix}`}
+        x="-150%"
+        y="-150%"
+        width="400%"
+        height="400%"
+      >
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_OUTER_GLOW.blur} result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+        </feMerge>
+      </filter>
+      <filter
+        id={`sun-outer-glow-midday${suffix}`}
         x="-150%"
         y="-150%"
         width="400%"

@@ -5,7 +5,7 @@ import {
   type RingSegment,
 } from '@islamic-day-dial/core';
 import { describeArc, polarToXY } from '../lib/geometry';
-import { getSegmentGradientStops, getSweepSubArcs, type MirrorSegment } from '../lib/segment-gradients';
+import { getSegmentGradientStops, getConicGradientCss, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 
@@ -146,6 +146,11 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
     >
       <defs>
         <CurrentMarkerDefs r={MARKER_R} />
+        <mask id="ring-sweep-mask">
+          <rect width={size} height={size} fill="black" />
+          <circle cx={cx} cy={cy} r={ringInner + ringStroke} fill="white" />
+          <circle cx={cx} cy={cy} r={ringInner} fill="black" />
+        </mask>
         <filter id="glow-ish" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={ISHA_GLOW.blur} result="blur" />
           <feMerge>
@@ -225,6 +230,20 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             </linearGradient>
           ) : null;
         })()}
+        {sunriseToDhuhrSeg && (
+          <linearGradient
+            key="grad-midday-neon"
+            id="grad-midday-neon"
+            x1={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.startAngleDeg).x}
+            y1={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.startAngleDeg).y}
+            x2={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.endAngleDeg).x}
+            y2={polarToXY(cx, cy, ringR, sunriseToDhuhrSeg.endAngleDeg).y}
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#ffd54f" />
+            <stop offset="100%" stopColor="#d4a017" />
+          </linearGradient>
+        )}
       </defs>
 
       {/* Last third: soft breathing halo when marker is in this sector */}
@@ -349,21 +368,23 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
           );
         })()}
 
-      {/* Sweep: sub-arcs with solid colors — follows the arc, no triangle, no seams */}
-      {getSweepSubArcs(displaySegments, mirrorSegment).map((sub, i) => {
-        const path = describeArc(cx, cy, ringR, sub.startAngleDeg, sub.endAngleDeg);
-        if (!path) return null;
-        return (
-          <path
-            key={`sweep-${i}`}
-            d={path}
-            fill="none"
-            stroke={sub.color}
-            strokeWidth={ringStroke}
-            strokeLinecap="butt"
-          />
-        );
-      })}
+      {/* Sweep: conic gradient via foreignObject — smooth, no banding or moiré */}
+      <foreignObject
+        x={0}
+        y={0}
+        width={size}
+        height={size}
+        mask="url(#ring-sweep-mask)"
+        style={{ overflow: 'hidden' }}
+      >
+        <div
+          style={{
+            width: size,
+            height: size,
+            background: getConicGradientCss(displaySegments, mirrorSegment),
+          }}
+        />
+      </foreignObject>
 
       {/* Markers — primary = short ticks, secondary = small dots; all from inner edge */}
       {ring.markers.map((m) => {
@@ -409,14 +430,16 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         const maghribBoundary = maghribMarker
           ? polarToXY(cx, cy, ringR, maghribMarker.angleDeg)
           : null;
-        const isInSunriseSubPeriod =
-          currentPhase === 'sunrise_to_dhuhr' &&
-          snapshot.timeline &&
-          getSunriseToDhuhrSubPeriod(
-            now ?? new Date(),
-            snapshot.timeline.sunrise,
-            snapshot.timeline.dhuhr,
-          ) === 'sunrise';
+        const sunriseToDhuhrSubPeriod =
+          currentPhase === 'sunrise_to_dhuhr' && snapshot.timeline
+            ? getSunriseToDhuhrSubPeriod(
+                now ?? new Date(),
+                snapshot.timeline.sunrise,
+                snapshot.timeline.dhuhr,
+              )
+            : null;
+        const isInSunriseSubPeriod = sunriseToDhuhrSubPeriod === 'sunrise';
+        const isInMiddaySubPeriod = sunriseToDhuhrSubPeriod === 'midday';
         return (
           <CurrentMarker
             x={pos.x}
@@ -433,6 +456,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             sunriseBoundary={sunriseBoundary}
             maghribBoundary={maghribBoundary}
             isInSunriseSubPeriod={isInSunriseSubPeriod}
+            isInMiddaySubPeriod={isInMiddaySubPeriod}
           />
         );
       })()}

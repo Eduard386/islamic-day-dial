@@ -9,7 +9,14 @@ let NIGHT = Color(red: 0.04, green: 0.04, blue: 0.07)
 let BLUE_MID = Color(red: 0.23, green: 0.51, blue: 0.66)
 let YELLOW = Color(red: 0.92, green: 0.70, blue: 0.03)
 
-let MARKER_STROKE = Color(red: 0.78, green: 0.78, blue: 0.86)
+/// Sun marker colors (from web CORE_SPEC)
+let SUN_NORMAL = Color(red: 1.0, green: 0.79, blue: 0.16)   // #ffca28
+let SUN_ORANGE = Color(red: 1.0, green: 0.44, blue: 0)    // #ff6f00
+let SUN_RED = Color(red: 0.78, green: 0.16, blue: 0.16)   // #c62828
+let MOON_LUNAR = Color(red: 0.75, green: 0.72, blue: 0.63) // #C0B8A0
+
+/// Tick marks — warm ivory, matches web #fbeccb
+let MARKER_STROKE = Color(red: 0.984, green: 0.925, blue: 0.796)
 
 /// Ivory for sector names and countdown
 enum Colors {

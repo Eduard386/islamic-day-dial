@@ -9,7 +9,7 @@ func addDays(date: Date, days: Int) -> Date {
 }
 
 func getPrayerTimesForDate(date: Date, location: Location) -> PrayerTimesData? {
-    let cal = Calendar.current
+    var cal = Calendar.current
     cal.timeZone = TimeZone.current
     let components = cal.dateComponents([.year, .month, .day], from: date)
     guard let year = components.year, let month = components.month, let day = components.day else {

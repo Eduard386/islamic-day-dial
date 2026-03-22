@@ -43,7 +43,7 @@ function getEffectiveNow(mode: TimeMode): Date {
 }
 
 const FALLBACK_LOCATION: Location = { latitude: 21.4225, longitude: 39.8262 }; // Mecca
-const CURRENT_CITY = 'Current city';
+const CURRENT_CITY = 'My location';
 const DEFAULT_PRESET = CURRENT_CITY;
 
 const SNAPSHOT_INTERVAL_MS = 60_000;

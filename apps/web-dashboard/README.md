@@ -1,6 +1,6 @@
 # Islamic Day Dial — Web Dashboard
 
-**Source of truth** for ring visuals, sun marker, and phase display. Apple Watch and Wear OS apps should match this implementation.
+**Source of truth** for ring visuals, sun marker, and phase display. The iPhone app, iPhone widget, Apple Watch app, and Wear OS app should match this implementation.
 
 ## Run
 

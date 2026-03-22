@@ -127,22 +127,22 @@ body {
 }
 
 .center-info-abs .current-period:not(.current-period-empty):not(.current-period-isha-neon) {
-  color: var(--ring-text);
+  color: var(--ivory);
 }
 
 /* Sunrise / Duha / Midday — один размер, тонкий начертание */
 .center-info-abs .current-period-subsectors {
-  color: var(--ring-text);
+  color: var(--ivory);
   font-size: 0.85em;
   font-weight: 300;
 }
 
 .center-info-abs .hijri-date-sector-style:not(.eid-date) {
-  color: var(--ring-text);
+  color: var(--ivory);
 }
 
 .center-info-abs .hijri-year-sector-style:not(.eid-date) {
-  color: var(--ring-text);
+  color: var(--ivory);
 }
 
 .center-info-abs .countdown {

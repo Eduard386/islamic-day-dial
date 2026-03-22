@@ -8,42 +8,61 @@ struct ContentView: View {
     var body: some View {
         Group {
             if let snap = snapshot {
-                ZStack {
-                    RingView(snapshot: snap)
-                    VStack(spacing: 2) {
-                        currentPeriodView(snapshot: snap, now: now)
-                        let parts = formatHijriDateParts(snap.hijriDate)
-                        Text(parts.dayMonth)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : .primary)
-                            .offset(y: 2)
-                        Text(parts.year)
-                            .font(.system(size: 10))
-                            .foregroundColor(Colors.ivory)
-                            .offset(y: 2)
-                        Text(formatCountdown(countdownMs(snapshot: snap)))
-                            .font(.system(size: 9, design: .monospaced))
-                            .foregroundColor(Colors.ivory)
-                            .padding(.top, 14)
+                GeometryReader { geo in
+                    // Кольцо: с запасом от границ (1.5x вместо 1.65)
+                    let dialSize = min(geo.size.width, geo.size.height) * 1.5
+                    // Web: center-info height 212px = hole diameter; positions 55, 100, 165 from hole top
+                    let holeTop = dialSize * (0.5 - 0.25125)
+                    let holeHeight = dialSize * 0.5025
+                    let sectorTop = holeTop + 55 * (holeHeight / 212)
+                    let dateTop = holeTop + 100 * (holeHeight / 212)
+                    let countdownTop = holeTop + 165 * (holeHeight / 212)
+                    let centerOffsetY = dialSize * (-10 / 420)  // Web: -10px nudge
+                    ZStack {
+                        RingView(snapshot: snap, now: now)
+                            .frame(width: dialSize, height: dialSize)
+                        ZStack(alignment: .top) {
+                            Color.clear
+                            currentPeriodView(snapshot: snap, now: now)
+                                .frame(maxWidth: .infinity)
+                                .offset(y: sectorTop)
+                            HijriDateLabels(hijriDate: snap.hijriDate)
+                                .frame(maxWidth: .infinity)
+                                .offset(y: dateTop)
+                            Text(formatCountdown(countdownMs(snapshot: snap)))
+                                .font(.system(size: 10, weight: .light, design: .monospaced))
+                                .foregroundColor(Colors.ivory)
+                                .frame(maxWidth: .infinity)
+                                .offset(y: countdownTop)
+                        }
+                        .frame(width: dialSize, height: dialSize)
+                        .offset(y: centerOffsetY)
                     }
-                    .padding(.vertical, 18)
-                    .offset(y: -6)
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
             } else {
                 ProgressView()
             }
         }
-        .onAppear {
-            Task {
-                location = await resolveLocation()
-                snapshot = computeIslamicDaySnapshot(location: location)
-            }
-        }
-        .onReceive(Timer.publish(every: 60, on: .main, in: .common).autoconnect()) { _ in
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .task {
+            location = await resolveLocation()
             snapshot = computeIslamicDaySnapshot(location: location)
         }
-        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-            now = Date()
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                now = Date()
+            }
+        }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                snapshot = computeIslamicDaySnapshot(location: location)
+            }
         }
     }
 
@@ -54,35 +73,68 @@ struct ContentView: View {
     
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date) -> some View {
-        let baseFont = Font.system(size: 9)
+        // Web: current-period-subsectors 0.85em of 1.4rem, weight 300
+        Text(periodLabel(snapshot: snap, now: now))
+            .font(.system(size: 10, weight: .light))
+            .foregroundColor(periodColor(snapshot: snap))
+            .modifier(IshaShadowModifier(phase: snap.currentPhase))
+    }
 
+    private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
+        let isFriday = Calendar.current.component(.weekday, from: now) == 6  // 1=Sun, 6=Fri
+        if snap.currentPhase == .dhuhr_to_asr && isFriday { return "Jumu'ah" }
         if snap.currentPhase == .sunrise_to_dhuhr {
-            let t = now.timeIntervalSince1970
-            let start = snap.timeline.sunrise.timeIntervalSince1970
-            let end = snap.timeline.dhuhr.timeIntervalSince1970
-            let hideFirst: TimeInterval = 20 * 60
-            let hideLast: TimeInterval = 5 * 60
-            if t < start + hideFirst || t > end - hideLast {
-                Text(" ")
-                    .font(baseFont)
-                    .foregroundColor(Colors.ivory)
-            } else {
-                Text("Duha")
-                    .font(baseFont.weight(.light))
-                    .foregroundColor(Colors.ivory)
-            }
+            let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: snap.timeline.sunrise, dhuhr: snap.timeline.dhuhr)
+            if sub == .sunrise { return "Sunrise" }
+            if isFriday && (sub == .duha || sub == .midday) { return "Jumu'ah" }
+            return sub == .duha ? "Duha" : "Midday"
+        }
+        if snap.currentPhase == .last_third_to_fajr { return "Isha" }
+        return formatCurrentPeriod(snap.currentPhase)
+    }
+
+    private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
+        snap.currentPhase == .last_third_to_fajr
+            ? Color(red: 0.22, green: 0.74, blue: 0.97)
+            : Colors.ivory
+    }
+}
+
+private struct IshaShadowModifier: ViewModifier {
+    let phase: IslamicPhaseId
+    func body(content: Content) -> some View {
+        if phase == .last_third_to_fajr {
+            content.shadow(color: Color(red: 0.22, green: 0.74, blue: 0.97).opacity(0.7), radius: 4)
         } else {
-            switch snap.currentPhase {
-            case .last_third_to_fajr:
-                Text("Isha")
-                    .font(baseFont)
-                    .foregroundColor(Color(red: 0.22, green: 0.74, blue: 0.97))
-                    .shadow(color: Color(red: 0.22, green: 0.74, blue: 0.97).opacity(0.7), radius: 4)
-            default:
-                Text(formatCurrentPeriod(snap.currentPhase))
-                    .font(baseFont)
-                    .foregroundColor(Colors.ivory)
-            }
+            content
+        }
+    }
+}
+
+private let COMPACT_MONTH_NAMES: Set<String> = [
+    "rabi al-awwal", "rabi al-thani", "jumada al-ula", "jumada al-thani"
+]
+
+private struct HijriDateLabels: View {
+    private let parts: (dayMonth: String, year: String, isEid: Bool)
+    private let useCompactDayMonth: Bool
+
+    init(hijriDate: HijriDate) {
+        self.parts = formatHijriDateParts(hijriDate)
+        self.useCompactDayMonth = COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased())
+    }
+
+    var body: some View {
+        // Web: hijri-date 1.2rem/1.0rem(compact), year 0.9rem — date крупнее года
+        VStack(spacing: 2) {
+            Text(parts.dayMonth.uppercased())
+                .font(.system(size: useCompactDayMonth ? 11 : 12, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.ivory)
+            Text(parts.year)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(Colors.ivory)
         }
     }
 }

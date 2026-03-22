@@ -16,8 +16,7 @@ func arcPath(cx: Double, cy: Double, r: Double, startDeg: Double, endDeg: Double
     guard span > 0 else { return Path() }
     
     let start = polarToXY(cx: cx, cy: cy, r: r, angleDeg: startDeg)
-    let end = polarToXY(cx: cx, cy: cy, r: r, angleDeg: endDeg)
-    
+
     var path = Path()
     path.move(to: start)
     // SwiftUI: 0° = right, 90° = bottom. Our 0° = top = -90° in standard.

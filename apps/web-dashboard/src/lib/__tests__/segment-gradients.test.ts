@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   getSegmentGradientStops,
-  getSweepSubArcs,
+  getConicGradientCss,
   MIRROR_GRADIENT_PALETTE,
   type MirrorSegment,
 } from '../segment-gradients.js';
@@ -48,7 +48,7 @@ describe('getSegmentGradientStops', () => {
   });
 });
 
-describe('getSweepSubArcs', () => {
+describe('getConicGradientCss', () => {
   const mockSegments = [
     { id: 'maghrib_to_isha', startAngleDeg: 0, endAngleDeg: 45 },
     { id: 'isha_to_midnight', startAngleDeg: 45, endAngleDeg: 90 },
@@ -59,53 +59,37 @@ describe('getSweepSubArcs', () => {
     { id: 'asr_to_maghrib', startAngleDeg: 330, endAngleDeg: 360 },
   ];
 
-  it('returns 480 sub-arcs', () => {
-    const arcs = getSweepSubArcs(mockSegments);
-    expect(arcs).toHaveLength(480);
+  it('returns conic-gradient CSS string', () => {
+    const css = getConicGradientCss(mockSegments);
+    expect(css).toMatch(/^conic-gradient\(/);
+    expect(css).toContain('deg');
+    expect(css.endsWith(')')).toBe(true);
   });
 
-  it('each sub-arc has startAngleDeg, endAngleDeg, color', () => {
-    const arcs = getSweepSubArcs(mockSegments);
-    for (const arc of arcs) {
-      expect(arc).toHaveProperty('startAngleDeg');
-      expect(arc).toHaveProperty('endAngleDeg');
-      expect(arc).toHaveProperty('color');
-      expect(typeof arc.color).toBe('string');
-      expect(arc.color).toMatch(/^rgb\(|^#/);
-    }
+  it('includes color stops for full 360°', () => {
+    const css = getConicGradientCss(mockSegments);
+    expect(css).toContain('0deg');
+    expect(css).toContain('360deg');
   });
 
-  it('sub-arcs cover full 360°', () => {
-    const arcs = getSweepSubArcs(mockSegments);
-    expect(arcs[0].startAngleDeg).toBe(0);
-    expect(arcs[arcs.length - 1].endAngleDeg).toBe(360);
+  it('includes segment colors (maghrib red, blue, black)', () => {
+    const css = getConicGradientCss(mockSegments);
+    expect(css).toMatch(/rgb\(200,\s*74,\s*58\)|#C84A3A/);
+    expect(css).toContain('#7CB8E8');
+    expect(css).toContain('#000000');
   });
 
-  it('uses mirror gradient when mirrorSegment provided and angle in range', () => {
+  it('uses mirror gradient when mirrorSegment provided', () => {
     const mirror: MirrorSegment = { startAngleDeg: 180, spanDeg: 90 };
-    const arcs = getSweepSubArcs(mockSegments, mirror);
-    const arcAtFajr = arcs.find((a) => {
-      const mid = (a.startAngleDeg + a.endAngleDeg) / 2;
-      return mid >= 180 && mid < 270;
-    });
-    expect(arcAtFajr).toBeDefined();
-    expect(arcAtFajr!.color).not.toBe('#000000');
-    expect(MIRROR_GRADIENT_PALETTE[0]).toBe('#000000');
-    expect(MIRROR_GRADIENT_PALETTE[MIRROR_GRADIENT_PALETTE.length - 1]).toBe('#7CB8E8');
-  });
-
-  it('uses segment palette when outside mirror range', () => {
-    const mirror: MirrorSegment = { startAngleDeg: 180, spanDeg: 90 };
-    const arcs = getSweepSubArcs(mockSegments, mirror);
-    const arcAtTop = arcs[0];
-    const mid = (arcAtTop.startAngleDeg + arcAtTop.endAngleDeg) / 2;
-    expect(mid).toBeLessThan(180);
-    expect(arcAtTop.color).toBeDefined();
+    const cssWithMirror = getConicGradientCss(mockSegments, mirror);
+    const cssWithoutMirror = getConicGradientCss(mockSegments);
+    expect(cssWithMirror).not.toBe(cssWithoutMirror);
+    expect(cssWithMirror).toContain(MIRROR_GRADIENT_PALETTE[MIRROR_GRADIENT_PALETTE.length - 1]);
   });
 
   it('works with null mirrorSegment', () => {
-    const arcs = getSweepSubArcs(mockSegments, null);
-    expect(arcs).toHaveLength(480);
+    const css = getConicGradientCss(mockSegments, null);
+    expect(css).toMatch(/^conic-gradient\(/);
   });
 });
 

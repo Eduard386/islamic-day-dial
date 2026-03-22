@@ -13,6 +13,8 @@ func buildTimeline(
     let nightPT = afterMaghrib ? todayPT : yesterdayPT
     let dayPT = afterMaghrib ? tomorrowPT : todayPT
     
+    let duhaStart = Date(timeIntervalSince1970: dayPT.sunrise.timeIntervalSince1970 + 20 * 60)
+    let duhaEnd = Date(timeIntervalSince1970: dayPT.dhuhr.timeIntervalSince1970 - 5 * 60)
     return ComputedTimeline(
         lastMaghrib: nightPT.maghrib,
         isha: nightPT.isha,
@@ -20,6 +22,8 @@ func buildTimeline(
         lastThirdStart: getLastThirdStart(lastMaghrib: nightPT.maghrib, fajr: dayPT.fajr),
         fajr: dayPT.fajr,
         sunrise: dayPT.sunrise,
+        duhaStart: duhaStart,
+        duhaEnd: duhaEnd,
         dhuhr: dayPT.dhuhr,
         asr: dayPT.asr,
         nextMaghrib: dayPT.maghrib

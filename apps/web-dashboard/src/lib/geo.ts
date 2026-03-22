@@ -53,10 +53,12 @@ let geoPromise: Promise<GeoResult> | null = null;
 
 /**
  * Resolve location: try IP (ipapi.co), fallback to timezone mapping.
- * Cached - single API call shared by all consumers.
+ * When IP timezone conflicts with browser timezone (e.g. VPN, proxy),
+ * prefer browser — user is physically in browser's timezone.
  */
 export async function resolveGeo(): Promise<GeoResult> {
   if (geoPromise) return geoPromise;
+  const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   geoPromise = (async () => {
     try {
       const res = await fetch('https://ipapi.co/json/', {
@@ -69,9 +71,21 @@ export async function resolveGeo(): Promise<GeoResult> {
       if (typeof lat !== 'number' || typeof lng !== 'number') {
         return getTimezoneFallback();
       }
+      const ipTimezone = data.timezone || browserTz;
+      const browserLoc = TIMEZONE_TO_LOCATION[browserTz];
+      // IP timezone ≠ browser → VPN/proxy; use browser location if we have it
+      if (ipTimezone !== browserTz && browserLoc) {
+        return {
+          location: browserLoc,
+          timezone: browserTz,
+          country: data.country_name || data.country,
+          city: data.city,
+          region: data.region,
+        };
+      }
       return {
         location: { latitude: lat, longitude: lng },
-        timezone: data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezone: ipTimezone,
         country: data.country_name || data.country,
         city: data.city,
         region: data.region,

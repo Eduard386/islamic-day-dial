@@ -1,0 +1,17 @@
+Target dependency graph (8 targets)
+Target 'IslamicDayDialTests' in project 'IslamicDayDial'
+➜ Explicit dependency on target 'IslamicDayDial' in project 'IslamicDayDial'
+Target 'IslamicDayDial' in project 'IslamicDayDial'
+➜ Explicit dependency on target 'IslamicDayDialWatch' in project 'IslamicDayDial'
+➜ Explicit dependency on target 'IslamicDayDialWidget' in project 'IslamicDayDial'
+➜ Explicit dependency on target 'Adhan' in project 'Adhan'
+Target 'IslamicDayDialWidget' in project 'IslamicDayDial'
+➜ Explicit dependency on target 'Adhan' in project 'Adhan'
+Target 'Adhan' in project 'Adhan'
+➜ Explicit dependency on target 'Adhan' in project 'Adhan'
+Target 'Adhan' in project 'Adhan' (no dependencies)
+Target 'IslamicDayDialWatch' in project 'IslamicDayDial'
+➜ Explicit dependency on target 'Adhan' in project 'Adhan'
+Target 'Adhan' in project 'Adhan'
+➜ Explicit dependency on target 'Adhan' in project 'Adhan'
+Target 'Adhan' in project 'Adhan' (no dependencies)

@@ -1,0 +1,169 @@
+{
+  "" : {
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatch-primary.dia",
+    "emit-module-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatch-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatch-primary-emit-module.dia",
+    "pch" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatch-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatch-primary.swiftdeps"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/Colors.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Colors~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/ContentView.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/ContentView~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/Geometry.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Geometry~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/DayBounds.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/DayBounds~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/Formatting.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Formatting~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/GeoResolver.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/GeoResolver~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/HijriCalendar.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/HijriCalendar~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/NightMarkers.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/NightMarkers~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/Phases.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Phases~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/PrayerTimes.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/PrayerTimes~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/Ring.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Ring~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/SegmentGradients.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/SegmentGradients~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/Snapshot.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Snapshot~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayCore/Types.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/Types~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/IslamicDayDialWatchApp.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/IslamicDayDialWatchApp~partial.swiftmodule"
+  },
+  "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/IslamicDayDialWatch/RingView.swift" : {
+    "const-values" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.swiftconstvalues",
+    "dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.d",
+    "diagnostics" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.dia",
+    "index-unit-output-path" : "/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.o",
+    "llvm-bc" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.bc",
+    "object" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.o",
+    "swift-dependencies" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView.swiftdeps",
+    "swiftmodule" : "/Users/eduardstepanyshchenko/Documents/islamic-day-dial/apps/apple-watch/build/IslamicDayDial.build/Debug-watchos/IslamicDayDialWatch.build/Objects-normal/arm64_32/RingView~partial.swiftmodule"
+  }
+}

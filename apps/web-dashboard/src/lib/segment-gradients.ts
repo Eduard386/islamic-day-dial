@@ -155,11 +155,6 @@ export function getSegmentGradientStops(
   }));
 }
 
-/** Sub-arc for sweep rendering: solid color along the arc */
-export type SweepSubArc = { startAngleDeg: number; endAngleDeg: number; color: string };
-
-const SUB_ARCS_PER_RING = 480;
-
 function lerpColor(a: string, b: string, t: number): string {
   const parse = (hex: string) => {
     const n = parseInt(hex.slice(1), 16);
@@ -180,62 +175,66 @@ export type MirrorSegment = {
   spanDeg: number;
 };
 
+function getColorAtAngle(
+  angleDeg: number,
+  segments: Array<{ id: string; startAngleDeg: number; endAngleDeg: number }>,
+  mirrorSegment: MirrorSegment | null | undefined,
+): string {
+  const lookupAngle = angleDeg >= 360 ? 0 : angleDeg;
+  if (mirrorSegment && isInAngleRange(lookupAngle, mirrorSegment.startAngleDeg, mirrorSegment.spanDeg)) {
+    const t = mirrorSegment.spanDeg > 0
+      ? ((lookupAngle - mirrorSegment.startAngleDeg + 360) % 360) / mirrorSegment.spanDeg
+      : 0;
+    const clampedT = Math.max(0, Math.min(1, t));
+    const palette = MIRROR_GRADIENT_PALETTE;
+    const idx = clampedT * (palette.length - 1);
+    const i0 = Math.floor(idx);
+    const i1 = Math.min(i0 + 1, palette.length - 1);
+    return lerpColor(palette[i0], palette[i1], idx - i0);
+  }
+  const seg = segments.find((s) => {
+    if (s.endAngleDeg <= 360) {
+      return lookupAngle >= s.startAngleDeg && lookupAngle < s.endAngleDeg;
+    }
+    return (lookupAngle >= s.startAngleDeg && lookupAngle < 360) ||
+      (lookupAngle >= 0 && lookupAngle < s.endAngleDeg - 360);
+  });
+  const palette = seg ? getPaletteForSegment(seg.id as IslamicPhaseId) : [NIGHT_BLACK];
+  const span = seg ? seg.endAngleDeg - seg.startAngleDeg : 360;
+  let t = 0;
+  if (seg && span > 0) {
+    if (seg.endAngleDeg <= 360) {
+      t = (lookupAngle - seg.startAngleDeg) / span;
+    } else {
+      t = lookupAngle >= seg.startAngleDeg
+        ? (lookupAngle - seg.startAngleDeg) / span
+        : (360 - seg.startAngleDeg + lookupAngle) / span;
+    }
+    t = Math.max(0, Math.min(1, t));
+  }
+  const idx = t * (palette.length - 1);
+  const i0 = Math.floor(idx);
+  const i1 = Math.min(i0 + 1, palette.length - 1);
+  return palette.length === 1 ? palette[0] : lerpColor(palette[i0], palette[i1], idx - i0);
+}
+
+/** Number of color samples around the ring for conic-gradient CSS (smooth, no banding) */
+const CONIC_SAMPLES = 360;
+
 /**
- * Returns sub-arcs for the full ring. Color varies along the arc (sweep), no triangle, no seams.
- * If mirrorSegment is provided, sub-arcs within that range use the mirror gradient (red→blue).
+ * Returns CSS conic-gradient() string for the full ring sweep.
+ * Uses native conic gradient for smooth rendering without sub-arc artifacts.
  */
-export function getSweepSubArcs(
+export function getConicGradientCss(
   segments: Array<{ id: string; startAngleDeg: number; endAngleDeg: number }>,
   mirrorSegment?: MirrorSegment | null,
-): SweepSubArc[] {
-  const result: SweepSubArc[] = [];
-  const step = 360 / SUB_ARCS_PER_RING;
-  for (let i = 0; i < SUB_ARCS_PER_RING; i++) {
-    const startAngle = i * step;
-    const endAngle = (i + 1) * step;
-    const midAngle = (startAngle + endAngle) / 2;
-
-    let color: string;
-    if (mirrorSegment && isInAngleRange(midAngle, mirrorSegment.startAngleDeg, mirrorSegment.spanDeg)) {
-      const t = mirrorSegment.spanDeg > 0
-        ? ((midAngle - mirrorSegment.startAngleDeg + 360) % 360) / mirrorSegment.spanDeg
-        : 0;
-      const clampedT = Math.max(0, Math.min(1, t));
-      const palette = MIRROR_GRADIENT_PALETTE;
-      const idx = clampedT * (palette.length - 1);
-      const i0 = Math.floor(idx);
-      const i1 = Math.min(i0 + 1, palette.length - 1);
-      color = lerpColor(palette[i0], palette[i1], idx - i0);
-    } else {
-      const seg = segments.find((s) => {
-        if (s.endAngleDeg <= 360) {
-          return midAngle >= s.startAngleDeg && midAngle < s.endAngleDeg;
-        }
-        // Wrapping segment (endAngleDeg > 360): covers [start, 360) ∪ [0, end - 360)
-        return (midAngle >= s.startAngleDeg && midAngle < 360) ||
-          (midAngle >= 0 && midAngle < s.endAngleDeg - 360);
-      });
-      const palette = seg ? getPaletteForSegment(seg.id as IslamicPhaseId) : [NIGHT_BLACK];
-      const span = seg ? seg.endAngleDeg - seg.startAngleDeg : 360;
-      let t = 0;
-      if (seg && span > 0) {
-        if (seg.endAngleDeg <= 360) {
-          t = (midAngle - seg.startAngleDeg) / span;
-        } else {
-          const wrapEnd = seg.endAngleDeg - 360;
-          t = midAngle >= seg.startAngleDeg
-            ? (midAngle - seg.startAngleDeg) / span
-            : (360 - seg.startAngleDeg + midAngle) / span;
-        }
-        t = Math.max(0, Math.min(1, t));
-      }
-      const idx = t * (palette.length - 1);
-      const i0 = Math.floor(idx);
-      const i1 = Math.min(i0 + 1, palette.length - 1);
-      color = palette.length === 1 ? palette[0] : lerpColor(palette[i0], palette[i1], idx - i0);
-    }
-    result.push({ startAngleDeg: startAngle, endAngleDeg: endAngle, color });
+): string {
+  const stops: string[] = [];
+  for (let i = 0; i <= CONIC_SAMPLES; i++) {
+    const angleDeg = (i / CONIC_SAMPLES) * 360;
+    const color = getColorAtAngle(angleDeg, segments, mirrorSegment);
+    stops.push(`${color} ${angleDeg}deg`);
   }
-  return result;
+  return `conic-gradient(from 0deg, ${stops.join(', ')})`;
 }
 

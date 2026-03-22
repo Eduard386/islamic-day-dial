@@ -39,6 +39,8 @@ public struct ComputedTimeline {
     public let lastThirdStart: Date
     public let fajr: Date
     public let sunrise: Date
+    public let duhaStart: Date
+    public let duhaEnd: Date
     public let dhuhr: Date
     public let asr: Date
     public let nextMaghrib: Date

@@ -26,12 +26,28 @@ func formatCurrentPeriod(_ phase: IslamicPhaseId) -> String {
     PERIOD_NAMES[phase] ?? "Unknown"
 }
 
-/// Format countdown ms as HH:mm:ss
+/// Sub-period within sunrise_to_dhuhr: SUNRISE (0–20 min), DUHA (20 min–5 min before Dhuhr), MIDDAY (last 5 min)
+/// Mirrors packages/core getSunriseToDhuhrSubPeriod
+enum SunriseToDhuhrSubPeriod {
+    case sunrise  // first 20 min after sunrise
+    case duha     // 20 min after sunrise until 5 min before Dhuhr
+    case midday   // last 5 min before Dhuhr
+}
+
+func getSunriseToDhuhrSubPeriod(now: Date, sunrise: Date, dhuhr: Date) -> SunriseToDhuhrSubPeriod {
+    let t = now.timeIntervalSince1970
+    let duhaStart = sunrise.timeIntervalSince1970 + 20 * 60
+    let duhaEnd = dhuhr.timeIntervalSince1970 - 5 * 60
+    if t < duhaStart { return .sunrise }
+    if t >= duhaEnd { return .midday }
+    return .duha
+}
+
+/// Format countdown ms as "-HH:MM" (no seconds). Mirrors packages/core formatCountdown.
 func formatCountdown(_ ms: Int64) -> String {
-    if ms <= 0 { return "00:00:00" }
+    if ms <= 0 { return "-00:00" }
     let totalSeconds = Int(ms / 1000)
     let hours = totalSeconds / 3600
     let minutes = (totalSeconds % 3600) / 60
-    let seconds = totalSeconds % 60
-    return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    return "-" + String(format: "%02d:%02d", hours, minutes)
 }

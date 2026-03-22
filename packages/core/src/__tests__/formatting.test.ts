@@ -24,22 +24,22 @@ describe('formatHijriDate', () => {
 });
 
 describe('formatCountdown', () => {
-  it('formats as - HH:MM (no seconds)', () => {
+  it('formats as -HH:MM (no seconds)', () => {
     const ms = (1 * 3600 + 23 * 60 + 45) * 1000;
-    expect(formatCountdown(ms)).toBe('- 01:23');
+    expect(formatCountdown(ms)).toBe('-01:23');
   });
 
-  it('returns - 00:00 for 0', () => {
-    expect(formatCountdown(0)).toBe('- 00:00');
+  it('returns -00:00 for 0', () => {
+    expect(formatCountdown(0)).toBe('-00:00');
   });
 
-  it('returns - 00:00 for negative', () => {
-    expect(formatCountdown(-5000)).toBe('- 00:00');
+  it('returns -00:00 for negative', () => {
+    expect(formatCountdown(-5000)).toBe('-00:00');
   });
 
   it('pads single digits', () => {
     const ms = (0 * 3600 + 5 * 60 + 3) * 1000;
-    expect(formatCountdown(ms)).toBe('- 00:05');
+    expect(formatCountdown(ms)).toBe('-00:05');
   });
 });
 

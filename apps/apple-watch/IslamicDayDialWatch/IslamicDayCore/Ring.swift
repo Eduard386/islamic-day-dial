@@ -9,6 +9,8 @@ private let MARKER_DEFS: [(String, KeyPath<ComputedTimeline, Date>, RingMarkerKi
     ("last_third_start", \.lastThirdStart, .secondary),
     ("fajr", \.fajr, .primary),
     ("sunrise", \.sunrise, .primary),
+    ("duha_start", \.duhaStart, .secondary),
+    ("duha_end", \.duhaEnd, .secondary),
     ("dhuhr", \.dhuhr, .primary),
     ("asr", \.asr, .primary),
 ]
