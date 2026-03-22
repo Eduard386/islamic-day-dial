@@ -2,19 +2,41 @@ import SwiftUI
 
 private let DIAL_VERTICAL_GAP: CGFloat = 18
 private let DIAL_SECTION_HEIGHT: CGFloat = 436
+/// Horizontal insets from ScrollView `.padding(20)` × 2
+private let SCROLL_HORIZONTAL_INSET: CGFloat = 40
 /// Quran 9:36 (matches web dashboard)
 private let HEADER_AYAH_AR =
     "إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
 /// Matches `App.tsx` dial-ayah-translation
 private let HEADER_AYAH_EN =
     "\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
-/// Below Arabic: spacing(12) + title(~22) + spacing(4) + subtitle(~17) + header bottom padding(6)
-private let ARABIC_BOTTOM_TO_DIAL_TOP: CGFloat = 12 + 22 + 4 + 17 + 6
-/// (Arabic bottom → ring center) = ARABIC_BOTTOM_TO_DIAL_TOP + DIAL_SECTION_HEIGHT/2
-/// (ring center → English top) = DIAL_SECTION_HEIGHT/2 + gap; set gap = ARABIC_BOTTOM_TO_DIAL_TOP so both match.
-private let GAP_DIAL_BOTTOM_TO_ENGLISH: CGFloat = ARABIC_BOTTOM_TO_DIAL_TOP
+/// Islamic Day Dial + gap + Maghrib (fonts 18 / 14)
+private let HEADER_TITLE_STACK_HEIGHT: CGFloat = 22 + 4 + 17
 private let MS_PER_HOUR: Int64 = 3_600_000
 private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
+
+/// Same layout as PhoneDialView: dialSize, holeTop, dateTop.
+private func dateOffsetFromDialFrameTop(contentWidth: CGFloat) -> CGFloat {
+    let h = DIAL_SECTION_HEIGHT
+    let dialSize = min(contentWidth, h) * 1.28
+    let holeTop = dialSize * (0.5 - 0.25125)
+    let holeHeight = dialSize * 0.5025
+    return holeTop + 100 * (holeHeight / 212)
+}
+
+/// Titles at 15% from ayah (0%) to date in ring (100%). padTop + titleH/2 = 0.15 * total, total = padTop + titleH + padBottom + dateOffset.
+private func headerTitlePaddingPair(contentWidth: CGFloat) -> (top: CGFloat, bottom: CGFloat) {
+    let bottom: CGFloat = 8
+    let dateOffset = dateOffsetFromDialFrameTop(contentWidth: contentWidth)
+    // padTop + titleH/2 = 0.15 * (padTop + titleH + padBottom + dateOffset) => 0.85*padTop = 0.15*(bottom + dateOffset) - 0.35*titleH
+    let padTop = (0.15 * (bottom + dateOffset) - 0.35 * HEADER_TITLE_STACK_HEIGHT) / 0.85
+    return (max(0, padTop), bottom)
+}
+
+private func arabicBottomToDialFrameTop(contentWidth: CGFloat) -> CGFloat {
+    let (t, b) = headerTitlePaddingPair(contentWidth: contentWidth)
+    return t + HEADER_TITLE_STACK_HEIGHT + b
+}
 
 struct ContentView: View {
     @State private var automaticLocation: Location = .mecca
@@ -83,7 +105,9 @@ struct ContentView: View {
     }
     
     private var headerSection: some View {
-        VStack(spacing: 12) {
+        let w = UIScreen.main.bounds.width - SCROLL_HORIZONTAL_INSET
+        let (padTop, padBottom) = headerTitlePaddingPair(contentWidth: w)
+        return VStack(spacing: 0) {
             Text(HEADER_AYAH_AR)
                 .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(.white)
@@ -91,6 +115,8 @@ struct ContentView: View {
                 .lineSpacing(4)
                 .environment(\.layoutDirection, .rightToLeft)
                 .padding(.horizontal, 8)
+            Color.clear
+                .frame(height: padTop)
             VStack(spacing: 4) {
                 Text("Islamic Day Dial")
                     .font(.system(size: 18, weight: .bold))
@@ -100,16 +126,17 @@ struct ContentView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white)
             }
+            Color.clear
+                .frame(height: padBottom)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 8)
-        .padding(.bottom, 6)
     }
     
     private var dialSection: some View {
         Group {
             if let snapshot {
-                VStack(spacing: GAP_DIAL_BOTTOM_TO_ENGLISH) {
+                VStack(spacing: arabicBottomToDialFrameTop(contentWidth: UIScreen.main.bounds.width - SCROLL_HORIZONTAL_INSET)) {
                     PhoneDialView(snapshot: snapshot, now: effectiveNow)
                         .frame(height: DIAL_SECTION_HEIGHT)
                     Text(HEADER_AYAH_EN)
