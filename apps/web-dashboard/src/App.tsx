@@ -17,17 +17,27 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Islamic Day Dial</h1>
-        <p className="subtitle">Maghrib to Maghrib</p>
+        <p className="header-ayah" dir="rtl" lang="ar">
+          إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا
+        </p>
+        <div className="header-titles">
+          <h1>Islamic Day Dial</h1>
+          <p className="subtitle">Maghrib to Maghrib</p>
+        </div>
       </header>
 
       <main className="app-main">
         <div className="dial-section">
-          <div className="dial-wrapper">
-            <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} />
-            <div className="center-overlay">
-              <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+          <div className="dial-stack">
+            <div className="dial-wrapper">
+              <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} />
+              <div className="center-overlay">
+                <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+              </div>
             </div>
+            <p className="dial-ayah-translation" lang="en">
+              &quot;Indeed, the number of months ordained by Allah is twelve&quot; [9:36]
+            </p>
           </div>
         </div>
 

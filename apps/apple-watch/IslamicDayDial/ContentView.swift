@@ -1,6 +1,18 @@
 import SwiftUI
 
 private let DIAL_VERTICAL_GAP: CGFloat = 18
+private let DIAL_SECTION_HEIGHT: CGFloat = 436
+/// Quran 9:36 (matches web dashboard)
+private let HEADER_AYAH_AR =
+    "إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
+/// Matches `App.tsx` dial-ayah-translation
+private let HEADER_AYAH_EN =
+    "\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
+/// Below Arabic: spacing(12) + title(~22) + spacing(4) + subtitle(~17) + header bottom padding(6)
+private let ARABIC_BOTTOM_TO_DIAL_TOP: CGFloat = 12 + 22 + 4 + 17 + 6
+/// (Arabic bottom → ring center) = ARABIC_BOTTOM_TO_DIAL_TOP + DIAL_SECTION_HEIGHT/2
+/// (ring center → English top) = DIAL_SECTION_HEIGHT/2 + gap; set gap = ARABIC_BOTTOM_TO_DIAL_TOP so both match.
+private let GAP_DIAL_BOTTOM_TO_ENGLISH: CGFloat = ARABIC_BOTTOM_TO_DIAL_TOP
 private let MS_PER_HOUR: Int64 = 3_600_000
 private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 
@@ -71,25 +83,42 @@ struct ContentView: View {
     }
     
     private var headerSection: some View {
-        VStack(spacing: 4) {
-            Text("Islamic Day Dial")
-                .font(.system(size: 26, weight: .bold))
-                .foregroundStyle(Color(red: 0.81, green: 0.67, blue: 0.33))
-                .tracking(0.5)
-            Text("Maghrib to Maghrib")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Color(red: 0.8, green: 0.8, blue: 0.84))
+        VStack(spacing: 12) {
+            Text(HEADER_AYAH_AR)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .environment(\.layoutDirection, .rightToLeft)
+                .padding(.horizontal, 8)
+            VStack(spacing: 4) {
+                Text("Islamic Day Dial")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(Color(red: 0.81, green: 0.67, blue: 0.33))
+                    .tracking(0.5)
+                Text("Maghrib to Maghrib")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 8)
-        .padding(.bottom, DIAL_VERTICAL_GAP)
+        .padding(.bottom, 6)
     }
     
     private var dialSection: some View {
         Group {
             if let snapshot {
-                PhoneDialView(snapshot: snapshot, now: effectiveNow)
-                    .frame(height: 436)
+                VStack(spacing: GAP_DIAL_BOTTOM_TO_ENGLISH) {
+                    PhoneDialView(snapshot: snapshot, now: effectiveNow)
+                        .frame(height: DIAL_SECTION_HEIGHT)
+                    Text(HEADER_AYAH_EN)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(3)
+                        .padding(.horizontal, 20)
+                }
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity, minHeight: 320)

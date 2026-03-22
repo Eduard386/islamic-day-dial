@@ -57,19 +57,38 @@ body {
 }
 
 .app-header {
+  --header-main-size: clamp(1.2rem, 4vw, 1.38rem);
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 4px;
+  padding-top: 8px;
+}
+
+/* Quran 9:36 — как раньше (тот же масштаб, что у заголовка до укрупнения) */
+.header-ayah {
+  color: #ffffff;
+  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  font-size: var(--header-main-size);
+  font-weight: 500;
+  line-height: 1.85;
+  direction: rtl;
+  max-width: min(34em, 100%);
+  margin: 0 auto 20px;
+  letter-spacing: 0.02em;
+}
+
+.header-titles {
+  margin-top: 4px;
 }
 
 .app-header h1 {
-  font-size: 1.6rem;
+  font-size: calc(var(--header-main-size) * 0.88);
   font-weight: 700;
   color: var(--accent);
   letter-spacing: 0.02em;
 }
 
-.subtitle {
-  color: var(--text-secondary);
+.app-header .subtitle {
+  color: #ffffff;
   font-size: 0.85rem;
   margin-top: 4px;
 }
@@ -86,6 +105,26 @@ body {
 .dial-section {
   display: flex;
   justify-content: center;
+  margin-top: -22px;
+}
+
+.dial-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+}
+
+/* Quran 9:36 — English */
+.dial-ayah-translation {
+  color: #ffffff;
+  text-align: center;
+  font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 26rem;
+  margin: 14px 16px 0;
+  letter-spacing: 0.02em;
 }
 
 .dial-wrapper {
