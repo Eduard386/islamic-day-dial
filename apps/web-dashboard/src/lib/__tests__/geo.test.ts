@@ -4,24 +4,28 @@ import { resolveGeo, clearGeoCache } from '../geo.js';
 describe('resolveGeo', () => {
   const MECCA = { latitude: 21.4225, longitude: 39.8262 };
 
+  function mockGeolocation(impl: Partial<Geolocation>) {
+    Object.defineProperty(navigator, 'geolocation', { value: impl, writable: true, configurable: true });
+  }
+
   beforeEach(() => {
     clearGeoCache();
     if (typeof navigator !== 'undefined') {
       Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
-      navigator.geolocation = {
+      mockGeolocation({
         getCurrentPosition: vi.fn((_s, err) => err?.()),
         watchPosition: vi.fn(),
         clearWatch: vi.fn(),
-      } as unknown as Geolocation;
+      } as unknown as Geolocation);
     }
   });
 
   it('returns GPS location when geolocation succeeds', async () => {
-    navigator.geolocation = {
+    mockGeolocation({
       getCurrentPosition: vi.fn((success) => success({ coords: { latitude: 50.45, longitude: 30.52 } })),
       watchPosition: vi.fn(),
       clearWatch: vi.fn(),
-    } as unknown as Geolocation;
+    } as unknown as Geolocation);
     const geo = await resolveGeo();
     expect(geo.location).toEqual({ latitude: 50.45, longitude: 30.52 });
     expect(geo.source).toBe('gps');

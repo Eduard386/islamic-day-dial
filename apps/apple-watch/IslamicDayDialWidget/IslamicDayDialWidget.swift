@@ -3,14 +3,23 @@ import WidgetKit
 
 struct IslamicDayDialEntry: TimelineEntry {
     let date: Date
-    let snapshot: ComputedIslamicDay
-    let countdownTarget: Date
+    let snapshot: ComputedIslamicDay?
+    let countdownTarget: Date?
     let locationTitle: String
+    let isPlaceholder: Bool
+
+    init(date: Date, snapshot: ComputedIslamicDay?, countdownTarget: Date?, locationTitle: String, isPlaceholder: Bool = false) {
+        self.date = date
+        self.snapshot = snapshot
+        self.countdownTarget = countdownTarget
+        self.locationTitle = locationTitle
+        self.isPlaceholder = isPlaceholder
+    }
 }
 
 struct IslamicDayDialProvider: TimelineProvider {
     func placeholder(in context: Context) -> IslamicDayDialEntry {
-        previewEntry()
+        IslamicDayDialEntry(date: Date(), snapshot: nil, countdownTarget: nil, locationTitle: "", isPlaceholder: true)
     }
     
     func getSnapshot(in context: Context, completion: @escaping (IslamicDayDialEntry) -> Void) {
@@ -22,9 +31,7 @@ struct IslamicDayDialProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<IslamicDayDialEntry>) -> Void) {
         Task {
             let entry = await makeEntry(date: Date(), prefersPreviewData: false)
-            let quarterHourRefresh = entry.date.addingTimeInterval(15 * 60)
-            let transitionRefresh = entry.snapshot.nextTransitionAt.addingTimeInterval(15)
-            let refreshDate = min(quarterHourRefresh, transitionRefresh)
+            let refreshDate = entry.date.addingTimeInterval(60) // Every minute for countdown accuracy
             completion(Timeline(entries: [entry], policy: .after(refreshDate)))
         }
     }
@@ -42,58 +49,79 @@ struct IslamicDayDialProvider: TimelineProvider {
             title = TimeZone.current.identifier.replacingOccurrences(of: "_", with: " ")
         }
         
-        let snapshot = computeIslamicDaySnapshot(now: date, location: location) ?? previewEntry().snapshot
+        guard let snapshot = computeIslamicDaySnapshot(now: date, location: location) else {
+            return IslamicDayDialEntry(date: date, snapshot: nil, countdownTarget: nil, locationTitle: title)
+        }
         let countdownTarget = getCountdownTarget(now: date, timeline: snapshot.timeline)
         return IslamicDayDialEntry(date: date, snapshot: snapshot, countdownTarget: countdownTarget, locationTitle: title)
-    }
-    
-    private func previewEntry() -> IslamicDayDialEntry {
-        let date = Date()
-        let snapshot = computeIslamicDaySnapshot(now: date, location: .mecca) ?? fallbackSnapshot(now: date)
-        let countdownTarget = getCountdownTarget(now: date, timeline: snapshot.timeline)
-        return IslamicDayDialEntry(date: date, snapshot: snapshot, countdownTarget: countdownTarget, locationTitle: "Preview")
-    }
-    
-    private func fallbackSnapshot(now: Date) -> ComputedIslamicDay {
-        guard let snapshot = computeIslamicDaySnapshot(now: now, location: .mecca) else {
-            fatalError("Unable to compute preview snapshot for the widget.")
-        }
-        return snapshot
     }
 }
 
 struct IslamicDayDialWidgetEntryView: View {
     let entry: IslamicDayDialProvider.Entry
-    
+
     var body: some View {
-        mediumWidget
+        Group {
+            if entry.isPlaceholder {
+                placeholderContent
+            } else if let snap = entry.snapshot {
+                dataContent(snapshot: snap)
+            } else {
+                fallbackContent
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .multilineTextAlignment(.center)
+        .padding(8)
         .containerBackground(Color(red: 0.06, green: 0.06, blue: 0.1), for: .widget)
     }
-    
-    private var mediumWidget: some View {
-        HStack(spacing: 12) {
-            RingView(snapshot: entry.snapshot, now: entry.date, thicknessScale: 1.35)
-                .frame(width: 118, height: 118)
-            
-            VStack(spacing: 6) {
-                Text(periodLabel(snapshot: entry.snapshot, now: entry.date).uppercased())
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(periodColor(snapshot: entry.snapshot))
-                    .lineLimit(1)
-                
-                HijriWidgetLabels(hijriDate: entry.snapshot.hijriDate)
-                
-                Text(formatCountdown(countdownMs(snapshot: entry.snapshot)))
-                    .font(.system(size: 16, weight: .light, design: .monospaced))
-                    .foregroundStyle(Colors.softUtility)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .multilineTextAlignment(.center)
-            .padding(.trailing, 4)
-            
-            Spacer(minLength: 0)
+
+    private var placeholderContent: some View {
+        VStack(spacing: 4) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Colors.softUtility.opacity(0.3))
+                .frame(height: 16)
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Colors.primaryGold.opacity(0.3))
+                .frame(height: 20)
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Colors.softUtility.opacity(0.3))
+                .frame(height: 14)
         }
-        .padding(16)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var fallbackContent: some View {
+        VStack(spacing: 4) {
+            Text("—")
+                .font(.system(size: 18, weight: .light))
+                .foregroundStyle(Colors.coolLabel)
+            Text("—")
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(Colors.secondaryGold)
+            Text("—")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Colors.secondaryGold)
+            Text("—")
+                .font(.system(size: 16, weight: .light))
+                .monospacedDigit()
+                .foregroundStyle(Colors.softUtility)
+        }
+    }
+
+    private func dataContent(snapshot snap: ComputedIslamicDay) -> some View {
+        VStack(spacing: 4) {
+            Text(periodLabel(snapshot: snap, now: entry.date).uppercased())
+                .font(.system(size: 18, weight: .light))
+                .foregroundStyle(periodColor(snapshot: snap))
+                .lineLimit(1)
+            HijriWidgetLabels(hijriDate: snap.hijriDate)
+            Text(formatCountdown(countdownMs(snapshot: snap)))
+                .font(.system(size: 16, weight: .light))
+                .monospacedDigit()
+                .foregroundStyle(Colors.softUtility)
+        }
+        .frame(maxWidth: .infinity)
     }
     
     private func countdownMs(snapshot snap: ComputedIslamicDay) -> Int64 {
@@ -115,34 +143,27 @@ struct IslamicDayDialWidgetEntryView: View {
     }
     
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
-        snap.currentPhase == .last_third_to_fajr
-            ? Color(red: 0.22, green: 0.74, blue: 0.97)
-            : Colors.coolLabel
+        Colors.coolLabel
     }
 }
 
-private let WIDGET_COMPACT_MONTH_NAMES: Set<String> = [
-    "rabi al-awwal", "rabi al-thani", "jumada al-ula", "jumada al-thani"
-]
-
 private struct HijriWidgetLabels: View {
     private let parts: (dayMonth: String, year: String, isEid: Bool)
-    private let useCompactDayMonth: Bool
-    
+
     init(hijriDate: HijriDate) {
         self.parts = formatHijriDateParts(hijriDate)
-        self.useCompactDayMonth = WIDGET_COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased())
     }
-    
+
     var body: some View {
-        VStack(spacing: 2) {
+        return VStack(spacing: 1) {
             Text(parts.dayMonth.uppercased())
-                .font(.system(size: useCompactDayMonth ? 12 : 14, weight: .semibold))
+                .font(.system(size: 28, weight: .semibold))
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.4)
                 .foregroundStyle(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
             Text(parts.year)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
+                .minimumScaleFactor(0.6)
                 .foregroundStyle(Colors.secondaryGold)
         }
     }
@@ -161,7 +182,7 @@ struct IslamicDayDialWidget: Widget {
             IslamicDayDialWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Islamic Day Dial")
-        .description("Track the current Islamic day phase, countdown, and ring at a glance.")
-        .supportedFamilies([.systemMedium])
+        .description("Track the current Islamic day phase and countdown.")
+        .supportedFamilies([.systemSmall])
     }
 }
