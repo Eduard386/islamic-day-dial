@@ -38,7 +38,7 @@ const DISK_FILL = '#000000';
 const DISK_STROKE = '#000000';
 const MOON_FILL = '#e8dcc8';
 /** Lunar: bluish-yellowish, muted, full-moon glow — Maghrib, Isha, Last Third (чуть ярче и желтее) */
-const MOON_LUNAR_FILL = '#C0B8A0';
+const MOON_LUNAR_FILL = '#E2D9C8';
 const MOON_INNER_R = 0.82; /** Moon circles radius as fraction of disk r */
 
 /** Солнце: glow — здесь настраивать силу и охват свечения */
@@ -74,7 +74,7 @@ const SUN_OUTER_GLOW_NORMAL = {
 const MOON_OUTER_GLOW = {
   strokeWidth: 18,
   blur: 6,
-  lunar: 'rgba(192, 184, 160, 0.7)',
+  lunar: 'rgba(226, 217, 200, 0.9)',
 };
 
 /** = JUMU_GLOW (IslamicRing) — неон солнца идентичен дню джума */
@@ -351,13 +351,13 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
               /* Night: lunar silver-blue, ring background shows through where shadow was */
               moonPhase.shadowOffset === 0 ? (
                 <>
-                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter={`url(#moon-lunar-glow${suffix})`} opacity={0.85} />
+                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter={`url(#moon-lunar-glow${suffix})`} opacity={0.95} />
                   <circle r={innerR} fill={MOON_LUNAR_FILL} />
                 </>
               ) : (
                 <>
                   {/* Glow + crescent: both masked so shadow area shows ring, not moon */}
-                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter={`url(#moon-lunar-glow${suffix})`} opacity={0.85} mask={`url(#${crescentMaskId})`} />
+                  <circle r={innerR} fill={MOON_LUNAR_FILL} filter={`url(#moon-lunar-glow${suffix})`} opacity={0.95} mask={`url(#${crescentMaskId})`} />
                   <circle r={innerR} fill={MOON_LUNAR_FILL} mask={`url(#${crescentMaskId})`} />
                 </>
               )

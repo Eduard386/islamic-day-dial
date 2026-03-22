@@ -33,4 +33,14 @@ final class GeometryTests: XCTestCase {
         XCTAssertEqual(result.x, 100, accuracy: 0.01)
         XCTAssertEqual(result.y, 50, accuracy: 0.01)
     }
+
+    func testArcPath_QuarterArcStaysInTopRightQuadrant() {
+        let path = arcPath(cx: 100, cy: 100, r: 50, startDeg: 0, endDeg: 90)
+        let bounds = path.boundingRect
+
+        XCTAssertGreaterThanOrEqual(bounds.minX, 99.0)
+        XCTAssertLessThanOrEqual(bounds.maxX, 150.5)
+        XCTAssertGreaterThanOrEqual(bounds.minY, 49.5)
+        XCTAssertLessThanOrEqual(bounds.maxY, 101.0)
+    }
 }

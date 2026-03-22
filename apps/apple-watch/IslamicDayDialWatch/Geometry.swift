@@ -25,7 +25,7 @@ func arcPath(cx: Double, cy: Double, r: Double, startDeg: Double, endDeg: Double
         radius: r,
         startAngle: .degrees(startDeg - 90),
         endAngle: .degrees(endDeg - 90),
-        clockwise: true
+        clockwise: false
     )
     return path
 }

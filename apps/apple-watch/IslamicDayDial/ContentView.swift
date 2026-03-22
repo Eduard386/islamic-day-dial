@@ -31,7 +31,7 @@ struct ContentView: View {
                 }
                 .padding(20)
             }
-            .background(Color(red: 0.03, green: 0.03, blue: 0.06).ignoresSafeArea())
+            .background(Color.black.ignoresSafeArea())
             .overlay {
                 ShakeDetectorView { showTimeTravel = true }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -175,9 +175,7 @@ private struct PhoneDialView: View {
     }
     
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
-        snap.currentPhase == .last_third_to_fajr
-            ? Color(red: 0.22, green: 0.74, blue: 0.97)
-            : Colors.ivory
+        Colors.ivory
     }
 }
 
@@ -197,11 +195,7 @@ private struct IshaShadowModifier: ViewModifier {
     let phase: IslamicPhaseId
     
     func body(content: Content) -> some View {
-        if phase == .last_third_to_fajr {
-            content.shadow(color: Color(red: 0.22, green: 0.74, blue: 0.97).opacity(0.7), radius: 4)
-        } else {
-            content
-        }
+        content
     }
 }
 
@@ -343,7 +337,7 @@ private struct TimeTravelSheet: View {
             }
             .navigationTitle("Time Travel")
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color(red: 0.03, green: 0.03, blue: 0.06))
+            .background(Color.black)
         }
     }
 }
