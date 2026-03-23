@@ -1,13 +1,11 @@
 import {
   getSunriseToDhuhrSubPeriod,
+  isJumuahGlowWindow,
+  NIGHT_SECTORS_GROUP,
   type ComputedIslamicDay,
   type IslamicPhaseId,
   type RingSegment,
 } from '@islamic-day-dial/core';
-import {
-  isJumuahGlowWindow,
-  NIGHT_SECTORS_GROUP,
-} from '../lib/glow-window';
 import { describeArc, polarToXY } from '../lib/geometry';
 import { getSegmentGradientStops, getConicGradientCss, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';

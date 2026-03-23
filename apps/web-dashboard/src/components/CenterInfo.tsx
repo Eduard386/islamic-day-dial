@@ -1,8 +1,7 @@
 import {
   formatHijriDateParts,
-  formatCurrentPeriod,
   formatCountdown,
-  getSunriseToDhuhrSubPeriod,
+  getSectorDisplayName,
   type ComputedIslamicDay,
 } from '@islamic-day-dial/core';
 
@@ -12,28 +11,12 @@ type Props = {
   timezone: string;
 };
 
-/** Пятница: DUHA / MIDDAY / DHUHR → одно имя латиницей */
-const JUMU_LABEL = "Jumu'ah";
-
 export function CenterInfo({ snapshot, now, timezone }: Props) {
-  const isFriday = now.getDay() === 5;
-
-  const periodLabel = (() => {
-    if (snapshot.currentPhase === 'dhuhr_to_asr' && isFriday) {
-      return JUMU_LABEL;
-    }
-    if (snapshot.currentPhase !== 'sunrise_to_dhuhr') {
-      return formatCurrentPeriod(snapshot.currentPhase);
-    }
-    const sub = getSunriseToDhuhrSubPeriod(
-      now,
-      snapshot.timeline.sunrise,
-      snapshot.timeline.dhuhr,
-    );
-    if (sub === 'sunrise') return 'Sunrise';
-    if (isFriday && (sub === 'duha' || sub === 'midday')) return JUMU_LABEL;
-    return sub === 'duha' ? 'Duha' : 'Midday';
-  })();
+  const periodLabel = getSectorDisplayName(
+    now,
+    snapshot.currentPhase,
+    { sunrise: snapshot.timeline.sunrise, dhuhr: snapshot.timeline.dhuhr },
+  );
 
   const periodContent = (() => {
     if (!periodLabel) return null;

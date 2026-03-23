@@ -66,6 +66,21 @@ export function formatCurrentPeriod(phase: IslamicPhaseId): string {
   return PERIOD_NAMES[phase];
 }
 
+/** Display name for current sector: Jumu'ah on Fri (Duha/Midday/Dhuhr), Sunrise/Duha/Midday, or default phase label */
+export function getSectorDisplayName(
+  now: Date,
+  currentPhase: IslamicPhaseId,
+  timeline: { sunrise: Date; dhuhr: Date },
+): string {
+  const isFriday = now.getDay() === 5;
+  if (currentPhase === 'dhuhr_to_asr' && isFriday) return "Jumu'ah";
+  if (currentPhase !== 'sunrise_to_dhuhr') return formatCurrentPeriod(currentPhase);
+  const sub = getSunriseToDhuhrSubPeriod(now, timeline.sunrise, timeline.dhuhr);
+  if (sub === 'sunrise') return 'Sunrise';
+  if (isFriday && (sub === 'duha' || sub === 'midday')) return "Jumu'ah";
+  return sub === 'duha' ? 'Duha' : 'Midday';
+}
+
 export type SunriseToDhuhrSubPeriod = 'sunrise' | 'duha' | 'midday';
 
 /** Sub-period within sunrise_to_dhuhr: SUNRISE (0–20 min), DUHA (20 min–5 min before Dhuhr), MIDDAY (last 5 min) */

@@ -1,6 +1,7 @@
 import Foundation
 
 /// Jumu'ah (Friday): glow shown only when marker is in DUHA, MIDDAY or DHUHR.
+/// Mirrors packages/core/src/glow-window.ts (source of truth).
 /// Not during SUNRISE, Fajr, night (Maghrib…Last 3rd), Asr→Maghrib.
 /// Mirrors apps/web-dashboard/src/lib/glow-window.ts isJumuahGlowWindow
 func isJumuahGlowWindow(now: Date, timeline: ComputedTimeline, currentPhase: IslamicPhaseId) -> Bool {

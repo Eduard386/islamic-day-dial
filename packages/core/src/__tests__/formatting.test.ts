@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { formatHijriDate, formatCountdown, formatPhase, getSunriseToDhuhrSubPeriod } from '../formatting.js';
+import {
+  formatHijriDate,
+  formatCountdown,
+  formatPhase,
+  getSunriseToDhuhrSubPeriod,
+  getSectorDisplayName,
+} from '../formatting.js';
 
 describe('formatHijriDate', () => {
   it('formats day monthName year', () => {
@@ -72,5 +78,39 @@ describe('getSunriseToDhuhrSubPeriod', () => {
 
   it('returns sunrise at 19 min after sunrise (still in sunrise sub-period)', () => {
     expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:34:00.000Z'), sunrise, dhuhr)).toBe('sunrise');
+  });
+});
+
+describe('getSectorDisplayName', () => {
+  const timeline = { sunrise: new Date('2025-03-21T04:15:00.000Z'), dhuhr: new Date('2025-03-21T09:15:00.000Z') };
+
+  it('returns Jumu\'ah on Friday in dhuhr_to_asr', () => {
+    const friday = new Date('2025-03-21T10:00:00.000Z');
+    expect(getSectorDisplayName(friday, 'dhuhr_to_asr', timeline)).toBe("Jumu'ah");
+  });
+
+  it('returns Dhuhr on Thursday in dhuhr_to_asr', () => {
+    const thursday = new Date('2025-03-20T10:00:00.000Z');
+    expect(getSectorDisplayName(thursday, 'dhuhr_to_asr', timeline)).toBe('Dhuhr');
+  });
+
+  it('returns Sunrise in sunrise sub-period', () => {
+    const friday = new Date('2025-03-21T04:20:00.000Z');
+    expect(getSectorDisplayName(friday, 'sunrise_to_dhuhr', timeline)).toBe('Sunrise');
+  });
+
+  it('returns Jumu\'ah on Friday in duha', () => {
+    const friday = new Date('2025-03-21T06:00:00.000Z');
+    expect(getSectorDisplayName(friday, 'sunrise_to_dhuhr', timeline)).toBe("Jumu'ah");
+  });
+
+  it('returns Duha on Thursday in duha', () => {
+    const thursdayTimeline = { sunrise: new Date('2025-03-20T04:15:00.000Z'), dhuhr: new Date('2025-03-20T09:15:00.000Z') };
+    const thursday = new Date('2025-03-20T06:00:00.000Z');
+    expect(getSectorDisplayName(thursday, 'sunrise_to_dhuhr', thursdayTimeline)).toBe('Duha');
+  });
+
+  it('returns Maghrib for maghrib_to_isha', () => {
+    expect(getSectorDisplayName(new Date(), 'maghrib_to_isha', timeline)).toBe('Maghrib');
   });
 });

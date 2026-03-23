@@ -4,7 +4,7 @@ import {
   isLastThirdPhase,
   NIGHT_SECTORS_GROUP,
   isInIshaOrLastThirdSector,
-} from '../glow-window.js';
+} from '@islamic-day-dial/core';
 
 describe('isJumuahGlowWindow', () => {
   const timeline = {

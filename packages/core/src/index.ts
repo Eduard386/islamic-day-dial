@@ -35,7 +35,15 @@ export {
   formatCurrentPeriod,
   formatTransition,
   getSunriseToDhuhrSubPeriod,
+  getSectorDisplayName,
   type HijriDateParts,
   type SunriseToDhuhrSubPeriod,
 } from './formatting.js';
+export {
+  isJumuahGlowWindow,
+  isLastThirdPhase,
+  isInIshaOrLastThirdSector,
+  NIGHT_SECTORS_GROUP,
+  type GlowTimelineSlice,
+} from './glow-window.js';
 export { computeIslamicDaySnapshot } from './snapshot.js';

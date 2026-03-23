@@ -130,16 +130,7 @@ struct IslamicDayDialWidgetEntryView: View {
     }
     
     private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
-        let isFriday = Calendar.current.component(.weekday, from: now) == 6
-        if snap.currentPhase == .dhuhr_to_asr && isFriday { return "Jumu'ah" }
-        if snap.currentPhase == .sunrise_to_dhuhr {
-            let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: snap.timeline.sunrise, dhuhr: snap.timeline.dhuhr)
-            if sub == .sunrise { return "Sunrise" }
-            if isFriday && (sub == .duha || sub == .midday) { return "Jumu'ah" }
-            return sub == .duha ? "Duha" : "Midday"
-        }
-        if snap.currentPhase == .last_third_to_fajr { return "Isha" }
-        return formatCurrentPeriod(snap.currentPhase)
+        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (sunrise: snap.timeline.sunrise, dhuhr: snap.timeline.dhuhr))
     }
     
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
