@@ -415,7 +415,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
           currentPhase === 'sunrise_to_dhuhr' && snapshot.timeline
             ? getSunriseToDhuhrSubPeriod(
                 now ?? new Date(),
-                snapshot.timeline.sunrise,
+                snapshot.timeline.duhaStart,
                 snapshot.timeline.dhuhr,
               )
             : null;

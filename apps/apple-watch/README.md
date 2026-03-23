@@ -36,11 +36,16 @@ What it includes:
 - current period / Hijri date / countdown center overlay
 - location presets with automatic fallback
 - prayer times list
+- **local notifications** for Fajr, Dhuhr, Asr, Maghrib, Isha (rescheduled on app launch and when returning from background)
 - embedded watch companion and widget extension
 
 ### `IslamicDayDialWatch`
 
 The companion watchOS app. It reuses the same dial logic and rendering files that power the iPhone app.
+
+### Prayer notifications (iOS)
+
+`PrayerNotificationScheduler` schedules local notifications for Fajr, Dhuhr, Asr, Maghrib, Isha. Title: Hijri date (day month year). Body: prayer name + Quran 4:103. Rescheduled on app launch and when returning from background (handles travel).
 
 ### `IslamicDayDialWidget`
 
@@ -82,6 +87,16 @@ If you only run the iPhone app, the watch companion is also embedded inside the 
 - Long-press the iPhone Home Screen
 - Tap `Edit` / `Add Widget`
 - Search for `Islamic Day Dial`
+
+## Testing
+
+Run unit tests:
+
+```bash
+npm run test:ios
+```
+
+Tests cover: duha sector start (4° solar altitude), countdown, glow windows, prayer notification content format, geometry, geo resolution.
 
 ## Build from command line
 

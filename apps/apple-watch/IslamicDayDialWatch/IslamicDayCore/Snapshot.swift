@@ -18,7 +18,8 @@ public func computeIslamicDaySnapshot(
         now: now,
         todayPT: todayPT,
         yesterdayPT: yesterdayPT,
-        tomorrowPT: tomorrowPT
+        tomorrowPT: tomorrowPT,
+        location: location
     )
     
     let hijriDate = getIslamicDayHijriDate(now: now, todayMaghrib: todayPT.maghrib)

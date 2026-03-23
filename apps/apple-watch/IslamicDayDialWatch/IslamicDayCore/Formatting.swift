@@ -28,29 +28,28 @@ func formatCurrentPeriod(_ phase: IslamicPhaseId) -> String {
 
 /// Display name for current sector: Jumu'ah on Fri (Duha/Midday/Dhuhr), Sunrise/Duha/Midday, or default phase label.
 /// Mirrors packages/core getSectorDisplayName
-func getSectorDisplayName(now: Date, currentPhase: IslamicPhaseId, timeline: (sunrise: Date, dhuhr: Date)) -> String {
+func getSectorDisplayName(now: Date, currentPhase: IslamicPhaseId, timeline: (duhaStart: Date, dhuhr: Date)) -> String {
     let isFriday = Calendar.current.component(.weekday, from: now) == 6
     if currentPhase == .dhuhr_to_asr && isFriday { return "Jumu'ah" }
     if currentPhase != .sunrise_to_dhuhr { return formatCurrentPeriod(currentPhase) }
-    let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: timeline.sunrise, dhuhr: timeline.dhuhr)
+    let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: timeline.duhaStart, dhuhr: timeline.dhuhr)
     if sub == .sunrise { return "Sunrise" }
     if isFriday && (sub == .duha || sub == .midday) { return "Jumu'ah" }
     return sub == .duha ? "Duha" : "Midday"
 }
 
-/// Sub-period within sunrise_to_dhuhr: SUNRISE (0–20 min), DUHA (20 min–5 min before Dhuhr), MIDDAY (last 5 min)
+/// Sub-period within sunrise_to_dhuhr: SUNRISE (until Duha start), DUHA (until 5 min before Dhuhr), MIDDAY (last 5 min)
 /// Mirrors packages/core getSunriseToDhuhrSubPeriod
 enum SunriseToDhuhrSubPeriod {
-    case sunrise  // first 20 min after sunrise
-    case duha     // 20 min after sunrise until 5 min before Dhuhr
+    case sunrise  // until dynamic Duha start (sun reaches 4° altitude)
+    case duha     // from Duha start until 5 min before Dhuhr
     case midday   // last 5 min before Dhuhr
 }
 
-func getSunriseToDhuhrSubPeriod(now: Date, sunrise: Date, dhuhr: Date) -> SunriseToDhuhrSubPeriod {
+func getSunriseToDhuhrSubPeriod(now: Date, duhaStart: Date, dhuhr: Date) -> SunriseToDhuhrSubPeriod {
     let t = now.timeIntervalSince1970
-    let duhaStart = sunrise.timeIntervalSince1970 + 20 * 60
     let duhaEnd = dhuhr.timeIntervalSince1970 - 5 * 60
-    if t < duhaStart { return .sunrise }
+    if t < duhaStart.timeIntervalSince1970 { return .sunrise }
     if t >= duhaEnd { return .midday }
     return .duha
 }

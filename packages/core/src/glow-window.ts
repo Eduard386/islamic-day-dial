@@ -2,7 +2,7 @@ import type { IslamicPhaseId } from './types.js';
 import { getSunriseToDhuhrSubPeriod } from './formatting.js';
 
 /** Minimal timeline slice needed for glow decisions */
-export type GlowTimelineSlice = { sunrise: Date; dhuhr: Date };
+export type GlowTimelineSlice = { duhaStart: Date; dhuhr: Date };
 
 /**
  * Jumu'ah (Friday): glow shown only when marker is in DUHA, MIDDAY or DHUHR.
@@ -16,7 +16,7 @@ export function isJumuahGlowWindow(
   if (now.getDay() !== 5) return false;
   if (currentPhase === 'dhuhr_to_asr') return true;
   if (currentPhase === 'sunrise_to_dhuhr') {
-    const sub = getSunriseToDhuhrSubPeriod(now, timeline.sunrise, timeline.dhuhr);
+    const sub = getSunriseToDhuhrSubPeriod(now, timeline.duhaStart, timeline.dhuhr);
     return sub === 'duha' || sub === 'midday';
   }
   return false;

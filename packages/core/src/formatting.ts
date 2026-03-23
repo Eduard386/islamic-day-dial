@@ -70,12 +70,12 @@ export function formatCurrentPeriod(phase: IslamicPhaseId): string {
 export function getSectorDisplayName(
   now: Date,
   currentPhase: IslamicPhaseId,
-  timeline: { sunrise: Date; dhuhr: Date },
+  timeline: { duhaStart: Date; dhuhr: Date },
 ): string {
   const isFriday = now.getDay() === 5;
   if (currentPhase === 'dhuhr_to_asr' && isFriday) return "Jumu'ah";
   if (currentPhase !== 'sunrise_to_dhuhr') return formatCurrentPeriod(currentPhase);
-  const sub = getSunriseToDhuhrSubPeriod(now, timeline.sunrise, timeline.dhuhr);
+  const sub = getSunriseToDhuhrSubPeriod(now, timeline.duhaStart, timeline.dhuhr);
   if (sub === 'sunrise') return 'Sunrise';
   if (isFriday && (sub === 'duha' || sub === 'midday')) return "Jumu'ah";
   return sub === 'duha' ? 'Duha' : 'Midday';
@@ -83,16 +83,15 @@ export function getSectorDisplayName(
 
 export type SunriseToDhuhrSubPeriod = 'sunrise' | 'duha' | 'midday';
 
-/** Sub-period within sunrise_to_dhuhr: SUNRISE (0–20 min), DUHA (20 min–5 min before Dhuhr), MIDDAY (last 5 min) */
+/** Sub-period within sunrise_to_dhuhr: SUNRISE (until Duha start), DUHA (until 5 min before Dhuhr), MIDDAY (last 5 min) */
 export function getSunriseToDhuhrSubPeriod(
   now: Date,
-  sunrise: Date,
+  duhaStart: Date,
   dhuhr: Date,
 ): SunriseToDhuhrSubPeriod {
   const t = now.getTime();
-  const duhaStart = sunrise.getTime() + 20 * 60 * 1000;
   const duhaEnd = dhuhr.getTime() - 5 * 60 * 1000;
-  if (t < duhaStart) return 'sunrise';
+  if (t < duhaStart.getTime()) return 'sunrise';
   if (t >= duhaEnd) return 'midday';
   return 'duha';
 }

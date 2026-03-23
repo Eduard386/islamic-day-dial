@@ -17,7 +17,7 @@ export function computeIslamicDaySnapshot(input: UserContext): ComputedIslamicDa
   const yesterdayPT = getPrayerTimesForDate(addDays(now, -1), location);
   const tomorrowPT = getPrayerTimesForDate(addDays(now, 1), location);
 
-  const timeline = buildTimeline(now, todayPT, yesterdayPT, tomorrowPT);
+  const timeline = buildTimeline(now, todayPT, yesterdayPT, tomorrowPT, location);
 
   const hijriDate = getIslamicDayHijriDate(now, todayPT.maghrib);
 

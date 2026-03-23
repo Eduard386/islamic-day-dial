@@ -8,7 +8,7 @@ import {
 
 describe('isJumuahGlowWindow', () => {
   const timeline = {
-    sunrise: new Date('2025-03-21T04:15:00.000Z'),
+    duhaStart: new Date('2025-03-21T04:38:00.000Z'),
     dhuhr: new Date('2025-03-21T09:15:00.000Z'),
   };
 

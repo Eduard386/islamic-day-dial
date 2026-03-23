@@ -81,7 +81,7 @@ struct ContentView: View {
     }
 
     private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
-        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (sunrise: snap.timeline.sunrise, dhuhr: snap.timeline.dhuhr))
+        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (duhaStart: snap.timeline.duhaStart, dhuhr: snap.timeline.dhuhr))
     }
 
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {

@@ -25,7 +25,7 @@ export function getCountdownTarget(now: Date, timeline: ComputedTimeline): Date 
     case 'fajr_to_sunrise':
       return timeline.sunrise;
     case 'sunrise_to_dhuhr': {
-      const sub = getSunriseToDhuhrSubPeriod(now, timeline.sunrise, timeline.dhuhr);
+      const sub = getSunriseToDhuhrSubPeriod(now, timeline.duhaStart, timeline.dhuhr);
       if (sub === 'sunrise') return timeline.duhaStart;
       if (sub === 'duha') return timeline.duhaEnd;
       return timeline.dhuhr;

@@ -39,6 +39,7 @@ private func arabicBottomToDialFrameTop(contentWidth: CGFloat) -> CGFloat {
 }
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var automaticLocation: Location = .mecca
     @State private var snapshot: ComputedIslamicDay?
     @State private var now = Date()
@@ -89,6 +90,11 @@ struct ContentView: View {
         }
         .onChange(of: now) { _, _ in recalcSnapshot() }
         .onChange(of: timeOffsetMs) { _, _ in recalcSnapshot() }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if oldPhase == .background && newPhase == .active {
+                Task { await refreshSnapshot(forceResolveLocation: true) }
+            }
+        }
         .sheet(isPresented: $showTimeTravel) {
             TimeTravelSheet(
                 monthOffset: $monthOffset,
@@ -158,7 +164,10 @@ struct ContentView: View {
         if forceResolveLocation || snapshot == nil {
             let result = await resolveGeoResult()
             automaticLocation = result.location
-            if forceResolveLocation { await trackVisit(geo: result) }
+            if forceResolveLocation {
+                await trackVisit(geo: result)
+                await PrayerNotificationScheduler.requestAndSchedule(location: automaticLocation)
+            }
         }
         
         let currentNow = Date()
@@ -221,7 +230,7 @@ private struct PhoneDialView: View {
     }
     
     private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
-        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (sunrise: snap.timeline.sunrise, dhuhr: snap.timeline.dhuhr))
+        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (duhaStart: snap.timeline.duhaStart, dhuhr: snap.timeline.dhuhr))
     }
     
     private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {

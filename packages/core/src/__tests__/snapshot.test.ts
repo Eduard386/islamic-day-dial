@@ -56,6 +56,17 @@ describe('computeIslamicDaySnapshot', () => {
     assertValidSnapshot(snapshot);
   });
 
+  it('computes dynamic duhaStart around 4° solar altitude', () => {
+    const snapshot = computeIslamicDaySnapshot({
+      now: new Date('2026-03-20T08:00:00.000Z'),
+      location: { latitude: 21.4225, longitude: 39.8262 },
+      timezone: 'Asia/Riyadh',
+    });
+    const diffMinutes = (snapshot.timeline.duhaStart.getTime() - snapshot.timeline.sunrise.getTime()) / 60000;
+    expect(diffMinutes).toBeGreaterThan(20);
+    expect(diffMinutes).toBeLessThan(26);
+  });
+
   it('timeline markers are strictly ordered', () => {
     const snapshot = computeIslamicDaySnapshot(ISTANBUL);
     const tl = snapshot.timeline;

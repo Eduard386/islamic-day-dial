@@ -130,7 +130,7 @@ struct RingView: View {
         }
         // Web sunrise sub-period: orange disk + orange glow.
         if snapshot.currentPhase == .sunrise_to_dhuhr {
-            let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: snapshot.timeline.sunrise, dhuhr: snapshot.timeline.dhuhr)
+            let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr)
             if sub == .sunrise {
                 return SunMarkerStyle(style: .sunrise, color: SUN_ORANGE, glowColor: SUN_ORANGE, strongGlow: true)
             }

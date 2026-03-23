@@ -8,7 +8,7 @@ import {
 
 describe('isJumuahGlowWindow', () => {
   const timeline = {
-    sunrise: new Date('2025-03-21T04:15:00.000Z'),
+    duhaStart: new Date('2025-03-21T04:38:00.000Z'),
     dhuhr: new Date('2025-03-21T09:15:00.000Z'),
   };
 
@@ -23,7 +23,7 @@ describe('isJumuahGlowWindow', () => {
   });
 
   it('returns true on Friday when in duha sub-period', () => {
-    const friday = new Date('2025-03-21T06:00:00.000Z'); // Fri, 20 min after sunrise = duha
+    const friday = new Date('2025-03-21T06:00:00.000Z'); // Fri, after dynamic duhaStart
     expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr')).toBe(true);
   });
 
@@ -33,7 +33,7 @@ describe('isJumuahGlowWindow', () => {
   });
 
   it('returns false on Friday when in sunrise sub-period', () => {
-    const friday = new Date('2025-03-21T04:20:00.000Z'); // Fri, first 20 min after sunrise
+    const friday = new Date('2025-03-21T04:20:00.000Z'); // Fri, before dynamic duhaStart
     expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr')).toBe(false);
   });
 

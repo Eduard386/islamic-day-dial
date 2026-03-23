@@ -6,6 +6,7 @@ function makeTimeline(entries: Record<string, number>): ComputedTimeline {
   const toDate = (ms: number) => new Date(ms);
   const sunrise = entries.sunrise ?? 0;
   const dhuhr = entries.dhuhr ?? 0;
+  const duhaStart = entries.duhaStart ?? sunrise + 20 * 60 * 1000;
   return {
     lastMaghrib: toDate(entries.lastMaghrib ?? 0),
     isha: toDate(entries.isha ?? 0),
@@ -13,7 +14,7 @@ function makeTimeline(entries: Record<string, number>): ComputedTimeline {
     lastThirdStart: toDate(entries.lastThirdStart ?? 0),
     fajr: toDate(entries.fajr ?? 0),
     sunrise: toDate(sunrise),
-    duhaStart: toDate(sunrise + 20 * 60 * 1000),
+    duhaStart: toDate(duhaStart),
     duhaEnd: toDate(dhuhr - 5 * 60 * 1000),
     dhuhr: toDate(dhuhr),
     asr: toDate(entries.asr ?? 0),
@@ -60,10 +61,10 @@ describe('getCountdownTarget', () => {
   it('Sunrise_to_dhuhr: sub-periods target next sector start', () => {
     const sunrise = 100000;
     const dhuhr = 2000000; // > sunrise + 20 min so duha/midday exist
-    const duhaStart = sunrise + 20 * 60 * 1000;
+    const duhaStart = sunrise + 23 * 60 * 1000;
     const duhaEnd = dhuhr - 5 * 60 * 1000;
     const tl = makeTimeline({
-      fajr: 80000, sunrise, dhuhr,
+      fajr: 80000, sunrise, duhaStart, dhuhr,
       lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
       asr: 2500000, nextMaghrib: 3000000,
     });

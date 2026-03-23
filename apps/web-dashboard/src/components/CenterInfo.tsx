@@ -15,7 +15,7 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
   const periodLabel = getSectorDisplayName(
     now,
     snapshot.currentPhase,
-    { sunrise: snapshot.timeline.sunrise, dhuhr: snapshot.timeline.dhuhr },
+    { duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr },
   );
 
   const periodContent = (() => {

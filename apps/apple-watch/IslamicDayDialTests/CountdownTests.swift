@@ -24,11 +24,12 @@ final class CountdownTests: XCTestCase {
         lastThirdStart: TimeInterval,
         fajr: TimeInterval,
         sunrise: TimeInterval,
+        duhaStart: TimeInterval? = nil,
         dhuhr: TimeInterval,
         asr: TimeInterval,
         nextMaghrib: TimeInterval
     ) -> ComputedTimeline {
-        let duhaStart = sunrise + 20 * 60
+        let duhaStart = duhaStart ?? (sunrise + 20 * 60)
         let duhaEnd = dhuhr - 5 * 60
         return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: lastMaghrib),
@@ -83,14 +84,14 @@ final class CountdownTests: XCTestCase {
     func testSunriseToDhuhr_SubPeriodsTargetNextSectorStart() {
         let sunrise: TimeInterval = 100000
         let dhuhr: TimeInterval = 2000000
-        let duhaStart = sunrise + 20 * 60
+        let duhaStart = sunrise + 23 * 60
         let duhaEnd = dhuhr - 5 * 60
         let tl = makeTimeline(
             lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
-            fajr: 80000, sunrise: sunrise, dhuhr: dhuhr,
+            fajr: 80000, sunrise: sunrise, duhaStart: duhaStart, dhuhr: dhuhr,
             asr: 2500000, nextMaghrib: 3000000
         )
-        // Before duhaStart (sunrise + 20 min = 101200), not 110000 which is already in Duha
+        // Before dynamic duhaStart, countdown points to the Duha boundary.
         var target = getCountdownTarget(now: Date(timeIntervalSince1970: 100500), timeline: tl)
         XCTAssertEqual(target.timeIntervalSince1970, duhaStart)
         target = getCountdownTarget(now: Date(timeIntervalSince1970: duhaStart + 1), timeline: tl)
@@ -98,4 +99,5 @@ final class CountdownTests: XCTestCase {
         target = getCountdownTarget(now: Date(timeIntervalSince1970: duhaEnd + 1), timeline: tl)
         XCTAssertEqual(target.timeIntervalSince1970, dhuhr)
     }
+
 }

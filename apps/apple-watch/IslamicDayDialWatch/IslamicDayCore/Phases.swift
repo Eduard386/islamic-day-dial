@@ -49,7 +49,7 @@ func getNextTransition(now: Date, timeline: ComputedTimeline) -> (id: String, at
 /// Mirrors packages/core/src/countdown.ts getCountdownTarget
 func getCountdownTarget(now: Date, timeline: ComputedTimeline) -> Date {
     let phase = getCurrentPhase(now: now, timeline: timeline)
-    let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: timeline.sunrise, dhuhr: timeline.dhuhr)
+    let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: timeline.duhaStart, dhuhr: timeline.dhuhr)
 
     switch phase {
     case .maghrib_to_isha:

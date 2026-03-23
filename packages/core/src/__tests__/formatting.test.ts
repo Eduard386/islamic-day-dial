@@ -56,33 +56,32 @@ describe('formatPhase', () => {
 });
 
 describe('getSunriseToDhuhrSubPeriod', () => {
-  const sunrise = new Date('2025-03-16T03:15:00.000Z');
+  const duhaStart = new Date('2025-03-16T03:36:00.000Z');
   const dhuhr = new Date('2025-03-16T09:15:00.000Z');
 
   it('returns sunrise before duha_start', () => {
-    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:20:00.000Z'), sunrise, dhuhr)).toBe('sunrise');
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:20:00.000Z'), duhaStart, dhuhr)).toBe('sunrise');
   });
 
   it('returns duha in the middle', () => {
-    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T06:00:00.000Z'), sunrise, dhuhr)).toBe('duha');
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T06:00:00.000Z'), duhaStart, dhuhr)).toBe('duha');
   });
 
   it('returns midday in last 5 min', () => {
-    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T09:12:00.000Z'), sunrise, dhuhr)).toBe('midday');
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T09:12:00.000Z'), duhaStart, dhuhr)).toBe('midday');
   });
 
-  it('returns duha at exactly 20 min after sunrise (boundary)', () => {
-    // sunrise + 20 min = duha start; at that moment sub-period is duha
-    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:35:00.000Z'), sunrise, dhuhr)).toBe('duha');
+  it('returns duha at exact duhaStart boundary', () => {
+    expect(getSunriseToDhuhrSubPeriod(duhaStart, duhaStart, dhuhr)).toBe('duha');
   });
 
-  it('returns sunrise at 19 min after sunrise (still in sunrise sub-period)', () => {
-    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:34:00.000Z'), sunrise, dhuhr)).toBe('sunrise');
+  it('returns sunrise one minute before duhaStart', () => {
+    expect(getSunriseToDhuhrSubPeriod(new Date('2025-03-16T03:35:00.000Z'), duhaStart, dhuhr)).toBe('sunrise');
   });
 });
 
 describe('getSectorDisplayName', () => {
-  const timeline = { sunrise: new Date('2025-03-21T04:15:00.000Z'), dhuhr: new Date('2025-03-21T09:15:00.000Z') };
+  const timeline = { duhaStart: new Date('2025-03-21T04:38:00.000Z'), dhuhr: new Date('2025-03-21T09:15:00.000Z') };
 
   it('returns Jumu\'ah on Friday in dhuhr_to_asr', () => {
     const friday = new Date('2025-03-21T10:00:00.000Z');
@@ -105,7 +104,7 @@ describe('getSectorDisplayName', () => {
   });
 
   it('returns Duha on Thursday in duha', () => {
-    const thursdayTimeline = { sunrise: new Date('2025-03-20T04:15:00.000Z'), dhuhr: new Date('2025-03-20T09:15:00.000Z') };
+    const thursdayTimeline = { duhaStart: new Date('2025-03-20T04:37:00.000Z'), dhuhr: new Date('2025-03-20T09:15:00.000Z') };
     const thursday = new Date('2025-03-20T06:00:00.000Z');
     expect(getSectorDisplayName(thursday, 'sunrise_to_dhuhr', thursdayTimeline)).toBe('Duha');
   });

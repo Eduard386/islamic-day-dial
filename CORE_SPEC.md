@@ -21,8 +21,8 @@
 - **Progress**: `(now - lastMaghrib) / (nextMaghrib - lastMaghrib)`, clamped 0–1
 - **Angle**: `progress * 360` (0° = top = lastMaghrib, clockwise)
 - **Countdown** (вместо текущего времени): целевое время зависит от фазы:
-  - Fajr → до появления надписи DUHA (sunrise + 20 min)
-  - Sunrise_to_dhuhr, до DUHA → до появления DUHA
+  - Fajr → до duhaStart (солнце 4° над горизонтом)
+  - Sunrise_to_dhuhr, до DUHA → до duhaStart
   - Sunrise_to_dhuhr, DUHA видна → до Dhuhr
   - Dhuhr → до Asr
   - Asr → до Maghrib
@@ -56,10 +56,12 @@ Defined in `apps/web-dashboard/src/components/CurrentMarker.tsx`. Implement on A
 
 ### Sub-periods within sunrise_to_dhuhr
 
-`getSunriseToDhuhrSubPeriod(now, sunrise, dhuhr)` → `'sunrise' | 'duha' | 'midday'` (from `packages/core`):
-- **sunrise**: first 20 min after sunrise — sun is **orange**
-- **duha**: from 20 min after sunrise until 5 min before Dhuhr — sun is **normal** (yellow)
+`getSunriseToDhuhrSubPeriod(now, duhaStart, dhuhr)` → `'sunrise' | 'duha' | 'midday'` (from `packages/core`):
+- **sunrise**: from sunrise until **duhaStart** (sun at 4° altitude) — sun is **orange**
+- **duha**: from duhaStart until 5 min before Dhuhr — sun is **normal** (yellow)
 - **midday**: last 5 min before Dhuhr — sun is normal
+
+**duhaStart** is computed dynamically (solar altitude 4°, per hadith “высота копья”): `getDuhaStart(sunrise, dhuhr, location)` in `packages/core/src/day-bounds.ts`. Varies by latitude and season.
 
 ### Sun color by state
 

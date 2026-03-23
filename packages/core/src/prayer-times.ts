@@ -1,11 +1,12 @@
-import { Coordinates, PrayerTimes, CalculationMethod, Shafaq } from 'adhan';
+import { Coordinates, PrayerTimes, CalculationMethod, Madhab, Shafaq } from 'adhan';
 import type { Location, PrayerTimesData } from './types.js';
 
 /**
  * Compute prayer times for a given Gregorian date and location.
- * Uses Umm al-Qura for Dhuhr/Asr/Maghrib and Hijri calendar consistency.
- * Isha: computed by twilight disappearance (15° sun angle, Shafaq.Ahmer),
- * per hadith: "Perform Isha when the evening twilight disappears".
+ * Fajr: Umm al-Qura (18.5°).
+ * Asr: Shafi (shadow length equals object length).
+ * Isha: twilight disappearance (15° sun angle, Shafaq.Ahmer),
+ * instead of Umm al-Qura's fixed 90-minute interval.
  */
 export function getPrayerTimesForDate(
   date: Date,
@@ -13,6 +14,7 @@ export function getPrayerTimesForDate(
 ): PrayerTimesData {
   const coords = new Coordinates(location.latitude, location.longitude);
   const params = CalculationMethod.UmmAlQura();
+  params.madhab = Madhab.Shafi;
   // Isha by twilight disappearance instead of fixed 90-min interval
   params.ishaInterval = 0;
   params.ishaAngle = 15;

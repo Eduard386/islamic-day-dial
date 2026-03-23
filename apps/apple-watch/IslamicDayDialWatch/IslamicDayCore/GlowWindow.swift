@@ -9,7 +9,7 @@ func isJumuahGlowWindow(now: Date, timeline: ComputedTimeline, currentPhase: Isl
     if !isFriday { return false }
     if currentPhase == .dhuhr_to_asr { return true }
     if currentPhase == .sunrise_to_dhuhr {
-        let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: timeline.sunrise, dhuhr: timeline.dhuhr)
+        let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: timeline.duhaStart, dhuhr: timeline.dhuhr)
         return sub == .duha || sub == .midday
     }
     return false
