@@ -45,15 +45,11 @@ func getNextTransition(now: Date, timeline: ComputedTimeline) -> (id: String, at
     return ("maghrib", timeline.nextMaghrib)
 }
 
-/// DUHA label visibility: hidden first 20 min and last 5 min of sunrise_to_dhuhr
-private let DUHA_LABEL_FIRST_SEC: TimeInterval = 20 * 60
-
-/// Target for countdown based on current phase and DUHA visibility.
+/// Target for countdown: always the start of the next sector.
 /// Mirrors packages/core/src/countdown.ts getCountdownTarget
 func getCountdownTarget(now: Date, timeline: ComputedTimeline) -> Date {
-    let t = now.timeIntervalSince1970
     let phase = getCurrentPhase(now: now, timeline: timeline)
-    let duhaLabelAt = timeline.sunrise.timeIntervalSince1970 + DUHA_LABEL_FIRST_SEC
+    let sub = getSunriseToDhuhrSubPeriod(now: now, sunrise: timeline.sunrise, dhuhr: timeline.dhuhr)
 
     switch phase {
     case .maghrib_to_isha:
@@ -61,9 +57,13 @@ func getCountdownTarget(now: Date, timeline: ComputedTimeline) -> Date {
     case .isha_to_midnight, .last_third_to_fajr:
         return timeline.fajr
     case .fajr_to_sunrise:
-        return Date(timeIntervalSince1970: duhaLabelAt)
+        return timeline.sunrise
     case .sunrise_to_dhuhr:
-        return t < duhaLabelAt ? Date(timeIntervalSince1970: duhaLabelAt) : timeline.dhuhr
+        switch sub {
+        case .sunrise: return timeline.duhaStart
+        case .duha: return timeline.duhaEnd
+        case .midday: return timeline.dhuhr
+        }
     case .dhuhr_to_asr:
         return timeline.asr
     case .asr_to_maghrib:

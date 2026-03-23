@@ -234,21 +234,26 @@ fun getNextTransition(now: Date, timeline: ComputedTimeline): Pair<String, Date>
     return "maghrib" to timeline.nextMaghrib
 }
 
-/** DUHA label visibility: hidden first 20 min and last 5 min of sunrise_to_dhuhr */
-private const val DUHA_LABEL_FIRST_MS = 20L * 60 * 1000
+/** Sub-period boundaries: duha 20 min after sunrise, midday = last 5 min before dhuhr */
+private const val DUHA_START_MS = 20L * 60 * 1000
+private const val MIDDAY_START_BEFORE_DHUHR_MS = 5L * 60 * 1000
 
-/** Target for countdown based on current phase and DUHA visibility. Mirrors packages/core countdown.ts */
+/** Target for countdown: always the start of the next sector. Mirrors packages/core countdown.ts */
 fun getCountdownTarget(now: Date, timeline: ComputedTimeline): Date {
     val t = now.time
     val phase = getCurrentPhase(now, timeline)
-    val duhaLabelAt = timeline.sunrise.time + DUHA_LABEL_FIRST_MS
+    val duhaStart = timeline.sunrise.time + DUHA_START_MS
+    val duhaEnd = timeline.dhuhr.time - MIDDAY_START_BEFORE_DHUHR_MS
 
     return when (phase) {
         IslamicPhaseId.MAGHRIB_TO_ISHA -> timeline.isha
-        IslamicPhaseId.ISHA_TO_MIDNIGHT, IslamicPhaseId.LAST_THIRD_TO_FAJR ->
-            timeline.fajr
-        IslamicPhaseId.FAJR_TO_SUNRISE -> Date(duhaLabelAt)
-        IslamicPhaseId.SUNRISE_TO_DHUHR -> if (t < duhaLabelAt) Date(duhaLabelAt) else timeline.dhuhr
+        IslamicPhaseId.ISHA_TO_MIDNIGHT, IslamicPhaseId.LAST_THIRD_TO_FAJR -> timeline.fajr
+        IslamicPhaseId.FAJR_TO_SUNRISE -> timeline.sunrise
+        IslamicPhaseId.SUNRISE_TO_DHUHR -> when {
+            t < duhaStart -> Date(duhaStart)
+            t < duhaEnd -> Date(duhaEnd)
+            else -> timeline.dhuhr
+        }
         IslamicPhaseId.DHUHR_TO_ASR -> timeline.asr
         IslamicPhaseId.ASR_TO_MAGHRIB -> timeline.nextMaghrib
     }

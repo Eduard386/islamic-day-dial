@@ -22,7 +22,7 @@ function makeTimeline(entries: Record<string, number>): ComputedTimeline {
 }
 
 describe('getCountdownTarget', () => {
-  it('Fajr sector: target is DUHA label (sunrise + 20 min)', () => {
+  it('Fajr sector: target is Sunrise', () => {
     const sunrise = 100000;
     const dhuhr = 200000;
     const tl = makeTimeline({
@@ -32,7 +32,7 @@ describe('getCountdownTarget', () => {
     });
     const now = new Date(90000); // in fajr_to_sunrise
     const target = getCountdownTarget(now, tl);
-    expect(target.getTime()).toBe(sunrise + 20 * 60 * 1000);
+    expect(target.getTime()).toBe(sunrise);
   });
 
   it('Maghrib sector: target is Isha', () => {
@@ -55,6 +55,24 @@ describe('getCountdownTarget', () => {
     const now = new Date(25000); // in isha_to_midnight
     const target = getCountdownTarget(now, tl);
     expect(target.getTime()).toBe(fajr);
+  });
+
+  it('Sunrise_to_dhuhr: sub-periods target next sector start', () => {
+    const sunrise = 100000;
+    const dhuhr = 2000000; // > sunrise + 20 min so duha/midday exist
+    const duhaStart = sunrise + 20 * 60 * 1000;
+    const duhaEnd = dhuhr - 5 * 60 * 1000;
+    const tl = makeTimeline({
+      fajr: 80000, sunrise, dhuhr,
+      lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+      asr: 2500000, nextMaghrib: 3000000,
+    });
+    // Sunrise sub: countdown to Duha
+    expect(getCountdownTarget(new Date(110000), tl).getTime()).toBe(duhaStart);
+    // Duha sub: countdown to Midday (duhaEnd)
+    expect(getCountdownTarget(new Date(duhaStart + 1000), tl).getTime()).toBe(duhaEnd);
+    // Midday sub: countdown to Dhuhr
+    expect(getCountdownTarget(new Date(duhaEnd + 1000), tl).getTime()).toBe(dhuhr);
   });
 });
 
