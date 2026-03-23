@@ -45,5 +45,5 @@ export {
   isInIshaOrLastThirdSector,
   NIGHT_SECTORS_GROUP,
   type GlowTimelineSlice,
-} from './glow-window.js';
+} from './glow-window';
 export { computeIslamicDaySnapshot } from './snapshot.js';
