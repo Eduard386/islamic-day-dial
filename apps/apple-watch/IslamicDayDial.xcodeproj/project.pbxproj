@@ -69,6 +69,8 @@
 		FA93F801E66C92596F79D775 /* DayBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926DDF68987C449EA796E817 /* DayBounds.swift */; };
 		FE159B5BB94663FF53CD799E /* Ring.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE030CA39FCD2B8F31EBC648 /* Ring.swift */; };
 		G1C2D3E4F5A6B7C8D9E0F1A2 /* GeoResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H2D3E4F5A6B7C8D9E0F1A2B3 /* GeoResolverTests.swift */; };
+		N1C2D3E4F5A60718293A4B5C /* CountdownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = N2C2D3E4F5A60718293A4B5C /* CountdownTests.swift */; };
+		N3C2D3E4F5A60718293A4B5D /* Phases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07ABDBDD6F4BE7BCF35137A3 /* Phases.swift */; };
 		J3E4F5A6B7C8D9E0F1A2B3C4 /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAD5540EF57FCEDAA17DC /* GeoResolver.swift */; };
 		V1S2T3T4R5A6C7K8E9R00123 /* VisitTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = V1S2T3T4R5A6C7K8E9R00122 /* VisitTracker.swift */; };
 /* End PBXBuildFile section */
@@ -152,6 +154,7 @@
 		F59AB0259162CFF8E8BFF885 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		F5FC7B4E3A74A600017506DB /* IslamicDayDialWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWatchApp.swift; sourceTree = "<group>"; };
 		H2D3E4F5A6B7C8D9E0F1A2B3 /* GeoResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoResolverTests.swift; sourceTree = "<group>"; };
+		N2C2D3E4F5A60718293A4B5C /* CountdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownTests.swift; sourceTree = "<group>"; };
 		V1S2T3T4R5A6C7K8E9R00122 /* VisitTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitTracker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -237,6 +240,7 @@
 		A1F5C4D3E6B7A89012CDEF34 /* IslamicDayDialTests */ = {
 			isa = PBXGroup;
 			children = (
+				N2C2D3E4F5A60718293A4B5C /* CountdownTests.swift */,
 				8F3A2B1C4D5E6F7890ABCD12 /* GeometryTests.swift */,
 				E2F3A4B5C6D72839F0E1A2B3 /* GlowWindowTests.swift */,
 				H2D3E4F5A6B7C8D9E0F1A2B3 /* GeoResolverTests.swift */,
@@ -484,6 +488,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				N1C2D3E4F5A60718293A4B5C /* CountdownTests.swift in Sources */,
 				A7B8C9D0E1F2A3B4C5D6E7F8 /* Geometry.swift in Sources */,
 				9E4B3C2D5E6F7A8901BCDE23 /* GeometryTests.swift in Sources */,
 				F3A4B5C6D7E82940E1A2B3C4 /* GlowWindowTests.swift in Sources */,
@@ -491,6 +496,7 @@
 				J3E4F5A6B7C8D9E0F1A2B3C4 /* GeoResolver.swift in Sources */,
 				E4F5A6B7C8D92031F2E3A4B5 /* GlowWindow.swift in Sources */,
 				F5A6B7C8D9E03142A3B4C5D6 /* Formatting.swift in Sources */,
+				N3C2D3E4F5A60718293A4B5D /* Phases.swift in Sources */,
 				A6B7C8D9E0F14253B4C5D6E7 /* Types.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
