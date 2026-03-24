@@ -46,8 +46,7 @@ const FALLBACK_LOCATION: Location = { latitude: 21.4225, longitude: 39.8262 }; /
 const CURRENT_CITY = 'My location';
 const DEFAULT_PRESET = CURRENT_CITY;
 
-const SNAPSHOT_INTERVAL_MS = 60_000;
-const TICK_INTERVAL_MS = 60_000;
+const TICK_INTERVAL_MS = 1_000;
 
 export function useIslamicDay(): DashboardState {
   const [location, setLocation] = useState<Location>(FALLBACK_LOCATION);
@@ -90,10 +89,12 @@ export function useIslamicDay(): DashboardState {
     setLiveNow(getEffectiveNow(timeMode));
   }, [timeMode]);
 
-  // Live mode: tick every 60s to refresh progress, phase, countdown
+  // Live mode: tick every second so sector label, sun position, and countdown stay visibly live.
   useEffect(() => {
     if (timeMode.kind !== 'live') return;
-    const timer = setInterval(() => setLiveNow(getEffectiveNow(timeMode)), TICK_INTERVAL_MS);
+    const tick = () => setLiveNow(new Date());
+    tick();
+    const timer = setInterval(tick, TICK_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [timeMode]);
 
@@ -145,6 +146,6 @@ export function useIslamicDay(): DashboardState {
     setTimeMode,
     setSelectedPreset,
     applyCurrentCity,
-    effectiveNow: liveNow,
+    effectiveNow: timeMode.kind === 'live' ? liveNow : effectiveNow,
   };
 }
