@@ -114,9 +114,6 @@ struct IslamicDayDialWatchWidgetEntryView: View {
                         .foregroundStyle(hijri.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
                         .lineLimit(1)
                         .minimumScaleFactor(0.65)
-                    Text(widgetCountdownText(snapshot: snapshot, now: entry.date))
-                        .font(.system(size: 11, weight: .light, design: .monospaced))
-                        .foregroundStyle(Colors.softUtility)
                 }
             } else {
                 Text("No data")

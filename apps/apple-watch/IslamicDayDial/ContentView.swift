@@ -7,7 +7,7 @@ private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 private let INFO_EXPANSION_DURATION = 1.0
 private let PHONE_DATE_INFO_SCALE: CGFloat = 1.25
 private let PHONE_TEXT_GLOW_PULSE_DURATION = 3.0
-let PHONE_READING_TINT = Color(red: 0.82, green: 0.78, blue: 0.60)
+let PHONE_READING_TINT = Color(red: 0.9, green: 0.88, blue: 0.8)
 let PHONE_READING_GLOW = Color(red: 0.99, green: 0.88, blue: 0.38)
 private let PHONE_INSIGHT_AYAH_AR = "إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
 private let PHONE_INSIGHT_AYAH_EN = "\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
@@ -491,58 +491,48 @@ private struct PhoneDialInsightView: View {
     let containerSize: CGSize
 
     var body: some View {
-        TimelineView(.animation) { timeline in
-            let (_, phase) = phoneGlowPulsePhase(timeline.date)
-            let monthGlowPhase = CGFloat(phase)
-            let listWidth = min(containerSize.width - 52, 280)
+        let listWidth = min(containerSize.width - 52, 292)
 
-            VStack(spacing: containerSize.height * 0.012) {
-                Text(PHONE_INSIGHT_AYAH_AR)
-                    .font(.system(size: min(containerSize.width * 0.052, 22), weight: .medium, design: .serif))
-                    .foregroundColor(PHONE_READING_TINT)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(containerSize.height * 0.006)
-                    .frame(maxWidth: min(containerSize.width - 36, 420))
+        VStack(spacing: containerSize.height * 0.012) {
+            Text(PHONE_INSIGHT_AYAH_AR)
+                .font(.system(size: min(containerSize.width * 0.052, 22), weight: .medium, design: .serif))
+                .foregroundColor(PHONE_READING_TINT)
+                .multilineTextAlignment(.center)
+                .lineSpacing(containerSize.height * 0.006)
+                .frame(maxWidth: min(containerSize.width - 36, 420))
 
-                Text(PHONE_INSIGHT_AYAH_EN)
-                    .font(.system(size: min(containerSize.width * 0.04, 17), weight: .regular, design: .serif))
-                    .foregroundColor(PHONE_READING_TINT)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(containerSize.height * 0.003)
-                    .frame(maxWidth: min(containerSize.width - 56, 360))
+            Text(PHONE_INSIGHT_AYAH_EN)
+                .font(.system(size: min(containerSize.width * 0.04, 17), weight: .regular, design: .serif))
+                .foregroundColor(PHONE_READING_TINT)
+                .multilineTextAlignment(.center)
+                .lineSpacing(containerSize.height * 0.003)
+                .frame(maxWidth: min(containerSize.width - 56, 360))
 
-                Color.clear
-                    .frame(height: containerSize.height * 0.03)
+            Color.clear
+                .frame(height: containerSize.height * 0.03)
 
-                VStack(alignment: .leading, spacing: containerSize.height * 0.005) {
-                    ForEach(Array(PHONE_HIJRI_MONTH_NAMES.enumerated()), id: \.offset) { index, monthName in
-                        let isCurrentMonth = snapshot.hijriDate.monthNumber == index + 1
-                        let currentMonthGlowOpacity = isCurrentMonth ? 0.2 + Double(phase) * 0.16 : 0
-                        let currentMonthWhiteOpacity = isCurrentMonth ? 0.08 + Double(phase) * 0.08 : 0
-                        let currentMonthRadius = isCurrentMonth ? CGFloat(4) + monthGlowPhase * CGFloat(4) : 0
-
-                        HStack(alignment: .firstTextBaseline, spacing: 10) {
-                            Text("\(index + 1).")
-                                .font(.system(size: 18, weight: .regular, design: .rounded))
-                                .monospacedDigit()
-                                .frame(width: 24, alignment: .trailing)
-                            Text(phoneSentenceCaseMonth(monthName))
-                                .font(.system(size: 18, weight: .regular))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.72)
-                        }
-                            .foregroundColor(PHONE_READING_TINT)
-                            .modifier(HijriEngravedLabelsModifier(isEid: false))
-                            .shadow(color: PHONE_READING_GLOW.opacity(currentMonthGlowOpacity), radius: currentMonthRadius)
-                            .shadow(color: Color.white.opacity(currentMonthWhiteOpacity), radius: currentMonthRadius * 0.6)
+            VStack(alignment: .leading, spacing: containerSize.height * 0.005) {
+                ForEach(Array(PHONE_HIJRI_MONTH_NAMES.enumerated()), id: \.offset) { index, monthName in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Text("\(index + 1).")
+                            .font(.system(size: 18, weight: .regular, design: .rounded))
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .frame(width: 34, alignment: .trailing)
+                        Text(phoneSentenceCaseMonth(monthName))
+                            .font(.system(size: 18, weight: .regular))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
                     }
+                    .foregroundColor(PHONE_READING_TINT)
+                    .modifier(HijriEngravedLabelsModifier(isEid: false))
                 }
-                .frame(width: listWidth, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.top, containerSize.height * 0.15)
-            .padding(.horizontal, 18)
+            .frame(width: listWidth, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, containerSize.height * 0.15)
+        .padding(.horizontal, 18)
         .allowsHitTesting(false)
     }
 }

@@ -92,10 +92,6 @@ struct IslamicDayDialWidgetEntryView: View {
             Text("—")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Colors.secondaryGold)
-            Text("—")
-                .font(.system(size: 16, weight: .light))
-                .monospacedDigit()
-                .foregroundStyle(Colors.softUtility)
         }
     }
 
@@ -106,10 +102,6 @@ struct IslamicDayDialWidgetEntryView: View {
                 .foregroundStyle(periodColor(snapshot: snap, now: entry.date))
                 .lineLimit(1)
             HijriWidgetLabels(hijriDate: snap.hijriDate)
-            Text(widgetCountdownText(snapshot: snap, now: entry.date))
-                .font(.system(size: 16, weight: .light))
-                .monospacedDigit()
-                .foregroundStyle(Colors.softUtility)
         }
         .frame(maxWidth: .infinity)
     }
@@ -154,7 +146,7 @@ struct IslamicDayDialWidget: Widget {
             IslamicDayDialWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Islamic Day Dial")
-        .description("Track the current Islamic day phase and countdown.")
+        .description("Track the current Islamic day phase and Hijri date.")
         .supportedFamilies([.systemSmall])
     }
 }
