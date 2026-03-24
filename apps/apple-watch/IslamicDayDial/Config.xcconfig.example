@@ -1,5 +1,8 @@
 // Copy to Config.xcconfig and fill in your values.
 // Config.xcconfig is gitignored — your keys won't be committed.
+//
+// IMPORTANT: Wrap URLs in double quotes. In .xcconfig, `//` starts a line comment, so an unquoted
+// https://... value is truncated to `https:` and analytics silently fail.
 
-SUPABASE_URL = https://your-project.supabase.co
-SUPABASE_ANON_KEY = your-anon-key
+SUPABASE_URL = "https://your-project.supabase.co"
+SUPABASE_ANON_KEY = "your-anon-key"

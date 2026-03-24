@@ -116,11 +116,21 @@ struct RingView: View {
     var thicknessScale: CGFloat = 1
     var renderVariant: RingRenderVariant = .watch
     
-    private var progressAngle: Double { snapshot.ringProgress * 360 }
+    private var currentPhase: IslamicPhaseId {
+        getCurrentPhase(now: now, timeline: snapshot.timeline)
+    }
+
+    private var progressAngle: Double {
+        getIslamicDayProgress(
+            now: now,
+            lastMaghrib: snapshot.timeline.lastMaghrib,
+            nextMaghrib: snapshot.timeline.nextMaghrib
+        ) * 360
+    }
     
     /// Mirrors web CurrentMarker styles: sunrise orange, maghrib red, otherwise yellow.
     private func sunMarkerState() -> SunMarkerStyle? {
-        guard SUN_PHASES.contains(snapshot.currentPhase) else { return nil }
+        guard SUN_PHASES.contains(currentPhase) else { return nil }
         let maghribAngle = snapshot.ringMarkers.first { $0.id == "maghrib" }?.angleDeg ?? 0
         let distToMag = normAngle(maghribAngle - progressAngle)
         
@@ -129,7 +139,7 @@ struct RingView: View {
             return SunMarkerStyle(style: .maghrib, color: SUN_RED, glowColor: SUN_RED, strongGlow: true)
         }
         // Web sunrise sub-period: orange disk + orange glow.
-        if snapshot.currentPhase == .sunrise_to_dhuhr {
+        if currentPhase == .sunrise_to_dhuhr {
             let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr)
             if sub == .sunrise {
                 return SunMarkerStyle(style: .sunrise, color: SUN_ORANGE, glowColor: SUN_ORANGE, strongGlow: true)
@@ -171,6 +181,7 @@ struct RingView: View {
                     PhoneNightGlowOverlay(
                         snapshot: snapshot,
                         now: now,
+                        currentPhase: currentPhase,
                         size: cs,
                         thicknessScale: thicknessScale
                     )
@@ -213,6 +224,7 @@ struct RingView: View {
                     CurrentMarkerOverlay(
                         snapshot: snapshot,
                         now: now,
+                        currentPhase: currentPhase,
                         progressAngle: progressAngle,
                         sunMarkerState: sunMarkerState(),
                         thicknessScale: thicknessScale,
@@ -224,7 +236,7 @@ struct RingView: View {
             .frame(width: cs, height: cs)
         }
         .aspectRatio(1, contentMode: .fill)
-        .clipped()
+        // No .clipped(): marker sun rotates with large blur; axis-aligned clip caused straight "cuts" through the glow.
     }
 }
 
@@ -240,6 +252,7 @@ private func glowPulsePhase(_ t: Date) -> (base: Double, phase: Double) {
 private struct PhoneNightGlowOverlay: View {
     let snapshot: ComputedIslamicDay
     let now: Date
+    let currentPhase: IslamicPhaseId
     let size: CGFloat
     let thicknessScale: CGFloat
 
@@ -250,7 +263,8 @@ private struct PhoneNightGlowOverlay: View {
     }
 
     var body: some View {
-        TimelineView(.periodic(from: Date(), by: 1.0 / 30)) { timeline in
+        // ~4 Hz: smooth enough for a 3s sine glow; 30 Hz was a major memory/CPU driver on device.
+        TimelineView(.periodic(from: Date(), by: 0.25)) { timeline in
             let (base, phase) = glowPulsePhase(timeline.date)
             let jumuBase = base
             let jumuPeak = phase * 1.0
@@ -258,9 +272,9 @@ private struct PhoneNightGlowOverlay: View {
             let lastThirdPeak = phase * 0.92  // Slightly brighter and stronger
 
             let nightSegments = snapshot.ringSegments.filter { NIGHT_SECTORS_GROUP.contains($0.id) }
-            let isInIsha = snapshot.currentPhase == .isha_to_midnight
-            let isInLastThird = snapshot.currentPhase == .last_third_to_fajr
-            let showJumuahGlow = isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: snapshot.currentPhase)
+            let isInIsha = currentPhase == .isha_to_midnight
+            let isInLastThird = currentPhase == .last_third_to_fajr
+            let showJumuahGlow = isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
             let duhaStartMarker = snapshot.ringMarkers.first { $0.id == "duha_start" }
             let dhuhrMarker = snapshot.ringMarkers.first { $0.id == "dhuhr" }
             let asrMarker = snapshot.ringMarkers.first { $0.id == "asr" }
@@ -350,13 +364,14 @@ private struct PhoneNightGlowOverlay: View {
 private struct CurrentMarkerOverlay: View {
     let snapshot: ComputedIslamicDay
     let now: Date
+    let currentPhase: IslamicPhaseId
     let progressAngle: Double
     let sunMarkerState: SunMarkerStyle?
     let thicknessScale: CGFloat
     let size: CGFloat
     let renderVariant: RingRenderVariant
 
-    private var isNight: Bool { MOON_ONLY_PHASES.contains(snapshot.currentPhase) }
+    private var isNight: Bool { MOON_ONLY_PHASES.contains(currentPhase) }
     private var markerR: CGFloat { size * 0.033 * thicknessScale }
     private var ccx: CGFloat { size / 2 }
     private var ccy: CGFloat { size / 2 }
@@ -419,7 +434,8 @@ private struct CurrentMarkerOverlay: View {
                 isRollIn: isRollIn,
                 markerCenter: markerCenter,
                 boundaryPoint: isRollIn ? boundaryPoint : nil,
-                dialCenter: CGPoint(x: ccx, y: ccy)
+                dialCenter: CGPoint(x: ccx, y: ccy),
+                renderVariant: renderVariant
             )
         }
     }
@@ -458,6 +474,37 @@ private struct CurrentMarkerOverlay: View {
     }
 }
 
+// MARK: - Sun outer halo (no TimelineView — avoids ~24Hz body refresh and memory pressure on device)
+private struct SunAnimatedOuterLayers: View {
+    let markerR: CGFloat
+    let state: SunMarkerStyle
+
+    @State private var pulse = false
+
+    var body: some View {
+        let s: CGFloat = state.strongGlow ? 1.0 : 0.72
+        ZStack {
+            Circle()
+                .stroke(state.glowColor.opacity((pulse ? 0.30 : 0.14) * s), lineWidth: markerR * 2.5)
+                .frame(width: markerR * (pulse ? 3.15 : 2.95), height: markerR * (pulse ? 3.15 : 2.95))
+                .blur(radius: markerR * (pulse ? 1.02 : 0.88))
+            Circle()
+                .stroke(Color.white.opacity((pulse ? 0.22 : 0.10) * s), lineWidth: markerR * 1.08)
+                .frame(width: markerR * (pulse ? 2.52 : 2.38), height: markerR * (pulse ? 2.52 : 2.38))
+                .blur(radius: markerR * (pulse ? 0.58 : 0.48))
+            Circle()
+                .stroke(state.glowColor.opacity((pulse ? 0.98 : 0.78) * (state.strongGlow ? 1.0 : 0.55)), lineWidth: state.strongGlow ? markerR * 2.05 : markerR * 1.42)
+                .frame(width: markerR * (pulse ? 2.06 : 2.0), height: markerR * (pulse ? 2.06 : 2.0))
+                .blur(radius: state.strongGlow ? markerR * (pulse ? 0.78 : 0.68) : markerR * (pulse ? 0.52 : 0.44))
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.85).repeatForever(autoreverses: true)) {
+                pulse = true
+            }
+        }
+    }
+}
+
 // MARK: - Sun marker mirroring web layering
 private struct SunCanvasView: View {
     let state: SunMarkerStyle
@@ -468,10 +515,11 @@ private struct SunCanvasView: View {
     let markerCenter: CGPoint
     let boundaryPoint: CGPoint?
     let dialCenter: CGPoint
+    let renderVariant: RingRenderVariant
 
     private let contentSize: CGFloat
 
-    init(state: SunMarkerStyle, markerR: CGFloat, reveal: Double, boundaryAngle: Double, isRollIn: Bool, markerCenter: CGPoint, boundaryPoint: CGPoint?, dialCenter: CGPoint) {
+    init(state: SunMarkerStyle, markerR: CGFloat, reveal: Double, boundaryAngle: Double, isRollIn: Bool, markerCenter: CGPoint, boundaryPoint: CGPoint?, dialCenter: CGPoint, renderVariant: RingRenderVariant) {
         self.state = state
         self.markerR = markerR
         self.reveal = reveal
@@ -480,76 +528,82 @@ private struct SunCanvasView: View {
         self.markerCenter = markerCenter
         self.boundaryPoint = boundaryPoint
         self.dialCenter = dialCenter
-        self.contentSize = markerR * 5.6
+        self.renderVariant = renderVariant
+        // Large enough to keep the original halo visible while still staying below the earlier 10r memory-heavy surface.
+        self.contentSize = markerR * 8.2
     }
+
+    /// ~6 Hz while sun is visible — full rotation in `spinPeriodSeconds` (lower rate saves memory vs 10+ Hz).
+    private static let spinPeriodSeconds: Double = 10
 
     var body: some View {
-        ZStack {
-            outerGlow
-            maskedSun
+        TimelineView(.periodic(from: .now, by: 1.0 / 6.0)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate
+            let p = Self.spinPeriodSeconds
+            let angle = (t.truncatingRemainder(dividingBy: p) / p) * 360.0
+            let content = rotatingSun(rotationAngle: angle)
+                .frame(width: contentSize, height: contentSize)
+
+            if renderVariant == .phone {
+                content
+            } else {
+                content.modifier(
+                    SunClipModifier(
+                        reveal: reveal,
+                        boundaryAngle: boundaryAngle,
+                        isRollIn: isRollIn,
+                        r: markerR,
+                        markerCenter: markerCenter,
+                        boundaryPoint: boundaryPoint,
+                        dialCenter: dialCenter
+                    )
+                )
+            }
         }
-        .frame(width: contentSize, height: contentSize)
     }
 
-    private var outerGlow: some View {
-        let strokeWidth = state.strongGlow ? markerR * 1.7 : markerR * 1.15
-        let blurRadius = state.strongGlow ? markerR * 0.65 : markerR * 0.4
-        let opacity = state.strongGlow ? 0.9 : 0.35
-
-        return Circle()
-            .stroke(state.glowColor.opacity(opacity), lineWidth: strokeWidth)
-            .frame(width: markerR * 2, height: markerR * 2)
-            .blur(radius: blurRadius)
-    }
-
-    private var maskedSun: some View {
+    private func rotatingSun(rotationAngle: Double) -> some View {
         ZStack {
-            Circle()
-                .stroke(glowStrokeGradient, lineWidth: state.strongGlow ? markerR * 1.45 : markerR * 1.0)
-                .frame(width: markerR * 2, height: markerR * 2)
-                .blur(radius: state.strongGlow ? markerR * 0.35 : markerR * 0.2)
-                .opacity(state.strongGlow ? 0.35 : 0.22)
+            // Whole sun rotates underneath a dial-fixed clip.
+            SunAnimatedOuterLayers(markerR: markerR, state: state)
+            ZStack {
+                Circle()
+                    .stroke(glowStrokeGradient, lineWidth: state.strongGlow ? markerR * 1.55 : markerR * 1.08)
+                    .frame(width: markerR * 2, height: markerR * 2)
+                    .blur(radius: state.strongGlow ? markerR * 0.38 : markerR * 0.24)
+                    .opacity(state.strongGlow ? 0.4 : 0.26)
 
-            Circle()
-                .stroke(glowStrokeGradient, lineWidth: state.strongGlow ? markerR * 1.7 : markerR * 1.15)
-                .frame(width: markerR * 2, height: markerR * 2)
-                .blur(radius: state.strongGlow ? markerR * 0.5 : markerR * 0.28)
-                .opacity(state.strongGlow ? 0.7 : 0.3)
+                Circle()
+                    .stroke(glowStrokeGradient, lineWidth: state.strongGlow ? markerR * 1.85 : markerR * 1.28)
+                    .frame(width: markerR * 2, height: markerR * 2)
+                    .blur(radius: state.strongGlow ? markerR * 0.55 : markerR * 0.32)
+                    .opacity(state.strongGlow ? 0.75 : 0.36)
 
-            Circle()
-                .fill(fillGradient)
-                .frame(width: markerR * 2, height: markerR * 2)
-                .overlay(
-                    Circle()
-                        .stroke(borderColor, lineWidth: 0.5)
-                )
-                .shadow(
-                    color: state.glowColor.opacity(state.strongGlow ? 0.45 : 0.18),
-                    radius: state.strongGlow ? markerR * 1.8 : markerR
-                )
-                .shadow(
-                    color: state.glowColor.opacity(state.strongGlow ? 0.28 : 0.1),
-                    radius: state.strongGlow ? markerR * 0.8 : markerR * 0.45,
-                    x: state.strongGlow ? markerR * 0.35 : 0,
-                    y: state.strongGlow ? markerR * 0.35 : 0
-                )
+                Circle()
+                    .fill(fillGradient)
+                    .frame(width: markerR * 2, height: markerR * 2)
+                    .overlay(
+                        Circle()
+                            .stroke(borderColor, lineWidth: 0.5)
+                    )
+                    .shadow(
+                        color: state.glowColor.opacity(state.strongGlow ? 0.52 : 0.22),
+                        radius: state.strongGlow ? markerR * 2.05 : markerR * 1.05
+                    )
+                    .shadow(
+                        color: Color.white.opacity(state.strongGlow ? 0.35 : 0.12),
+                        radius: state.strongGlow ? markerR * 0.55 : markerR * 0.32
+                    )
+                    .shadow(
+                        color: state.glowColor.opacity(state.strongGlow ? 0.32 : 0.14),
+                        radius: state.strongGlow ? markerR * 0.95 : markerR * 0.5,
+                        x: state.strongGlow ? markerR * 0.38 : 0,
+                        y: state.strongGlow ? markerR * 0.38 : 0
+                    )
+            }
         }
+        .rotationEffect(.degrees(rotationAngle))
         .frame(width: contentSize, height: contentSize)
-        .mask(
-            Circle()
-                .frame(width: markerR * 2, height: markerR * 2)
-        )
-        .modifier(
-            SunClipModifier(
-                reveal: reveal,
-                boundaryAngle: boundaryAngle,
-                isRollIn: isRollIn,
-                r: markerR,
-                markerCenter: markerCenter,
-                boundaryPoint: boundaryPoint,
-                dialCenter: dialCenter
-            )
-        )
     }
 
     private var fillGradient: RadialGradient {
@@ -594,11 +648,13 @@ private struct SunCanvasView: View {
             return RadialGradient(
                 gradient: Gradient(stops: [
                     .init(color: .white, location: 0),
-                    .init(color: Color(red: 1.0, green: 0.99, blue: 0.91), location: 0.3),
-                    .init(color: Color(red: 1.0, green: 0.96, blue: 0.62), location: 0.6),
+                    .init(color: Color(red: 1.0, green: 0.998, blue: 0.96), location: 0.12),
+                    .init(color: Color(red: 1.0, green: 0.96, blue: 0.62), location: 0.35),
+                    .init(color: Color(red: 1.0, green: 0.87, blue: 0.2), location: 0.62),
+                    .init(color: Color(red: 1.0, green: 0.72, blue: 0.08), location: 0.85),
                     .init(color: SUN_NORMAL, location: 1),
                 ]),
-                center: .center,
+                center: UnitPoint(x: 0.46, y: 0.42),
                 startRadius: 0,
                 endRadius: markerR
             )
@@ -641,7 +697,6 @@ private struct SunClipModifier: ViewModifier {
         if reveal >= 1 {
             content
         } else {
-            let contentSize = r * 5.6
             content.mask(SunClipMaskView(
                 reveal: reveal,
                 boundaryAngle: boundaryAngle,
@@ -650,7 +705,7 @@ private struct SunClipModifier: ViewModifier {
                 markerCenter: markerCenter,
                 boundaryPoint: boundaryPoint,
                 dialCenter: dialCenter,
-                contentSize: contentSize
+                contentSize: r * 8.2
             ))
         }
     }
@@ -691,13 +746,15 @@ private struct SunClipMaskView: View {
 
         let dx = shift * tanX
         let dy = shift * tanY
-        let dxUnit = dx / cs
-        let dyUnit = dy / cs
-
-        let startX = 0.5 - 0.5 * tanX + dxUnit
-        let startY = 0.5 - 0.5 * tanY + dyUnit
-        let endX = 0.5 + 0.5 * tanX + dxUnit
-        let endY = 0.5 + 0.5 * tanY + dyUnit
+        // Match web `CurrentMarker` mask: extent `k = 2r` in marker-local px, then map into this view's square.
+        let lx1 = -tanX * k + dx
+        let ly1 = -tanY * k + dy
+        let lx2 = tanX * k + dx
+        let ly2 = tanY * k + dy
+        let startX = 0.5 + lx1 / cs
+        let startY = 0.5 + ly1 / cs
+        let endX = 0.5 + lx2 / cs
+        let endY = 0.5 + ly2 / cs
 
         let stops: [Gradient.Stop] = isRollIn
             ? [.init(color: .white, location: 0), .init(color: .white, location: reveal), .init(color: .black, location: reveal), .init(color: .black, location: 1)]

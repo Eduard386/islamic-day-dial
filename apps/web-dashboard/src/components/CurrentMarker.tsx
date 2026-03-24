@@ -43,8 +43,9 @@ const MOON_INNER_R = 0.82; /** Moon circles radius as fraction of disk r */
 
 /** Солнце: glow — здесь настраивать силу и охват свечения */
 const SUN_GLOW = {
-  stdDeviation: 14,    /** размытие (↑ = шире/мягче ореол) */
-  filterSize: 700,    /** % относительно маркера (x/y/width/height) */
+  stdDeviation: 20,
+  stdDeviation2: 10,
+  filterSize: 820,
 };
 
 /** Оранжевое/красное солнце: усиленный ореол */
@@ -65,9 +66,9 @@ const SUN_OUTER_GLOW = {
 
 /** Лёгкий glow для обычного жёлтого солнца */
 const SUN_OUTER_GLOW_NORMAL = {
-  strokeWidth: 16,
-  blur: 5,
-  yellow: 'rgba(255, 202, 40, 0.35)',
+  strokeWidth: 22,
+  blur: 8,
+  yellow: 'rgba(255, 220, 100, 0.55)',
 };
 
 /** Лёгкий glow для луны (чуть меньше чем у солнца) */
@@ -172,41 +173,11 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
   const useRed = isBrightSun && isInRedZone;
   const useMidday = isBrightSun && currentPhase === 'sunrise_to_dhuhr' && !isRollIn && !useOrange && !!isInMiddaySubPeriod;
 
-  return (
-    <g transform={`translate(${x}, ${y})`}>
-      {/* Наружный glow — до clipPath, чтобы не обрезался */}
-      {isBrightSun && (useOrange || useRed || useMidday) && (
-        <g filter={`url(#sun-outer-glow-${useOrange ? 'orange' : useRed ? 'red' : 'midday'}${suffix})`}>
-          <circle
-            r={r}
-            fill="none"
-            stroke={useOrange ? SUN_OUTER_GLOW.orange : useRed ? SUN_OUTER_GLOW.red : SUN_OUTER_GLOW.midday}
-            strokeWidth={SUN_OUTER_GLOW.strokeWidth}
-          />
-        </g>
-      )}
-      {isBrightSun && !useOrange && !useRed && !useMidday && (
-        <g filter={`url(#sun-outer-glow-normal${suffix})`}>
-          <circle
-            r={r}
-            fill="none"
-            stroke={SUN_OUTER_GLOW_NORMAL.yellow}
-            strokeWidth={SUN_OUTER_GLOW_NORMAL.strokeWidth}
-          />
-        </g>
-      )}
-      {isMoonOnlySector && moonPhase && moonPhase.shadowOffset !== 0 && (
-        <defs>
-          <mask id={crescentMaskId}>
-            <circle r={innerR} fill="white" />
-            <circle r={innerR} cx={moonPhase.shadowOffset * innerR} cy={0} fill="black" />
-          </mask>
-        </defs>
-      )}
-      <g clipPath={`url(#marker-disk-clip${suffix})`}>
-        {/* Base disk: пред-roll-out, roll-out, roll-in — солнце с самого начала Sunrise */}
-        {reveal > 0 && (
-          (() => {
+  const diskClipContents = (
+    <>
+      {/* Base disk: пред-roll-out, roll-out, roll-in — солнце с самого начала Sunrise */}
+      {reveal > 0 &&
+        (() => {
             const isBrightSun = SUN_PHASES.has(currentPhase);
             if (reveal >= 1) {
               const useOrange = isBrightSun && !!isInSunriseSubPeriod;
@@ -332,8 +303,7 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
                 <circle r={r} fill={diskFill} stroke={diskStroke} strokeWidth={isBrightSun ? 0.5 : 1} mask={`url(#${maskId})`} filter={diskFilter} />
               </>
             );
-          })()
-        )}
+          })()}
         {/* Night: луна всегда, даже если торчит за риску Sunrise */}
         {isNight && moonPhase && (
           <g>
@@ -378,7 +348,63 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
             )}
           </g>
         )}
-      </g>
+    </>
+  );
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      {isMoonOnlySector && moonPhase && moonPhase.shadowOffset !== 0 && (
+        <defs>
+          <mask id={crescentMaskId}>
+            <circle r={innerR} fill="white" />
+            <circle r={innerR} cx={moonPhase.shadowOffset * innerR} cy={0} fill="black" />
+          </mask>
+        </defs>
+      )}
+      {isBrightSun ? (
+        <>
+          {/* Roll mask + disk: no spin — cut stays aligned with Sunrise/Maghrib ticks */}
+          <g clipPath={`url(#marker-disk-clip${suffix})`}>{diskClipContents}</g>
+          <g>
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 0 0"
+              to="360 0 0"
+              dur="10s"
+              repeatCount="indefinite"
+            />
+            <g className="sun-alive-sun-mark">
+              <circle r={r * 1.58} fill={`url(#sun-corona${suffix})`} className="sun-alive-corona" />
+              {(useOrange || useRed || useMidday) && (
+                <g
+                  className="sun-alive-halo"
+                  filter={`url(#sun-outer-glow-${useOrange ? 'orange' : useRed ? 'red' : 'midday'}${suffix})`}
+                >
+                  <circle
+                    r={r}
+                    fill="none"
+                    stroke={useOrange ? SUN_OUTER_GLOW.orange : useRed ? SUN_OUTER_GLOW.red : SUN_OUTER_GLOW.midday}
+                    strokeWidth={SUN_OUTER_GLOW.strokeWidth}
+                  />
+                </g>
+              )}
+              {!useOrange && !useRed && !useMidday && (
+                <g className="sun-alive-halo" filter={`url(#sun-outer-glow-normal${suffix})`}>
+                  <circle
+                    r={r}
+                    fill="none"
+                    stroke={SUN_OUTER_GLOW_NORMAL.yellow}
+                    strokeWidth={SUN_OUTER_GLOW_NORMAL.strokeWidth}
+                  />
+                </g>
+              )}
+            </g>
+          </g>
+        </>
+      ) : (
+        <g clipPath={`url(#marker-disk-clip${suffix})`}>{diskClipContents}</g>
+      )}
     </g>
   );
 }
@@ -421,9 +447,10 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
         width={`${SUN_GLOW.filterSize}%`}
         height={`${SUN_GLOW.filterSize}%`}
       >
-        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_GLOW.stdDeviation} result="blur" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation={SUN_GLOW.stdDeviation} result="blur1" />
+        <feGaussianBlur in="blur1" stdDeviation={SUN_GLOW.stdDeviation2} result="blur2" />
         <feMerge>
-          <feMergeNode in="blur" />
+          <feMergeNode in="blur2" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
@@ -484,11 +511,19 @@ export function CurrentMarkerDefs({ r, instanceId }: { r: number; instanceId?: s
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <radialGradient id={`sun-fill${suffix}`} cx="0.5" cy="0.5" r="0.5">
+      <radialGradient id={`sun-corona${suffix}`} cx="0.42" cy="0.4" r="0.62">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+        <stop offset="28%" stopColor="#fff8e1" stopOpacity="0.5" />
+        <stop offset="55%" stopColor="#ffb74d" stopOpacity="0.28" />
+        <stop offset="100%" stopColor="#ff6f00" stopOpacity="0" />
+      </radialGradient>
+      <radialGradient id={`sun-fill${suffix}`} cx="0.46" cy="0.42" r="0.52">
         <stop offset="0" stopColor="#ffffff" />
-        <stop offset="0.3" stopColor="#fffde7" />
-        <stop offset="0.6" stopColor="#fff59d" />
-        <stop offset="1" stopColor="#ffca28" />
+        <stop offset="0.12" stopColor="#fffef5" />
+        <stop offset="0.32" stopColor="#fff59d" />
+        <stop offset="0.58" stopColor="#ffca28" />
+        <stop offset="0.82" stopColor="#ffb300" />
+        <stop offset="1" stopColor="#ff8f00" />
       </radialGradient>
       {/* Sunrise: насыщенный оранжевый */}
       <radialGradient id={`sun-fill-sunrise${suffix}`} cx="0.5" cy="0.5" r="0.5">

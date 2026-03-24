@@ -13,3 +13,20 @@ To enable visit tracking on iOS:
 3. `Config.xcconfig` is gitignored — your keys won't be committed
 
 (Same values as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for web.)
+
+## Surface semantics
+
+Visits now support a nullable `surface` field in addition to `platform`.
+
+Recommended `surface` values:
+
+- `ios_app`
+- `ios_widget`
+- `watch_app`
+- `watch_complication`
+
+Current app behavior:
+
+- the iPhone app tracks `surface = ios_app`
+- the watch app tracks `surface = watch_app`
+- widget / complication refreshes are intentionally not tracked yet, to avoid noisy and battery-unfriendly analytics

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS visits (
   os text,
   browser text,
   device_type text,
+  surface text,
   country text,
   city text,
   region text,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS visits (
 -- For existing tables: add new columns if missing
 ALTER TABLE visits ADD COLUMN IF NOT EXISTS geo_source text;
 ALTER TABLE visits ADD COLUMN IF NOT EXISTS platform text NOT NULL DEFAULT 'web';
+ALTER TABLE visits ADD COLUMN IF NOT EXISTS surface text;
 
 -- Enable RLS; allow anonymous insert (anon key)
 ALTER TABLE visits ENABLE ROW LEVEL SECURITY;

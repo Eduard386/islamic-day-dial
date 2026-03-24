@@ -1,6 +1,6 @@
 import XCTest
 
-/// Notification content format: Hijri title, prayer name + Quran 4:103 in body.
+/// Notification content format: "PrayerName. day month year" in title and empty body.
 final class PrayerNotificationTests: XCTestCase {
 
     private var originalTimeZone: TimeZone!
@@ -16,7 +16,7 @@ final class PrayerNotificationTests: XCTestCase {
         super.tearDown()
     }
 
-    func testFormatContent_TitleIsHijriDate() {
+    func testFormatContent_TitleContainsPrayerAndHijriDate() {
         let fireDate = dateFromISO("2026-03-20T04:30:00")
         let maghrib = dateFromISO("2026-03-19T18:00:00")
         let (title, _) = PrayerNotificationScheduler.formatContentForTesting(
@@ -24,6 +24,7 @@ final class PrayerNotificationTests: XCTestCase {
             fireDate: fireDate,
             maghrib: maghrib
         )
+        XCTAssertTrue(title.hasPrefix("Fajr. "))
         XCTAssertTrue(title.contains("1447") || title.contains("1448"))
         XCTAssertTrue(
             title.contains("Ramadan") || title.contains("Shaban") ||
@@ -31,7 +32,7 @@ final class PrayerNotificationTests: XCTestCase {
         )
     }
 
-    func testFormatContent_BodyFormat() {
+    func testFormatContent_BodyIsEmpty() {
         let fireDate = dateFromISO("2026-03-20T04:30:00")
         let maghrib = dateFromISO("2026-03-20T18:00:00")
         let (_, body) = PrayerNotificationScheduler.formatContentForTesting(
@@ -39,10 +40,7 @@ final class PrayerNotificationTests: XCTestCase {
             fireDate: fireDate,
             maghrib: maghrib
         )
-        XCTAssertTrue(body.hasPrefix("Fajr."))
-        XCTAssertTrue(body.contains("Indeed, performing prayers is a duty on the believers at the appointed times."))
-        XCTAssertTrue(body.contains("[4:103]"))
-        XCTAssertTrue(body.contains("\n"))
+        XCTAssertEqual(body, "")
     }
 
     func testFormatContent_AllFivePrayers() {
@@ -50,12 +48,13 @@ final class PrayerNotificationTests: XCTestCase {
         let maghrib = dateFromISO("2026-03-20T18:00:00")
         let prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
         for name in prayers {
-            let (_, body) = PrayerNotificationScheduler.formatContentForTesting(
+            let (title, body) = PrayerNotificationScheduler.formatContentForTesting(
                 prayerName: name,
                 fireDate: fireDate,
                 maghrib: maghrib
             )
-            XCTAssertTrue(body.hasPrefix("\(name)."))
+            XCTAssertTrue(title.hasPrefix("\(name). "))
+            XCTAssertEqual(body, "")
         }
     }
 

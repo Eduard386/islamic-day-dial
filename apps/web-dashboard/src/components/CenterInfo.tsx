@@ -35,7 +35,7 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
         {periodContent || '\u00A0'}
       </div>
 
-      <div className="center-date date-block">
+      <div className="center-date date-block hijri-date-pair">
         <div
           className={`hijri-date hijri-date-sector-style${useCompactDayMonthSize ? ' hijri-date-compact' : ''}${dateParts.isEid ? ' eid-date' : ''}`}
         >

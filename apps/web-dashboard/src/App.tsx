@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useIslamicDay } from './hooks/useIslamicDay';
 import { IslamicRing } from './components/IslamicRing';
+import { DialFootnotes } from './components/DialFootnotes';
 import { CenterInfo } from './components/CenterInfo';
 import { Controls } from './components/Controls';
 import { trackVisit } from './lib/analytics';
@@ -22,18 +23,27 @@ export default function App() {
         </p>
         <div className="header-titles">
           <h1>Islamic Day Dial</h1>
-          <p className="subtitle">Maghrib to Maghrib</p>
         </div>
       </header>
 
       <main className="app-main">
-        <div className="dial-section">
-          <div className="dial-stack">
-            <div className="dial-wrapper">
-              <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} />
-              <div className="center-overlay">
-                <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+        <div className="dial-section dial-section--balanced">
+          <div className="dial-stack dial-stack--balanced">
+            <p className="subtitle dial-stack-subtitle">Maghrib to Maghrib</p>
+            <div className="dial-stack-middle">
+              <div className="dial-stack-spring" aria-hidden />
+              <div className="dial-footnotes-shell">
+                <DialFootnotes snapshot={snapshot} dialSize={420} sidePad={92} />
+                <div className="dial-core">
+                  <div className="dial-wrapper">
+                    <IslamicRing snapshot={snapshot} now={effectiveNow} size={420} />
+                    <div className="center-overlay">
+                      <CenterInfo snapshot={snapshot} now={effectiveNow} timezone={timezone} />
+                    </div>
+                  </div>
+                </div>
               </div>
+              <div className="dial-stack-spring" aria-hidden />
             </div>
             <p className="dial-ayah-translation" lang="en">
               &quot;Indeed, the number of months ordained by Allah is twelve&quot; [9:36]

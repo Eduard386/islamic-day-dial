@@ -2,41 +2,8 @@ import SwiftUI
 
 private let DIAL_VERTICAL_GAP: CGFloat = 18
 private let DIAL_SECTION_HEIGHT: CGFloat = 436
-/// Horizontal insets from ScrollView `.padding(20)` × 2
-private let SCROLL_HORIZONTAL_INSET: CGFloat = 40
-/// Quran 9:36 (matches web dashboard)
-private let HEADER_AYAH_AR =
-    "إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
-/// Matches `App.tsx` dial-ayah-translation
-private let HEADER_AYAH_EN =
-    "\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
-/// Islamic Day Dial + gap + Maghrib (fonts 18 / 14)
-private let HEADER_TITLE_STACK_HEIGHT: CGFloat = 22 + 4 + 17
 private let MS_PER_HOUR: Int64 = 3_600_000
 private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
-
-/// Same layout as PhoneDialView: dialSize, holeTop, dateTop.
-private func dateOffsetFromDialFrameTop(contentWidth: CGFloat) -> CGFloat {
-    let h = DIAL_SECTION_HEIGHT
-    let dialSize = min(contentWidth, h) * 1.28
-    let holeTop = dialSize * (0.5 - 0.25125)
-    let holeHeight = dialSize * 0.5025
-    return holeTop + 100 * (holeHeight / 212)
-}
-
-/// Titles at 15% from ayah (0%) to date in ring (100%). padTop + titleH/2 = 0.15 * total, total = padTop + titleH + padBottom + dateOffset.
-private func headerTitlePaddingPair(contentWidth: CGFloat) -> (top: CGFloat, bottom: CGFloat) {
-    let bottom: CGFloat = 8
-    let dateOffset = dateOffsetFromDialFrameTop(contentWidth: contentWidth)
-    // padTop + titleH/2 = 0.15 * (padTop + titleH + padBottom + dateOffset) => 0.85*padTop = 0.15*(bottom + dateOffset) - 0.35*titleH
-    let padTop = (0.15 * (bottom + dateOffset) - 0.35 * HEADER_TITLE_STACK_HEIGHT) / 0.85
-    return (max(0, padTop), bottom)
-}
-
-private func arabicBottomToDialFrameTop(contentWidth: CGFloat) -> CGFloat {
-    let (t, b) = headerTitlePaddingPair(contentWidth: contentWidth)
-    return t + HEADER_TITLE_STACK_HEIGHT + b
-}
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -50,7 +17,8 @@ struct ContentView: View {
     @State private var dayOffset = 0
     @State private var hourOffset: Double = 0
     @State private var timeOffsetMs: Int64 = 0
-    
+    @State private var showFootnotes = false
+
     private var effectiveNow: Date {
         if timeOffsetMs == 0 { return now }
         return now.addingTimeInterval(Double(timeOffsetMs) / 1000)
@@ -58,19 +26,36 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            GeometryReader { _ in
                 VStack(spacing: 0) {
-                    headerSection
+                    Spacer(minLength: 0)
                     dialSection
-                    Spacer().frame(height: 24)
+                    Spacer(minLength: 0)
                 }
-                .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.horizontal, 20)
             }
             .background(Color.black.ignoresSafeArea())
             .overlay {
                 ShakeDetectorView { showTimeTravel = true }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .allowsHitTesting(false)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if snapshot != nil {
+                    Button {
+                        showFootnotes.toggle()
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 26, weight: .regular))
+                            .foregroundStyle(Colors.secondaryGold)
+                            .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 18)
+                    .padding(.bottom, 20)
+                    .accessibilityLabel("Prayer labels")
+                }
             }
         }
         .task {
@@ -84,11 +69,12 @@ struct ContentView: View {
         }
         .task {
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(60))
                 await refreshSnapshot(forceResolveLocation: false)
+                let currentSnapshot = snapshot
+                let currentNow = effectiveNow
+                try? await Task.sleep(for: .seconds(secondsUntilNextRefresh(from: currentNow, snapshot: currentSnapshot)))
             }
         }
-        .onChange(of: now) { _, _ in recalcSnapshot() }
         .onChange(of: timeOffsetMs) { _, _ in recalcSnapshot() }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if oldPhase == .background && newPhase == .active {
@@ -109,49 +95,24 @@ struct ContentView: View {
     private func recalcSnapshot() {
         snapshot = computeIslamicDaySnapshot(now: effectiveNow, location: automaticLocation)
     }
-    
-    private var headerSection: some View {
-        let w = UIScreen.main.bounds.width - SCROLL_HORIZONTAL_INSET
-        let (padTop, padBottom) = headerTitlePaddingPair(contentWidth: w)
-        return VStack(spacing: 0) {
-            Text(HEADER_AYAH_AR)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundStyle(Colors.warmSacredWhite)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-                .environment(\.layoutDirection, .rightToLeft)
-                .padding(.horizontal, 8)
-            Color.clear
-                .frame(height: padTop)
-            VStack(spacing: 4) {
-                Text("Islamic Day Dial")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(Colors.neutralHeadingWhite)
-                    .tracking(0.5)
-                Text("Maghrib to Maghrib")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Colors.coolMutedSubtitle)
-            }
-            Color.clear
-                .frame(height: padBottom)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 8)
+
+    private func secondsUntilNextRefresh(from date: Date, snapshot: ComputedIslamicDay?) -> Double {
+        let calendar = Calendar.current
+        let nextMinute = calendar.nextDate(
+            after: date,
+            matching: DateComponents(second: 0),
+            matchingPolicy: .nextTime
+        ) ?? date.addingTimeInterval(60)
+        let nextTransition = snapshot.map { getNextTransition(now: date, timeline: $0.timeline).at } ?? nextMinute
+        let refreshAt = min(nextMinute, nextTransition)
+        return max(1, refreshAt.timeIntervalSince(date) + 0.25)
     }
     
     private var dialSection: some View {
         Group {
             if let snapshot {
-                VStack(spacing: arabicBottomToDialFrameTop(contentWidth: UIScreen.main.bounds.width - SCROLL_HORIZONTAL_INSET)) {
-                    PhoneDialView(snapshot: snapshot, now: effectiveNow)
-                        .frame(height: DIAL_SECTION_HEIGHT)
-                    Text(HEADER_AYAH_EN)
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(Colors.softQuoteWhite)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(3)
-                        .padding(.horizontal, 20)
-                }
+                PhoneDialView(snapshot: snapshot, now: effectiveNow, showFootnotes: $showFootnotes)
+                    .frame(height: DIAL_SECTION_HEIGHT)
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity, minHeight: 320)
@@ -180,39 +141,55 @@ struct ContentView: View {
 private struct PhoneDialView: View {
     let snapshot: ComputedIslamicDay
     let now: Date
-    
+    @Binding var showFootnotes: Bool
+
     var body: some View {
         GeometryReader { geo in
-            let dialSize = min(geo.size.width, geo.size.height) * 1.28
+            let w = geo.size.width
+            let h = geo.size.height
+            let dialSize = min(w, h) * 1.28
+            let dialCenter = CGPoint(x: w / 2, y: h / 2)
             let holeTop = dialSize * (0.5 - 0.25125)
             let holeHeight = dialSize * 0.5025
             let sectorTop = holeTop + 55 * (holeHeight / 212)
             let dateTop = holeTop + 100 * (holeHeight / 212)
             let countdownTop = holeTop + 165 * (holeHeight / 212)
             let centerOffsetY = dialSize * (-10 / 420)
-            
+
             ZStack {
-                PhoneRingView(snapshot: snapshot, now: now)
+                if showFootnotes {
+                    PhoneDialFootnotesView(
+                        snapshot: snapshot,
+                        dialSize: dialSize,
+                        dialCenter: dialCenter,
+                        bounds: geo.size
+                    )
+                }
+                ZStack {
+                    PhoneRingView(snapshot: snapshot, now: now)
+                        .frame(width: dialSize, height: dialSize)
+                    ZStack(alignment: .top) {
+                        Color.clear
+                        currentPeriodView(snapshot: snapshot, now: now)
+                            .frame(maxWidth: .infinity)
+                            .offset(y: sectorTop)
+                        HijriDateLabels(hijriDate: snapshot.hijriDate)
+                            .frame(maxWidth: .infinity)
+                            .offset(y: dateTop)
+                        Text(formatCountdown(countdownMs(snapshot: snapshot)))
+                            .font(.system(size: 17, weight: .light))
+                            .monospacedDigit()
+                            .foregroundColor(Colors.softUtility)
+                            .frame(maxWidth: .infinity)
+                            .offset(y: countdownTop)
+                    }
                     .frame(width: dialSize, height: dialSize)
-                ZStack(alignment: .top) {
-                    Color.clear
-                    currentPeriodView(snapshot: snapshot, now: now)
-                        .frame(maxWidth: .infinity)
-                        .offset(y: sectorTop)
-                    HijriDateLabels(hijriDate: snapshot.hijriDate)
-                        .frame(maxWidth: .infinity)
-                        .offset(y: dateTop)
-                    Text(formatCountdown(countdownMs(snapshot: snapshot)))
-                        .font(.system(size: 17, weight: .light))
-                        .monospacedDigit()
-                        .foregroundColor(Colors.softUtility)
-                        .frame(maxWidth: .infinity)
-                        .offset(y: countdownTop)
+                    .offset(y: centerOffsetY)
                 }
                 .frame(width: dialSize, height: dialSize)
-                .offset(y: centerOffsetY)
+                .position(dialCenter)
             }
-            .frame(width: geo.size.width, height: geo.size.height)
+            .frame(width: w, height: h)
         }
     }
     
@@ -223,18 +200,27 @@ private struct PhoneDialView: View {
     
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date) -> some View {
+        let phase = currentPhase(snapshot: snap, now: now)
         Text(periodLabel(snapshot: snap, now: now).uppercased())
             .font(.system(size: 20, weight: .light))
-            .foregroundColor(periodColor(snapshot: snap))
-            .modifier(IshaShadowModifier(phase: snap.currentPhase))
+            .foregroundColor(periodColor(snapshot: snap, now: now))
+            .modifier(IshaShadowModifier(phase: phase))
     }
     
     private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
-        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (duhaStart: snap.timeline.duhaStart, dhuhr: snap.timeline.dhuhr))
+        getSectorDisplayName(
+            now: now,
+            currentPhase: currentPhase(snapshot: snap, now: now),
+            timeline: (duhaStart: snap.timeline.duhaStart, dhuhr: snap.timeline.dhuhr)
+        )
     }
     
-    private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
+    private func periodColor(snapshot snap: ComputedIslamicDay, now: Date) -> Color {
         Colors.coolLabel
+    }
+
+    private func currentPhase(snapshot snap: ComputedIslamicDay, now: Date) -> IslamicPhaseId {
+        getCurrentPhase(now: now, timeline: snap.timeline)
     }
 }
 
@@ -262,15 +248,29 @@ private let COMPACT_MONTH_NAMES: Set<String> = [
     "rabi al-awwal", "rabi al-thani", "jumada al-ula", "jumada al-thani"
 ]
 
+private struct HijriEngravedLabelsModifier: ViewModifier {
+    let isEid: Bool
+
+    func body(content: Content) -> some View {
+        let hi = isEid ? Color.white.opacity(0.32) : Color.white.opacity(0.24)
+        let lo = isEid ? Color.black.opacity(0.42) : Color.black.opacity(0.52)
+        content
+            .shadow(color: hi, radius: 0, x: 0, y: -0.5)
+            .shadow(color: lo, radius: 0, x: 0, y: 0.9)
+            .shadow(color: lo.opacity(0.38), radius: 1.2, x: 0, y: 1.3)
+    }
+}
+
 private struct HijriDateLabels: View {
     private let parts: (dayMonth: String, year: String, isEid: Bool)
     private let useCompactDayMonth: Bool
-    
+    @State private var pulseBright = false
+
     init(hijriDate: HijriDate) {
         self.parts = formatHijriDateParts(hijriDate)
         self.useCompactDayMonth = COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased())
     }
-    
+
     var body: some View {
         VStack(spacing: 2) {
             Text(parts.dayMonth.uppercased())
@@ -278,9 +278,17 @@ private struct HijriDateLabels: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
+                .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
             Text(parts.year)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(Colors.secondaryGold)
+                .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
+        }
+        .brightness(pulseBright ? 0.05 : -0.025)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+                pulseBright = true
+            }
         }
     }
 }

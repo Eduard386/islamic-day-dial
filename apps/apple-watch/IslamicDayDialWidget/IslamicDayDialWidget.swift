@@ -31,29 +31,19 @@ struct IslamicDayDialProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<IslamicDayDialEntry>) -> Void) {
         Task {
             let entry = await makeEntry(date: Date(), prefersPreviewData: false)
-            let refreshDate = entry.date.addingTimeInterval(60) // Every minute for countdown accuracy
+            let refreshDate = nextWidgetRefreshDate(from: entry.date, snapshot: entry.snapshot)
             completion(Timeline(entries: [entry], policy: .after(refreshDate)))
         }
     }
     
     private func makeEntry(date: Date, prefersPreviewData: Bool) async -> IslamicDayDialEntry {
-        let location: Location
-        let title: String
-        
-        if prefersPreviewData {
-            location = .mecca
-            title = "Mecca"
-        } else {
-            let resolved = await resolveLocation()
-            location = resolved
-            title = TimeZone.current.identifier.replacingOccurrences(of: "_", with: " ")
-        }
-        
-        guard let snapshot = computeIslamicDaySnapshot(now: date, location: location) else {
-            return IslamicDayDialEntry(date: date, snapshot: nil, countdownTarget: nil, locationTitle: title)
-        }
-        let countdownTarget = getCountdownTarget(now: date, timeline: snapshot.timeline)
-        return IslamicDayDialEntry(date: date, snapshot: snapshot, countdownTarget: countdownTarget, locationTitle: title)
+        let payload = await makeWidgetSnapshotPayload(date: date, prefersPreviewData: prefersPreviewData)
+        return IslamicDayDialEntry(
+            date: date,
+            snapshot: payload.snapshot,
+            countdownTarget: payload.countdownTarget,
+            locationTitle: payload.locationTitle
+        )
     }
 }
 
@@ -111,48 +101,39 @@ struct IslamicDayDialWidgetEntryView: View {
 
     private func dataContent(snapshot snap: ComputedIslamicDay) -> some View {
         VStack(spacing: 4) {
-            Text(periodLabel(snapshot: snap, now: entry.date).uppercased())
+            Text(widgetPeriodLabel(snapshot: snap, now: entry.date).uppercased())
                 .font(.system(size: 18, weight: .light))
-                .foregroundStyle(periodColor(snapshot: snap))
+                .foregroundStyle(periodColor(snapshot: snap, now: entry.date))
                 .lineLimit(1)
             HijriWidgetLabels(hijriDate: snap.hijriDate)
-            Text(formatCountdown(countdownMs(snapshot: snap)))
+            Text(widgetCountdownText(snapshot: snap, now: entry.date))
                 .font(.system(size: 16, weight: .light))
                 .monospacedDigit()
                 .foregroundStyle(Colors.softUtility)
         }
         .frame(maxWidth: .infinity)
     }
-    
-    private func countdownMs(snapshot snap: ComputedIslamicDay) -> Int64 {
-        let target = getCountdownTarget(now: entry.date, timeline: snap.timeline)
-        return Int64(max(0, target.timeIntervalSince(entry.date) * 1000))
-    }
-    
-    private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
-        getSectorDisplayName(now: now, currentPhase: snap.currentPhase, timeline: (duhaStart: snap.timeline.duhaStart, dhuhr: snap.timeline.dhuhr))
-    }
-    
-    private func periodColor(snapshot snap: ComputedIslamicDay) -> Color {
+
+    private func periodColor(snapshot snap: ComputedIslamicDay, now: Date) -> Color {
         Colors.coolLabel
     }
 }
 
 private struct HijriWidgetLabels: View {
-    private let parts: (dayMonth: String, year: String, isEid: Bool)
+    private let label: CompactHijriLabel
 
     init(hijriDate: HijriDate) {
-        self.parts = formatHijriDateParts(hijriDate)
+        self.label = compactHijriLabel(hijriDate: hijriDate)
     }
 
     var body: some View {
         return VStack(spacing: 1) {
-            Text(parts.dayMonth.uppercased())
+            Text(label.primary)
                 .font(.system(size: 28, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.4)
-                .foregroundStyle(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
-            Text(parts.year)
+                .foregroundStyle(label.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
+            Text(label.secondary)
                 .font(.system(size: 14, weight: .semibold))
                 .minimumScaleFactor(0.6)
                 .foregroundStyle(Colors.secondaryGold)

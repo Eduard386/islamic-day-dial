@@ -123,7 +123,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      style={{ display: 'block' }}
+      style={{ display: 'block', overflow: 'visible' }}
     >
       <defs>
         <CurrentMarkerDefs r={MARKER_R} />
@@ -367,13 +367,13 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         />
       </foreignObject>
 
-      {/* Markers — primary = short ticks, secondary = small dots; all from inner edge */}
+      {/* Markers — короткие риски только внутрь от внутреннего края кольца (не пересекают цветную полосу) */}
       {ring.markers.map((m) => {
         const isPrimary = PRIMARY_MARKER_IDS.has(m.id);
         const isSecondary = SECONDARY_MARKER_IDS.has(m.id);
         const tickStrokeWidth = 1.2;
-        const tickLen = size * 0.0125; // чуть короче, чтобы не "залезали" в сегменты
-        const tickStartR = ringInner - tickStrokeWidth / 2; // начинаем строго внутри
+        const tickLen = size * 0.0125;
+        const tickStartR = ringInner - tickStrokeWidth / 2;
         const tickEndR = tickStartR - tickLen;
         const angle = m.angleDeg;
         const inner = polarToXY(cx, cy, tickStartR, angle);

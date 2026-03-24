@@ -46,6 +46,57 @@
   animation: last-third-glow-peak var(--last-third-glow-pulse-duration, 4s) ease-in-out infinite;
 }
 
+/* Living sun: corona + stroke halo pulse (origin = marker center after translate) */
+@keyframes sun-alive-corona {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.16);
+  }
+}
+
+.sun-alive-corona {
+  transform-origin: 0px 0px;
+  animation: sun-alive-corona 2.15s ease-in-out infinite;
+}
+
+@keyframes sun-alive-halo {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.sun-alive-halo {
+  transform-origin: 0px 0px;
+  animation: sun-alive-halo 2.15s ease-in-out infinite;
+}
+
+/* Whole sun stack (corona + halos): gentle breathe so glow visibly grows/shrinks */
+@keyframes sun-alive-mark {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+.sun-alive-sun-mark {
+  transform-origin: 0px 0px;
+  animation: sun-alive-mark 2.15s ease-in-out infinite;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -64,6 +115,9 @@ body {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-header {
@@ -104,10 +158,12 @@ body {
 }
 
 .app-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
+  min-height: 0;
 }
 
 /* ---------- Dial ---------- */
@@ -115,7 +171,14 @@ body {
 .dial-section {
   display: flex;
   justify-content: center;
-  margin-top: -22px;
+}
+
+/* Dial vertical center = midpoint between subtitle and ayah translation */
+.dial-section--balanced {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  flex-direction: column;
 }
 
 .dial-stack {
@@ -123,6 +186,35 @@ body {
   flex-direction: column;
   align-items: center;
   max-width: 100%;
+}
+
+.dial-stack--balanced {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.dial-stack-subtitle {
+  flex: 0 0 auto;
+  color: var(--cool-muted-subtitle);
+  font-size: 0.85rem;
+  margin: 0 16px 6px;
+  text-align: center;
+}
+
+.dial-stack-middle {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dial-stack-spring {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
 }
 
 /* Quran 9:36 — English */
@@ -133,14 +225,96 @@ body {
   font-weight: 400;
   line-height: 1.5;
   max-width: 26rem;
-  margin: 14px 16px 0;
+  margin: 10px 16px 0;
+  flex: 0 0 auto;
   letter-spacing: 0.02em;
+}
+
+/* Dial + optional side footnotes (leader lines from ticks) */
+.dial-footnotes-shell {
+  position: relative;
+  flex: 0 0 auto;
+  --dial: 420px;
+  --footnote-side: 92px;
+  --footnote-pad: 50px;
+  width: calc(var(--dial) + 2 * var(--footnote-side));
+  max-width: 100%;
+  height: calc(var(--dial) + var(--footnote-pad));
+  margin-left: auto;
+  margin-right: auto;
+  transform: translateY(calc(var(--footnote-pad) * -0.18));
+}
+
+.dial-footnote-leaders {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.dial-footnote-line {
+  stroke: rgba(251, 236, 203, 0.45);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.footnote-label {
+  position: absolute;
+  z-index: 3;
+  transform: translateY(-50%);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--cool-label);
+  pointer-events: none;
+  line-height: 1.15;
+  max-width: calc(var(--footnote-side) - 12px);
+}
+
+.footnote-label--left {
+  left: 8px;
+  text-align: right;
+  width: calc(var(--footnote-side) - 16px);
+}
+
+.footnote-label--right {
+  right: 8px;
+  text-align: left;
+  width: calc(var(--footnote-side) - 16px);
+}
+
+.dial-core {
+  position: absolute;
+  left: var(--footnote-side);
+  top: 0;
+  width: var(--dial);
+  height: var(--dial);
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .dial-footnotes-shell {
+    --footnote-side: 0px;
+    width: var(--dial);
+  }
+
+  .dial-footnote-leaders,
+  .footnote-label {
+    display: none;
+  }
+
+  .dial-core {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 .dial-wrapper {
   position: relative;
-  width: 420px;
-  height: 420px;
+  width: var(--dial, 420px);
+  height: var(--dial, 420px);
 }
 
 .center-overlay {
@@ -216,6 +390,37 @@ body {
   width: 100%;
   max-width: 100%;
   min-width: 0; /* allow shrink */
+}
+
+/* Hijri day + year: subtle shared breathing + light engraved edge (no moving stripe) */
+.hijri-date-pair {
+  animation: hijri-date-lumen 5s ease-in-out infinite;
+}
+
+.center-info-abs .hijri-date-sector-style:not(.eid-date),
+.center-info-abs .hijri-year-sector-style:not(.eid-date) {
+  text-shadow:
+    0 -0.6px 0 rgba(255, 255, 255, 0.2),
+    0 0.8px 0 rgba(0, 0, 0, 0.42),
+    0 1.5px 2px rgba(0, 0, 0, 0.28);
+}
+
+.center-info-abs .hijri-date-sector-style.eid-date,
+.center-info-abs .hijri-year-sector-style.eid-date {
+  text-shadow:
+    0 -0.5px 0 rgba(255, 255, 255, 0.28),
+    0 0.7px 0 rgba(0, 0, 0, 0.38),
+    0 1.2px 2px rgba(0, 0, 0, 0.22);
+}
+
+@keyframes hijri-date-lumen {
+  0%,
+  100% {
+    filter: brightness(0.94);
+  }
+  50% {
+    filter: brightness(1.1);
+  }
 }
 
 .sector-block {
@@ -352,6 +557,7 @@ body {
 /* ---------- Controls Section ---------- */
 
 .controls-section {
+  flex-shrink: 0;
   width: 100%;
   max-width: 600px;
   display: flex;

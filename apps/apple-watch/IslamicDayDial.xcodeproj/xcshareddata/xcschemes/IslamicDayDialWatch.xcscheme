@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1430"
-   version = "1.7">
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES"
-      runPostActionsOnFailure = "NO">
+      buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -15,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "41A754A24988CF1466BAD77D"
-               BuildableName = "IslamicDayDial.app"
-               BlueprintName = "IslamicDayDial"
+               BlueprintIdentifier = "7E88FAF3E6FF7619F73AD82F"
+               BuildableName = "IslamicDayDialWatch.app"
+               BlueprintName = "IslamicDayDialWatch"
                ReferencedContainer = "container:IslamicDayDial.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -27,32 +26,18 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      onlyGenerateCoverageForSpecifiedTargets = "NO">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "41A754A24988CF1466BAD77D"
-            BuildableName = "IslamicDayDial.app"
-            BlueprintName = "IslamicDayDial"
+            BlueprintIdentifier = "7E88FAF3E6FF7619F73AD82F"
+            BuildableName = "IslamicDayDialWatch.app"
+            BlueprintName = "IslamicDayDialWatch"
             ReferencedContainer = "container:IslamicDayDial.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A5AD7DBE20441AE9D098AE3D"
-               BuildableName = "IslamicDayDialTests.xctest"
-               BlueprintName = "IslamicDayDialTests"
-               ReferencedContainer = "container:IslamicDayDial.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <CommandLineArguments>
-      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -68,14 +53,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "41A754A24988CF1466BAD77D"
-            BuildableName = "IslamicDayDial.app"
-            BlueprintName = "IslamicDayDial"
+            BlueprintIdentifier = "7E88FAF3E6FF7619F73AD82F"
+            BuildableName = "IslamicDayDialWatch.app"
+            BlueprintName = "IslamicDayDialWatch"
             ReferencedContainer = "container:IslamicDayDial.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -87,9 +70,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "41A754A24988CF1466BAD77D"
-            BuildableName = "IslamicDayDial.app"
-            BlueprintName = "IslamicDayDial"
+            BlueprintIdentifier = "7E88FAF3E6FF7619F73AD82F"
+            BuildableName = "IslamicDayDialWatch.app"
+            BlueprintName = "IslamicDayDialWatch"
             ReferencedContainer = "container:IslamicDayDial.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

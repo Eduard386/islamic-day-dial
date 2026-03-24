@@ -1,6 +1,6 @@
 # Islamic Day Dial — Core Specification
 
-**Source of truth for visual behavior**: `apps/web-dashboard` (Vite + React). Apple platforms (iPhone app, iPhone widget, Apple Watch) and Android surfaces should match the web dashboard. When changing core logic or ring visuals, update web first, then sync to other platforms.
+**Source of truth for visual behavior**: `apps/web-dashboard` (Vite + React). Apple platforms (iPhone app, iPhone widget, watch app, watch complication/widget) and Android surfaces should match the web dashboard. When changing core logic or ring visuals, update web first, then sync to other platforms.
 
 ## Phases (Islamic Day Segments)
 
@@ -104,8 +104,8 @@ Rendered as separate circle with thick stroke, blurred (like last third glow)
 When changing core:
 
 1. [ ] Update `packages/core` (TypeScript)
-2. [ ] Update the shared Swift implementation used by `IslamicDayDial`, `IslamicDayDialWidget`, and `IslamicDayDialWatch`
+2. [ ] Update the shared Swift implementation used by `IslamicDayDial`, `IslamicDayDialWidget`, `IslamicDayDialWatch`, and the watch WidgetKit complication surface
 3. [ ] Run `npm test` (web)
-4. [ ] Build and verify iPhone app / widget / watch app in Xcode
+4. [ ] Build and verify iPhone app / widget / watch app / watch complication in Xcode
 5. [ ] Update this spec if formulas/phases changed
 6. [ ] When porting visuals: `apps/web-dashboard` is source of truth — match sun marker colors, roll zones, outer glow
