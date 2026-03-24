@@ -9,6 +9,15 @@ type Props = {
   sidePad?: number;
 };
 
+type TimelineKey = keyof ComputedIslamicDay['timeline'];
+
+type FootnoteDef = {
+  id: string;
+  label: string;
+  start: TimelineKey;
+  end: TimelineKey;
+};
+
 /** Same ring metrics as `IslamicRing`. */
 function ringMetrics(dialSize: number) {
   const cx = dialSize / 2;
@@ -38,20 +47,20 @@ function footnoteAnchorPoints(
 }
 
 /** Левая колонка: дневные ориентиры по часовой логике. */
-const LEFT: ReadonlyArray<{ id: string; label: string }> = [
-  { id: 'sunrise', label: 'Sunrise' },
-  { id: 'duha_start', label: 'Duha' },
-  { id: 'duha_end', label: 'Midday' },
-  { id: 'dhuhr', label: 'Dhuhr' },
-  { id: 'asr', label: 'Asr' },
+const LEFT: ReadonlyArray<FootnoteDef> = [
+  { id: 'sunrise', label: 'Sunrise', start: 'sunrise', end: 'duhaStart' },
+  { id: 'duha_start', label: 'Duha', start: 'duhaStart', end: 'duhaEnd' },
+  { id: 'duha_end', label: 'Midday', start: 'duhaEnd', end: 'dhuhr' },
+  { id: 'dhuhr', label: 'Dhuhr', start: 'dhuhr', end: 'asr' },
+  { id: 'asr', label: 'Asr', start: 'asr', end: 'nextMaghrib' },
 ];
 
 /** Правая колонка. */
-const RIGHT: ReadonlyArray<{ id: string; label: string }> = [
-  { id: 'maghrib', label: 'Maghrib' },
-  { id: 'isha', label: 'Isha' },
-  { id: 'last_third_start', label: 'Last 3rd' },
-  { id: 'fajr', label: 'Fajr' },
+const RIGHT: ReadonlyArray<FootnoteDef> = [
+  { id: 'maghrib', label: 'Maghrib', start: 'lastMaghrib', end: 'isha' },
+  { id: 'isha', label: 'Isha', start: 'isha', end: 'lastThirdStart' },
+  { id: 'last_third_start', label: 'Last 3rd', start: 'lastThirdStart', end: 'fajr' },
+  { id: 'fajr', label: 'Fajr', start: 'fajr', end: 'sunrise' },
 ];
 
 const MIN_LABEL_GAP = 38;
@@ -103,20 +112,33 @@ type FootItem = {
 /** Запас под разведённые подписи ниже кольца (синхронно с `--footnote-pad` в App.css) */
 const FOOTNOTE_VERTICAL_PAD = 120;
 
+function midpointMs(startMs: number, endMs: number) {
+  return startMs + (endMs - startMs) / 2;
+}
+
+function footnoteAngle(snapshot: ComputedIslamicDay, def: FootnoteDef) {
+  const { timeline } = snapshot;
+  const totalMs = timeline.nextMaghrib.getTime() - timeline.lastMaghrib.getTime();
+  if (totalMs <= 0) return 0;
+
+  const startMs = timeline[def.start].getTime();
+  const endMs = timeline[def.end].getTime();
+  const elapsedMs = midpointMs(startMs, endMs) - timeline.lastMaghrib.getTime();
+
+  return Math.max(0, Math.min(360, (elapsedMs / totalMs) * 360));
+}
+
 export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92 }: Props) {
-  const markers = snapshot.ring.markers;
   const totalW = dialSize + 2 * sidePad;
   const h = dialSize + FOOTNOTE_VERTICAL_PAD;
 
   const xMidLeft = sidePad - 8;
   const xMidRight = sidePad + dialSize + 8;
 
-  const buildSide = (defs: ReadonlyArray<{ id: string; label: string }>, side: 'left' | 'right'): FootItem[] => {
+  const buildSide = (defs: ReadonlyArray<FootnoteDef>, side: 'left' | 'right'): FootItem[] => {
     const raw = defs
       .map((def) => {
-        const m = markers.find((x) => x.id === def.id);
-        if (!m) return null;
-        const a = footnoteAnchorPoints(dialSize, m.angleDeg, def.id);
+        const a = footnoteAnchorPoints(dialSize, footnoteAngle(snapshot, def), def.id);
         const xRing = sidePad + a.xRing;
         const yRing = a.yRing;
         const xStub = sidePad + a.xStub;

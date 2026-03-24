@@ -5,22 +5,23 @@ private let footnoteStubBaseRatio: CGFloat = 0.048
 private struct PhoneFootnoteDef {
     let id: String
     let label: String
-    let bendsToCenter: Bool
+    let start: KeyPath<ComputedTimeline, Date>
+    let end: KeyPath<ComputedTimeline, Date>
 }
 
 private let footnoteTopDefs: [PhoneFootnoteDef] = [
-    .init(id: "dhuhr", label: "Dhuhr", bendsToCenter: false),
-    .init(id: "asr", label: "Asr", bendsToCenter: true),
-    .init(id: "maghrib", label: "Maghrib", bendsToCenter: true),
-    .init(id: "isha", label: "Isha", bendsToCenter: true),
+    .init(id: "dhuhr", label: "Dhuhr", start: \.dhuhr, end: \.asr),
+    .init(id: "asr", label: "Asr", start: \.asr, end: \.nextMaghrib),
+    .init(id: "maghrib", label: "Maghrib", start: \.lastMaghrib, end: \.isha),
+    .init(id: "isha", label: "Isha", start: \.isha, end: \.lastThirdStart),
 ]
 
 private let footnoteBottomDefs: [PhoneFootnoteDef] = [
-    .init(id: "duha_end", label: "Midday", bendsToCenter: false),
-    .init(id: "duha_start", label: "Duha", bendsToCenter: true),
-    .init(id: "sunrise", label: "Sunrise", bendsToCenter: true),
-    .init(id: "fajr", label: "Fajr", bendsToCenter: true),
-    .init(id: "last_third_start", label: "Last 3rd", bendsToCenter: false),
+    .init(id: "duha_end", label: "Midday", start: \.duhaEnd, end: \.dhuhr),
+    .init(id: "duha_start", label: "Duha", start: \.duhaStart, end: \.duhaEnd),
+    .init(id: "sunrise", label: "Sunrise", start: \.sunrise, end: \.duhaStart),
+    .init(id: "fajr", label: "Fajr", start: \.fajr, end: \.sunrise),
+    .init(id: "last_third_start", label: "Last 3rd", start: \.lastThirdStart, end: \.fajr),
 ]
 
 private struct VerticalFootnoteItem: Identifiable {
@@ -63,6 +64,54 @@ private func evenlySpacedCenters(count: Int, minX: CGFloat, maxX: CGFloat) -> [C
     return (0..<count).map { minX + CGFloat($0) * step }
 }
 
+private func midpoint(_ start: Date, _ end: Date) -> Date {
+    Date(timeIntervalSince1970: start.timeIntervalSince1970 + (end.timeIntervalSince1970 - start.timeIntervalSince1970) / 2)
+}
+
+private func footnoteAngle(_ def: PhoneFootnoteDef, timeline: ComputedTimeline) -> Double {
+    let start = timeline[keyPath: def.start]
+    let end = timeline[keyPath: def.end]
+    let total = timeline.nextMaghrib.timeIntervalSince(timeline.lastMaghrib)
+    guard total > 0 else { return 0 }
+    let mid = midpoint(start, end)
+    let elapsed = mid.timeIntervalSince(timeline.lastMaghrib)
+    return max(0, min(360, elapsed / total * 360))
+}
+
+private func spreadCenters(
+    refs: [(key: String, targetX: CGFloat)],
+    minX: CGFloat,
+    maxX: CGFloat,
+    minGap: CGFloat
+) -> [String: CGFloat] {
+    guard !refs.isEmpty else { return [:] }
+    let sorted = refs.sorted { $0.targetX < $1.targetX }
+    let clampedTargets = sorted.map { min(max($0.targetX, minX), maxX) }
+    var positions = clampedTargets
+
+    for index in 1..<positions.count {
+        positions[index] = max(positions[index], positions[index - 1] + minGap)
+    }
+    if let overflow = positions.last.map({ $0 - maxX }), overflow > 0 {
+        positions = positions.map { $0 - overflow }
+    }
+    if let underflow = positions.first.map({ minX - $0 }), underflow > 0 {
+        positions = positions.map { $0 + underflow }
+    }
+    for index in stride(from: positions.count - 2, through: 0, by: -1) {
+        positions[index] = min(positions[index], positions[index + 1] - minGap)
+    }
+    if let underflow = positions.first.map({ minX - $0 }), underflow > 0 {
+        positions = positions.map { $0 + underflow }
+    }
+
+    var resolved: [String: CGFloat] = [:]
+    for (index, item) in sorted.enumerated() {
+        resolved[item.key] = positions[index]
+    }
+    return resolved
+}
+
 struct PhoneDialFootnotesView: View {
     let snapshot: ComputedIslamicDay
     let dialSize: CGFloat
@@ -100,10 +149,12 @@ struct PhoneDialFootnotesView: View {
             ForEach(items) { item in
                 Text(item.label)
                     .font(.system(size: labelFont, weight: .medium))
-                    .foregroundStyle(Colors.coolLabel)
+                    .foregroundStyle(PHONE_READING_TINT)
                     .textCase(.uppercase)
                     .tracking(1.0)
                     .multilineTextAlignment(.center)
+                    .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
+                    .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
                     .frame(width: item.labelWidth)
                     .position(item.labelPosition)
             }
@@ -113,7 +164,7 @@ struct PhoneDialFootnotesView: View {
     }
 
     private func buildItems() -> [VerticalFootnoteItem] {
-        let markers = snapshot.ringMarkers
+        let timeline = snapshot.timeline
         let origin = dialOrigin
         let minCenterX = origin.x + 28 + labelWidth / 2
         let maxCenterX = origin.x + dialSize - 28 - labelWidth / 2
@@ -127,33 +178,33 @@ struct PhoneDialFootnotesView: View {
             lineY: CGFloat,
             labelY: CGFloat
         ) -> [VerticalFootnoteItem] {
-            let centers = evenlySpacedCenters(count: defs.count, minX: minCenterX, maxX: maxCenterX)
+            let targets = defs.map { def -> (String, CGFloat) in
+                let angle = footnoteAngle(def, timeline: timeline)
+                let anchor = anchorOnRing(dialSize: dialSize, angleDeg: angle, markerId: def.id)
+                let stubAbs = toAbs(anchor.stub)
+                return (def.id, stubAbs.x)
+            }
+            let fallbackCenters = evenlySpacedCenters(count: defs.count, minX: minCenterX, maxX: maxCenterX)
+            let resolvedCenters = spreadCenters(
+                refs: targets,
+                minX: minCenterX,
+                maxX: maxCenterX,
+                minGap: labelWidth * 0.94
+            )
 
             return defs.enumerated().compactMap { index, def in
-                guard let marker = markers.first(where: { $0.id == def.id }) else { return nil }
-                let anchor = anchorOnRing(dialSize: dialSize, angleDeg: marker.angleDeg, markerId: def.id)
+                let angle = footnoteAngle(def, timeline: timeline)
+                let anchor = anchorOnRing(dialSize: dialSize, angleDeg: angle, markerId: def.id)
                 let rimAbs = toAbs(anchor.rim)
                 let stubAbs = toAbs(anchor.stub)
-                let labelCenterX = centers[index]
-
-                let points: [CGPoint]
-                if def.bendsToCenter {
-                    let centerJoinY = labelY + (labelY < lineY ? labelFont * 0.07 : -labelFont * 0.07)
-                    points = [
-                        rimAbs,
-                        stubAbs,
-                        CGPoint(x: labelCenterX, y: centerJoinY),
-                    ]
-                } else {
-                    let edgeInset = labelWidth * 0.17
-                    let anchorX = stubAbs.x < labelCenterX ? (labelCenterX - edgeInset) : (labelCenterX + edgeInset)
-                    points = [
-                        rimAbs,
-                        stubAbs,
-                        CGPoint(x: stubAbs.x, y: lineY),
-                        CGPoint(x: anchorX, y: lineY),
-                    ]
-                }
+                let labelCenterX = resolvedCenters[def.id] ?? fallbackCenters[index]
+                let labelJoinY = labelY + (labelY < lineY ? labelFont * 0.18 : -labelFont * 0.18)
+                let points = [
+                    rimAbs,
+                    stubAbs,
+                    CGPoint(x: labelCenterX, y: lineY),
+                    CGPoint(x: labelCenterX, y: labelJoinY),
+                ]
 
                 return VerticalFootnoteItem(
                     key: def.id,

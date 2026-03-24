@@ -11,6 +11,7 @@ private let PRIMARY_MARKER_IDS: Set<String> = ["fajr", "dhuhr", "asr", "maghrib"
 private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "last_third_start", "duha_start", "duha_end"]
 private let MOON_INNER_R: Double = 0.82
 private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔peak↔base)
+private let PHONE_INFO_RADIUS_EXPANSION_RATIO: CGFloat = 10 / 420
 
 private struct MoonPhaseParams {
     let shadowOffset: Double
@@ -103,6 +104,168 @@ enum RingRenderVariant {
     case phone
 }
 
+private enum PhoneRingArcKind: String {
+    case maghribToIsha = "maghrib_to_isha"
+    case ishaGroup = "isha_group"
+    case fajrToSunrise = "fajr_to_sunrise"
+    case sunrise = "sunrise"
+    case duha = "duha"
+    case midday = "midday"
+    case dhuhrToAsr = "dhuhr_to_asr"
+    case asrToMaghrib = "asr_to_maghrib"
+}
+
+private struct PhoneRingArcSpec: Identifiable {
+    let kind: PhoneRingArcKind
+    let originalStartAngleDeg: CGFloat
+    let originalEndAngleDeg: CGFloat
+    let startAngleDeg: CGFloat
+    let endAngleDeg: CGFloat
+
+    var id: String { kind.rawValue }
+}
+
+private struct PhoneRingArcShape: Shape {
+    var radius: CGFloat
+    var startAngleDeg: CGFloat
+    var endAngleDeg: CGFloat
+
+    var animatableData: AnimatablePair<CGFloat, AnimatablePair<CGFloat, CGFloat>> {
+        get { AnimatablePair(radius, AnimatablePair(startAngleDeg, endAngleDeg)) }
+        set {
+            radius = newValue.first
+            startAngleDeg = newValue.second.first
+            endAngleDeg = newValue.second.second
+        }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        arcPath(
+            cx: Double(rect.midX),
+            cy: Double(rect.midY),
+            r: Double(radius),
+            startDeg: Double(startAngleDeg),
+            endDeg: Double(endAngleDeg)
+        )
+    }
+}
+
+private func angleSpan(startDeg: CGFloat, endDeg: CGFloat) -> CGFloat {
+    let raw = endDeg - startDeg
+    return raw >= 0 ? raw : raw + 360
+}
+
+private func adjustedPhoneMarkerAngle(phoneArcSpecs: [PhoneRingArcSpec], originalAngle: Double) -> Double {
+    let lookupAngle = CGFloat(originalAngle >= 360 ? 0 : originalAngle)
+
+    for spec in phoneArcSpecs {
+        let originalSpan = angleSpan(startDeg: spec.originalStartAngleDeg, endDeg: spec.originalEndAngleDeg)
+        guard originalSpan > 0 else { continue }
+
+        let traveled = angleSpan(startDeg: spec.originalStartAngleDeg, endDeg: lookupAngle)
+        guard traveled <= originalSpan + 0.001 else { continue }
+
+        let t = traveled / originalSpan
+        let adjustedSpan = angleSpan(startDeg: spec.startAngleDeg, endDeg: spec.endAngleDeg)
+        return Double(spec.startAngleDeg + adjustedSpan * t)
+    }
+
+    return originalAngle
+}
+
+private func adjustedArcBounds(startDeg: CGFloat, endDeg: CGFloat, radiusScale: CGFloat) -> (start: CGFloat, end: CGFloat) {
+    let span = angleSpan(startDeg: startDeg, endDeg: endDeg)
+    let midpoint = startDeg + span / 2
+    let adjustedSpan = span * radiusScale
+    return (midpoint - adjustedSpan / 2, midpoint + adjustedSpan / 2)
+}
+
+private func expandedPhoneRingRadius(baseRadius: CGFloat, size: CGFloat, infoProgress: Double) -> CGFloat {
+    baseRadius + size * PHONE_INFO_RADIUS_EXPANSION_RATIO * CGFloat(max(0, min(1, infoProgress)))
+}
+
+private func phoneQuakeMetrics(date: Date, progress: Double, size: CGFloat) -> (x: CGFloat, y: CGFloat, rotation: Double) {
+    let clamped = max(0, min(1, progress))
+    let envelope = pow(max(0, sin(clamped * .pi)), 0.42)
+    guard envelope > 0.001 else { return (0, 0, 0) }
+
+    let time = date.timeIntervalSinceReferenceDate
+    let amplitude = size * (13.5 / 420) * CGFloat(envelope)
+    let x = CGFloat(
+        sin(time * 71) +
+        sin(time * 123) * 0.92 +
+        cos(time * 187) * 0.56 +
+        sin(time * 251) * 0.22
+    ) * amplitude
+    let y = CGFloat(
+        cos(time * 79) +
+        sin(time * 141) * 0.88 +
+        cos(time * 211) * 0.48 +
+        sin(time * 269) * 0.2
+    ) * amplitude * 1.06
+    let rotation = Double(
+        sin(time * 67) +
+        cos(time * 129) * 0.78 +
+        sin(time * 203) * 0.32
+    ) * Double(envelope) * 1.25
+    return (x, y, rotation)
+}
+
+private func buildPhoneRingArcSpecs(
+    snapshot: ComputedIslamicDay,
+    baseRadius: CGFloat,
+    ringRadius: CGFloat
+) -> [PhoneRingArcSpec] {
+    let byId = Dictionary(uniqueKeysWithValues: snapshot.ringSegments.map { ($0.id, $0) })
+    guard
+        let maghribToIsha = byId[.maghrib_to_isha],
+        let ishaToMidnight = byId[.isha_to_midnight],
+        let lastThirdToFajr = byId[.last_third_to_fajr],
+        let fajrToSunrise = byId[.fajr_to_sunrise],
+        let dhuhrToAsr = byId[.dhuhr_to_asr],
+        let asrToMaghrib = byId[.asr_to_maghrib]
+    else {
+        return []
+    }
+
+    let radiusScale = baseRadius / max(ringRadius, baseRadius)
+    let timeline = snapshot.timeline
+
+    func angle(for timestamp: Date) -> Double {
+        timestampToAngle(
+            timestamp: timestamp,
+            lastMaghrib: timeline.lastMaghrib,
+            nextMaghrib: timeline.nextMaghrib
+        )
+    }
+
+    func makeSpec(kind: PhoneRingArcKind, start: Double, end: Double) -> PhoneRingArcSpec {
+        let adjusted = adjustedArcBounds(
+            startDeg: CGFloat(start),
+            endDeg: CGFloat(end),
+            radiusScale: radiusScale
+        )
+        return PhoneRingArcSpec(
+            kind: kind,
+            originalStartAngleDeg: CGFloat(start),
+            originalEndAngleDeg: CGFloat(end),
+            startAngleDeg: adjusted.start,
+            endAngleDeg: adjusted.end
+        )
+    }
+
+    return [
+        makeSpec(kind: .maghribToIsha, start: maghribToIsha.startAngleDeg, end: maghribToIsha.endAngleDeg),
+        makeSpec(kind: .ishaGroup, start: ishaToMidnight.startAngleDeg, end: lastThirdToFajr.endAngleDeg),
+        makeSpec(kind: .fajrToSunrise, start: fajrToSunrise.startAngleDeg, end: fajrToSunrise.endAngleDeg),
+        makeSpec(kind: .sunrise, start: angle(for: timeline.sunrise), end: angle(for: timeline.duhaStart)),
+        makeSpec(kind: .duha, start: angle(for: timeline.duhaStart), end: angle(for: timeline.duhaEnd)),
+        makeSpec(kind: .midday, start: angle(for: timeline.duhaEnd), end: angle(for: timeline.dhuhr)),
+        makeSpec(kind: .dhuhrToAsr, start: dhuhrToAsr.startAngleDeg, end: dhuhrToAsr.endAngleDeg),
+        makeSpec(kind: .asrToMaghrib, start: asrToMaghrib.startAngleDeg, end: asrToMaghrib.endAngleDeg),
+    ]
+}
+
 private struct SunMarkerStyle {
     let style: SunRenderStyle
     let color: Color
@@ -115,6 +278,7 @@ struct RingView: View {
     var now: Date = Date()
     var thicknessScale: CGFloat = 1
     var renderVariant: RingRenderVariant = .watch
+    var phoneInfoProgress: Double = 0
     
     private var currentPhase: IslamicPhaseId {
         getCurrentPhase(now: now, timeline: snapshot.timeline)
@@ -161,7 +325,10 @@ struct RingView: View {
             let cs = min(geo.size.width, geo.size.height)
             let cStroke = cs * 0.081 * thicknessScale
             let cInner = cs * 0.25125
-            let cr = cInner + cStroke / 2
+            let baseRingRadius = cInner + cStroke / 2
+            let ringRadius = renderVariant == .phone
+                ? expandedPhoneRingRadius(baseRadius: baseRingRadius, size: cs, infoProgress: phoneInfoProgress)
+                : baseRingRadius
             
             let displaySegments: [(id: IslamicPhaseId, startAngleDeg: Double, endAngleDeg: Double)] = snapshot.ringSegments.map {
                 (id: $0.id, startAngleDeg: $0.startAngleDeg, endAngleDeg: $0.endAngleDeg)
@@ -175,30 +342,66 @@ struct RingView: View {
                 return MirrorSegment(startAngleDeg: fajr.angleDeg, spanDeg: asrToIshaSpanDeg)
             }()
             let gradientStops = buildAngularGradientStops(segments: displaySegments, mirrorSegment: mirrorSegment)
+            let ringGradient = AngularGradient(
+                gradient: Gradient(stops: gradientStops),
+                center: .center,
+                startAngle: .degrees(-90),
+                endAngle: .degrees(270)
+            )
+            let phoneArcSpecs = renderVariant == .phone
+                ? buildPhoneRingArcSpecs(snapshot: snapshot, baseRadius: baseRingRadius, ringRadius: ringRadius)
+                : []
+            let markerAngle = renderVariant == .phone
+                ? adjustedPhoneMarkerAngle(phoneArcSpecs: phoneArcSpecs, originalAngle: progressAngle)
+                : progressAngle
+            let tickOpacity = renderVariant == .phone
+                ? max(0, 1 - phoneInfoProgress)
+                : 1.0
             
             ZStack(alignment: .center) {
                 if renderVariant == .phone {
-                    PhoneNightGlowOverlay(
-                        snapshot: snapshot,
-                        now: now,
-                        currentPhase: currentPhase,
-                        size: cs,
-                        thicknessScale: thicknessScale
-                    )
-                }
+                    ZStack(alignment: .center) {
+                        PhoneNightGlowOverlay(
+                            snapshot: snapshot,
+                            now: now,
+                            currentPhase: currentPhase,
+                            size: cs,
+                            thicknessScale: thicknessScale,
+                            ringRadius: ringRadius,
+                            phoneInfoProgress: phoneInfoProgress,
+                            phoneArcSpecs: phoneArcSpecs
+                        )
 
-                // Ring: single smooth AngularGradient (no sub-arc seams). SwiftUI 0°=right; web 0°=top → startAngle -90°
-                Circle()
-                    .stroke(
-                        AngularGradient(
-                            gradient: Gradient(stops: gradientStops),
-                            center: .center,
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(270)
-                        ),
-                        style: StrokeStyle(lineWidth: cStroke, lineCap: .butt, lineJoin: .miter)
-                    )
-                    .frame(width: cr * 2, height: cr * 2)
+                        if !phoneArcSpecs.isEmpty {
+                            ForEach(phoneArcSpecs) { spec in
+                                PhoneRingArcShape(
+                                    radius: ringRadius,
+                                    startAngleDeg: spec.startAngleDeg,
+                                    endAngleDeg: spec.endAngleDeg
+                                )
+                                .stroke(
+                                    ringGradient,
+                                    style: StrokeStyle(lineWidth: cStroke, lineCap: .butt, lineJoin: .miter)
+                                )
+                            }
+                        } else {
+                            Circle()
+                                .stroke(
+                                    ringGradient,
+                                    style: StrokeStyle(lineWidth: cStroke, lineCap: .butt, lineJoin: .miter)
+                                )
+                                .frame(width: ringRadius * 2, height: ringRadius * 2)
+                        }
+                    }
+                } else {
+                    // Ring: single smooth AngularGradient (no sub-arc seams). SwiftUI 0°=right; web 0°=top → startAngle -90°
+                    Circle()
+                        .stroke(
+                            ringGradient,
+                            style: StrokeStyle(lineWidth: cStroke, lineCap: .butt, lineJoin: .miter)
+                        )
+                        .frame(width: baseRingRadius * 2, height: baseRingRadius * 2)
+                }
                 
                 Canvas { context, canvasSize in
                     let csCanvas = min(canvasSize.width, canvasSize.height)
@@ -220,18 +423,20 @@ struct RingView: View {
                         context.stroke(linePath, with: .color(MARKER_STROKE), style: tickStyle)
                     }
                 }
-                .overlay {
-                    CurrentMarkerOverlay(
-                        snapshot: snapshot,
-                        now: now,
-                        currentPhase: currentPhase,
-                        progressAngle: progressAngle,
-                        sunMarkerState: sunMarkerState(),
-                        thicknessScale: thicknessScale,
-                        size: cs,
-                        renderVariant: renderVariant
-                    )
-                }
+                .opacity(tickOpacity)
+
+                CurrentMarkerOverlay(
+                    snapshot: snapshot,
+                    now: now,
+                    currentPhase: currentPhase,
+                    progressAngle: progressAngle,
+                    markerAngle: markerAngle,
+                    sunMarkerState: sunMarkerState(),
+                    thicknessScale: thicknessScale,
+                    size: cs,
+                    renderVariant: renderVariant,
+                    ringRadius: ringRadius
+                )
             }
             .frame(width: cs, height: cs)
         }
@@ -255,16 +460,14 @@ private struct PhoneNightGlowOverlay: View {
     let currentPhase: IslamicPhaseId
     let size: CGFloat
     let thicknessScale: CGFloat
+    let ringRadius: CGFloat
+    let phoneInfoProgress: Double
+    let phoneArcSpecs: [PhoneRingArcSpec]
 
     private var cStroke: CGFloat { size * 0.081 * thicknessScale }
-    private var cr: CGFloat {
-        let cInner = size * 0.25125
-        return cInner + cStroke / 2
-    }
 
     var body: some View {
-        // ~4 Hz: smooth enough for a 3s sine glow; 30 Hz was a major memory/CPU driver on device.
-        TimelineView(.periodic(from: Date(), by: 0.25)) { timeline in
+        TimelineView(.animation) { timeline in
             let (base, phase) = glowPulsePhase(timeline.date)
             let jumuBase = base
             let jumuPeak = phase * 1.0
@@ -274,10 +477,14 @@ private struct PhoneNightGlowOverlay: View {
             let nightSegments = snapshot.ringSegments.filter { NIGHT_SECTORS_GROUP.contains($0.id) }
             let isInIsha = currentPhase == .isha_to_midnight
             let isInLastThird = currentPhase == .last_third_to_fajr
-            let showJumuahGlow = isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
+            let showJumuahGlow = phoneInfoProgress <= 0.001
+                && isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
             let duhaStartMarker = snapshot.ringMarkers.first { $0.id == "duha_start" }
             let dhuhrMarker = snapshot.ringMarkers.first { $0.id == "dhuhr" }
             let asrMarker = snapshot.ringMarkers.first { $0.id == "asr" }
+            let showExpandedNightGroupGlow = phoneInfoProgress > 0.001
+            let expandedNightGlowOpacity = 0.35 * CGFloat(phoneInfoProgress)
+            let ishaGroupArc = phoneArcSpecs.first { $0.kind == .ishaGroup }
 
             ZStack {
                 if showJumuahGlow,
@@ -287,14 +494,14 @@ private struct PhoneNightGlowOverlay: View {
                     let pathDuhaToDhuhr = arcPath(
                         cx: Double(size / 2),
                         cy: Double(size / 2),
-                        r: Double(cr),
+                        r: Double(ringRadius),
                         startDeg: duhaStartMarker.angleDeg,
                         endDeg: dhuhrMarker.angleDeg
                     )
                     let pathDhuhrToAsr = arcPath(
                         cx: Double(size / 2),
                         cy: Double(size / 2),
-                        r: Double(cr),
+                        r: Double(ringRadius),
                         startDeg: dhuhrMarker.angleDeg,
                         endDeg: asrMarker.angleDeg
                     )
@@ -323,12 +530,23 @@ private struct PhoneNightGlowOverlay: View {
                             jumuColor.opacity(jumuPeak),
                             style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
                         )
-                        .blur(radius: size * (5 / 420))
+                            .blur(radius: size * (5 / 420))
                     }
                 }
-                if isInIsha || isInLastThird {
+                if showExpandedNightGroupGlow, let ishaGroupArc {
+                    PhoneRingArcShape(
+                        radius: ringRadius,
+                        startAngleDeg: ishaGroupArc.startAngleDeg,
+                        endAngleDeg: ishaGroupArc.endAngleDeg
+                    )
+                    .stroke(
+                        Color(red: 0.231, green: 0.51, blue: 0.965).opacity(expandedNightGlowOpacity),
+                        style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                    )
+                    .blur(radius: size * (4 / 420))
+                } else if isInIsha || isInLastThird {
                     ForEach(nightSegments.filter { isInIsha || $0.id == .isha_to_midnight || $0.id == .last_third_to_fajr }, id: \.id) { seg in
-                        let path = arcPath(cx: Double(size / 2), cy: Double(size / 2), r: Double(cr), startDeg: seg.startAngleDeg, endDeg: seg.endAngleDeg)
+                        let path = arcPath(cx: Double(size / 2), cy: Double(size / 2), r: Double(ringRadius), startDeg: seg.startAngleDeg, endDeg: seg.endAngleDeg)
                         if seg.id == .last_third_to_fajr && isInLastThird {
                             let lastThirdColor = Color(red: 0.231, green: 0.51, blue: 0.965)
                             ZStack {
@@ -366,22 +584,19 @@ private struct CurrentMarkerOverlay: View {
     let now: Date
     let currentPhase: IslamicPhaseId
     let progressAngle: Double
+    let markerAngle: Double
     let sunMarkerState: SunMarkerStyle?
     let thicknessScale: CGFloat
     let size: CGFloat
     let renderVariant: RingRenderVariant
+    let ringRadius: CGFloat
 
     private var isNight: Bool { MOON_ONLY_PHASES.contains(currentPhase) }
     private var markerR: CGFloat { size * 0.033 * thicknessScale }
     private var ccx: CGFloat { size / 2 }
     private var ccy: CGFloat { size / 2 }
-    private var cr: CGFloat {
-        let cInner = size * 0.25125
-        let cStroke = size * 0.081 * thicknessScale
-        return cInner + cStroke / 2
-    }
     private var markerCenter: CGPoint {
-        polarToXY(cx: Double(ccx), cy: Double(ccy), r: Double(cr), angleDeg: progressAngle)
+        polarToXY(cx: Double(ccx), cy: Double(ccy), r: Double(ringRadius), angleDeg: markerAngle)
     }
 
     private var sunriseAngle: Double {
@@ -419,7 +634,7 @@ private struct CurrentMarkerOverlay: View {
     }
 
     private var boundaryPoint: CGPoint {
-        polarToXY(cx: Double(ccx), cy: Double(ccy), r: Double(cr), angleDeg: revealResult.boundaryAngle)
+        polarToXY(cx: Double(ccx), cy: Double(ccy), r: Double(ringRadius), angleDeg: revealResult.boundaryAngle)
     }
 
     @ViewBuilder
