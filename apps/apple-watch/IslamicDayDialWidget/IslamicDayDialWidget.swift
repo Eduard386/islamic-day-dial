@@ -31,7 +31,7 @@ struct IslamicDayDialProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<IslamicDayDialEntry>) -> Void) {
         Task {
             let entry = await makeEntry(date: Date(), prefersPreviewData: false)
-            let refreshDate = nextWidgetRefreshDate(from: entry.date, snapshot: entry.snapshot)
+            let refreshDate = nextHijriDateRefreshDate(from: entry.date, snapshot: entry.snapshot)
             completion(Timeline(entries: [entry], policy: .after(refreshDate)))
         }
     }
@@ -96,18 +96,8 @@ struct IslamicDayDialWidgetEntryView: View {
     }
 
     private func dataContent(snapshot snap: ComputedIslamicDay) -> some View {
-        VStack(spacing: 4) {
-            Text(widgetPeriodLabel(snapshot: snap, now: entry.date).uppercased())
-                .font(.system(size: 18, weight: .light))
-                .foregroundStyle(periodColor(snapshot: snap, now: entry.date))
-                .lineLimit(1)
-            HijriWidgetLabels(hijriDate: snap.hijriDate)
-        }
+        HijriWidgetLabels(hijriDate: snap.hijriDate)
         .frame(maxWidth: .infinity)
-    }
-
-    private func periodColor(snapshot snap: ComputedIslamicDay, now: Date) -> Color {
-        Colors.coolLabel
     }
 }
 
@@ -146,7 +136,7 @@ struct IslamicDayDialWidget: Widget {
             IslamicDayDialWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Islamic Day Dial")
-        .description("Track the current Islamic day phase and Hijri date.")
+        .description("Show the current Hijri date.")
         .supportedFamilies([.systemSmall])
     }
 }

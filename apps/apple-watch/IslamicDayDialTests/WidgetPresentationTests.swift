@@ -89,6 +89,34 @@ final class WidgetPresentationTests: XCTestCase {
         XCTAssertEqual(refreshDate.timeIntervalSince1970, 1_020, accuracy: 0.001)
     }
 
+    func testNextHijriDateRefreshDate_UsesNextMaghrib() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let timeline = makeTimeline(
+            lastMaghrib: 0,
+            isha: 100,
+            lastThirdStart: 300,
+            fajr: 400,
+            sunrise: 500,
+            duhaStart: 900,
+            dhuhr: 1_300,
+            asr: 1_700,
+            nextMaghrib: 2_400
+        )
+        let snapshot = makeSnapshot(timeline: timeline)
+
+        let refreshDate = nextHijriDateRefreshDate(from: now, snapshot: snapshot)
+
+        XCTAssertEqual(refreshDate.timeIntervalSince1970, 2_400.25, accuracy: 0.001)
+    }
+
+    func testNextHijriDateRefreshDate_FallsBackToOneHourWithoutSnapshot() {
+        let now = Date(timeIntervalSince1970: 1_000)
+
+        let refreshDate = nextHijriDateRefreshDate(from: now, snapshot: nil)
+
+        XCTAssertEqual(refreshDate.timeIntervalSince1970, 4_600, accuracy: 0.001)
+    }
+
     func testCompactHijriLabel_UsesEidTitle() {
         let label = compactHijriLabel(
             hijriDate: HijriDate(day: 1, monthNumber: 10, monthNameEn: "Shawwal", year: 1447)

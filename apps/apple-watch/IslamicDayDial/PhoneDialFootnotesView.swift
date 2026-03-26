@@ -33,6 +33,29 @@ private struct VerticalFootnoteItem: Identifiable {
     let labelWidth: CGFloat
 }
 
+private func phoneFootnoteLabelColor(_ label: String) -> Color {
+    switch label {
+    case "Isha", "Last 3rd":
+        return Color(red: 0.72, green: 0.82, blue: 0.97)
+    case "Fajr":
+        return Color(red: 0.86, green: 0.84, blue: 0.66)
+    case "Sunrise":
+        return Color(red: 0.95, green: 0.64, blue: 0.39)
+    case "Duha":
+        return Color(red: 0.91, green: 0.77, blue: 0.43)
+    case "Midday":
+        return Color(red: 0.97, green: 0.9, blue: 0.62)
+    case "Dhuhr":
+        return Color(red: 0.93, green: 0.8, blue: 0.48)
+    case "Asr":
+        return Color(red: 0.89, green: 0.75, blue: 0.47)
+    case "Maghrib":
+        return Color(red: 0.9, green: 0.53, blue: 0.4)
+    default:
+        return PHONE_READING_TINT
+    }
+}
+
 private func ringOuterR(dialSize: CGFloat) -> CGFloat {
     dialSize * 0.25125 + dialSize * 0.081
 }
@@ -151,14 +174,15 @@ struct PhoneDialFootnotesView: View {
             .allowsHitTesting(false)
 
             ForEach(items) { item in
+                let labelColor = phoneFootnoteLabelColor(item.label)
                 Text(item.label)
                     .font(.system(size: labelFont, weight: .medium))
-                    .foregroundStyle(PHONE_READING_TINT)
+                    .foregroundStyle(labelColor)
                     .textCase(.uppercase)
                     .tracking(1.0)
                     .multilineTextAlignment(.center)
-                    .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
-                    .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
+                    .shadow(color: labelColor.opacity(0.24), radius: 6)
+                    .shadow(color: labelColor.opacity(0.12), radius: 12)
                     .frame(width: item.labelWidth, height: labelHeight)
                     .contentShape(Rectangle())
                     .onTapGesture {

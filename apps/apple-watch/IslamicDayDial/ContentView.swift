@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 private let DIAL_VERTICAL_GAP: CGFloat = 18
 private let DIAL_SECTION_HEIGHT: CGFloat = 436
@@ -34,6 +35,12 @@ private let PHONE_DUHA_HADITH_THREE_AR = "قَالَ رَسُولُ اللَّه
 private let PHONE_DUHA_HADITH_THREE_EN = "Messenger of Allah (ﷺ) said: “Observe the dawn prayer, then stop praying when the sun is rising till it is fully up, for when it rises it comes up between the horns of Satan, and the unbelievers prostrate themselves to it at that time. Then pray, for the prayer is witnessed and attended (by angels) till the shadow becomes about the length of a lance; then cease prayer, for at that time Hell is heated up.”"
 private let PHONE_LAST_THIRD_HADITH_AR = "أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ فَيَقُولُ مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ وَمَنْ يَسْأَلُنِي فَأُعْطِيَهُ وَمَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ ‏\"‏.‏"
 private let PHONE_LAST_THIRD_HADITH_EN = "Allah's Messenger (ﷺ) said, \"Our Lord, the Blessed and the Exalted, descends every night to the lowest heaven when one-third of the latter part of the night is left, and says: Who supplicates Me so that I may answer him? Who asks Me so that I may give to him? Who asks Me forgiveness so that I may forgive him?\""
+
+private func phoneSelectionHaptic() {
+    let generator = UISelectionFeedbackGenerator()
+    generator.prepare()
+    generator.selectionChanged()
+}
 
 private func phoneGlowPulsePhase(_ date: Date) -> (base: Double, phase: Double) {
     let seconds = date.timeIntervalSince1970.truncatingRemainder(dividingBy: PHONE_TEXT_GLOW_PULSE_DURATION)
@@ -287,11 +294,11 @@ struct ContentView: View {
                                                 source: .months
                                             )
                                         } else if isPhoneHijriDateTap(location: value.location, containerSize: geo.size) {
-                                            dismissInsightPresentation()
+                                            dismissInsightPresentation(triggerHaptic: true)
                                         } else if isPhoneMainRingTap(location: value.location, containerSize: geo.size) {
                                             beginInfoModeFromInsight()
                                         } else {
-                                            dismissInsightPresentation()
+                                            dismissInsightPresentation(triggerHaptic: false)
                                         }
                                     }
                                 }
@@ -376,10 +383,10 @@ struct ContentView: View {
                     interactionsEnabled: !isInteractionLocked,
                     onDateTap: beginInsightPresentation,
                     onSectorTap: openInfoMode,
-                    onSeparatedSectorTap: { _ in closeInfoMode() },
+                    onSeparatedSectorTap: { _ in closeInfoMode(triggerHaptic: true) },
                     onCurrentSectorTap: { title, source in beginSectorSpotlight(title: title, source: source) },
                     onFootnoteTap: { title in beginSectorSpotlight(title: title, source: .separated) },
-                    onBackgroundTap: closeInfoMode
+                    onBackgroundTap: { closeInfoMode(triggerHaptic: false) }
                 )
                     .frame(height: DIAL_SECTION_HEIGHT)
             } else {
@@ -392,6 +399,7 @@ struct ContentView: View {
 
     private func openInfoMode() {
         lockInteractions()
+        phoneSelectionHaptic()
         showFootnotes = true
         insightOpacity = 0
         baseScreenOpacity = 1
@@ -401,8 +409,11 @@ struct ContentView: View {
         }
     }
 
-    private func closeInfoMode() {
+    private func closeInfoMode(triggerHaptic: Bool) {
         lockInteractions()
+        if triggerHaptic {
+            phoneSelectionHaptic()
+        }
         showFootnotes = false
         baseScreenOpacity = 1
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
@@ -419,6 +430,7 @@ struct ContentView: View {
             sectorSpotlightOpacity < 0.001
         else { return }
         lockInteractions()
+        phoneSelectionHaptic()
         if showFootnotes {
             showFootnotes = false
             withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
@@ -440,6 +452,7 @@ struct ContentView: View {
             sectorSpotlightOpacity < 0.001
         else { return }
         lockInteractions()
+        phoneSelectionHaptic()
         showFootnotes = true
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             insightOpacity = 0
@@ -448,9 +461,12 @@ struct ContentView: View {
         }
     }
 
-    private func dismissInsightPresentation() {
+    private func dismissInsightPresentation(triggerHaptic: Bool) {
         guard insightOpacity > 0.001 else { return }
         lockInteractions()
+        if triggerHaptic {
+            phoneSelectionHaptic()
+        }
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             insightOpacity = 0
         }
@@ -463,6 +479,7 @@ struct ContentView: View {
             (insightOpacity < 0.001 || source == .months)
         else { return }
         lockInteractions()
+        phoneSelectionHaptic()
         sectorSpotlightTitle = title
         sectorSpotlightSource = source
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
@@ -477,6 +494,7 @@ struct ContentView: View {
     private func dismissSectorSpotlight() {
         guard sectorSpotlightOpacity > 0.001 else { return }
         lockInteractions()
+        phoneSelectionHaptic()
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             baseScreenOpacity = 1
             insightOpacity = sectorSpotlightSource == .months ? 1 : 0
@@ -945,6 +963,7 @@ private struct PhoneSectorTitleSpotlightView: View {
 
     private func technicalDetailsLink() -> some View {
         Button {
+            phoneSelectionHaptic()
             withAnimation(.easeInOut(duration: 0.25)) {
                 showsTechnicalDetails = true
             }
@@ -1125,6 +1144,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                 .frame(maxWidth: .infinity, alignment: .top)
                 .transition(.opacity)
                 .onTapGesture {
+                    phoneSelectionHaptic()
                     withAnimation(.easeInOut(duration: 0.25)) {
                         showsTechnicalDetails = false
                     }

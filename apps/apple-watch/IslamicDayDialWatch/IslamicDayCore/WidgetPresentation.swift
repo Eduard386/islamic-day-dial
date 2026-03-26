@@ -52,6 +52,14 @@ func nextWidgetRefreshDate(from date: Date, snapshot: ComputedIslamicDay?) -> Da
     return min(nextMinute, nextTransition)
 }
 
+func nextHijriDateRefreshDate(from date: Date, snapshot: ComputedIslamicDay?) -> Date {
+    guard let snapshot else {
+        return date.addingTimeInterval(60 * 60)
+    }
+
+    return snapshot.timeline.nextMaghrib.addingTimeInterval(0.25)
+}
+
 func widgetCurrentPhase(snapshot: ComputedIslamicDay, now: Date) -> IslamicPhaseId {
     getCurrentPhase(now: now, timeline: snapshot.timeline)
 }
