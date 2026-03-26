@@ -376,7 +376,7 @@ struct ContentView: View {
                     interactionsEnabled: !isInteractionLocked,
                     onDateTap: beginInsightPresentation,
                     onSectorTap: openInfoMode,
-                    onSeparatedSectorTap: { title in beginSectorSpotlight(title: title, source: .separated) },
+                    onSeparatedSectorTap: { _ in closeInfoMode() },
                     onCurrentSectorTap: { title, source in beginSectorSpotlight(title: title, source: source) },
                     onFootnoteTap: { title in beginSectorSpotlight(title: title, source: .separated) },
                     onBackgroundTap: closeInfoMode

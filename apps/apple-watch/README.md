@@ -100,8 +100,22 @@ What it includes:
 - current period / Hijri date / countdown center overlay
 - location presets with automatic fallback
 - prayer times list
-- **local notifications** for Fajr, Dhuhr, Asr, Maghrib, Isha (rescheduled on app launch and when returning from background)
+- **local notifications** for Fajr, Asr, Maghrib, Isha, plus the special `Dhuhr / Jumu'ah / Eid` slot (rescheduled on app launch and when returning from background)
 - embedded watch companion and widget extension
+
+### iPhone dial interactions
+
+- Main ring tap: expands the ring into the separated state and fades in footnotes.
+- Separated state:
+  - arc tap closes the separated state, brings the ring back together, and fades footnotes out;
+  - footnote label tap opens the sector description spotlight;
+  - center sector title tap opens the same spotlight.
+- Hijri date tap: opens the ayah + month list overlay.
+- Months overlay:
+  - ring tap returns to the separated state;
+  - center sector title tap opens the sector description spotlight and returns to months on dismiss;
+  - Hijri date tap closes the months overlay back to the main screen.
+- Sector spotlight: fades the base screen out, shows the hadith/calculation content, and on the next tap returns to the screen it came from (`main`, `separated`, or `months`).
 
 ### `IslamicDayDialWatch`
 
