@@ -80,7 +80,7 @@ final class PrayerNotificationTests: XCTestCase {
         let snapshot = computeIslamicDaySnapshot(now: eidFriday, location: mecca)
         let eidNotification = notifications.first { $0.name == "EID AL-FITR" }
 
-        XCTAssertEqual(notifications.count, 5)
+        XCTAssertEqual(notifications.count, 6)
         XCTAssertTrue(notifications.contains { $0.name == "EID AL-FITR" })
         XCTAssertFalse(notifications.contains { $0.name == "Jumu'ah" })
         XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
@@ -98,7 +98,7 @@ final class PrayerNotificationTests: XCTestCase {
         let snapshot = computeIslamicDaySnapshot(now: eidDay, location: mecca)
         let eidNotification = notifications.first { $0.name == "EID AL-ADHA" }
 
-        XCTAssertEqual(notifications.count, 5)
+        XCTAssertEqual(notifications.count, 6)
         XCTAssertNotNil(eidNotification)
         XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
         XCTAssertNotNil(prayerTimes)
@@ -110,6 +110,21 @@ final class PrayerNotificationTests: XCTestCase {
         XCTAssertNotEqual(
             Int(eidNotification?.fireDate.timeIntervalSince1970 ?? -1),
             Int(prayerTimes?.dhuhr.timeIntervalSince1970 ?? -1)
+        )
+    }
+
+    func testDescribeNotificationPayloads_AddsEidGreetingTwoHoursAfterDuha() {
+        let eidDay = dateFromISO("2026-05-27T12:00:00")
+        let payloads = PrayerNotificationScheduler.describeNotificationPayloadsForTesting(date: eidDay, location: mecca)
+        let snapshot = computeIslamicDaySnapshot(now: eidDay, location: mecca)
+        let greeting = payloads.first { $0.title == "Taqabbal Allahu minna wa minkum!" }
+
+        XCTAssertNotNil(snapshot)
+        XCTAssertNotNil(greeting)
+        XCTAssertEqual(greeting?.body, "May Allah accept from us and from you!")
+        XCTAssertEqual(
+            Int(greeting?.fireDate.timeIntervalSince1970 ?? -1),
+            Int((snapshot?.timeline.duhaStart.addingTimeInterval(2 * 60 * 60).timeIntervalSince1970) ?? -2)
         )
     }
 

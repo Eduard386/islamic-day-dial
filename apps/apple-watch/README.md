@@ -133,7 +133,7 @@ Use this target for Apple Watch complications and Smart Stack widgets. It is emb
 
 ### Prayer notifications (iOS)
 
-`PrayerNotificationScheduler` schedules local notifications for Fajr, Asr, Maghrib, Isha, plus a midday special slot. On normal days that slot is `Dhuhr` at `Dhuhr`. On Fridays it becomes `Jumu'ah` at `Duha`, with no `Dhuhr` notification later. On Eid it becomes the Eid name at `Duha`, with no `Dhuhr` notification later, including when Eid falls on Friday. Titles use the marker name and bodies use the Hijri date. Rescheduled on app launch and when returning from background (handles travel).
+`PrayerNotificationScheduler` schedules local notifications for Fajr, Asr, Maghrib, Isha, plus a midday special slot. On normal days that slot is `Dhuhr` at `Dhuhr`. On Fridays it becomes `Jumu'ah` at `Duha`, with no `Dhuhr` notification later. On Eid it becomes the Eid name at `Duha`, with no `Dhuhr` notification later, including when Eid falls on Friday. Eid days also get an extra greeting notification 2 hours after `Duha`: title `Taqabbal Allahu minna wa minkum!`, body `May Allah accept from us and from you!`. Titles use the marker name and bodies use the Hijri date unless the notification is this fixed Eid greeting. Rescheduled on app launch and when returning from background (handles travel).
 
 Apple Watch complications/widgets do not replace prayer notifications. Phase 1 keeps notification scheduling on iPhone and relies on normal iPhone-to-Watch mirroring behavior when system settings allow it.
 

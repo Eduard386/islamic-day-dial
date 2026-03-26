@@ -11,6 +11,10 @@ import UserNotifications
 enum PrayerNotificationScheduler {
     private static let categoryId = "PRAYER_REMINDER"
     private static let identifierPrefix = "prayer_"
+    private static let eidGreetingDelay: TimeInterval = 2 * 60 * 60
+    private static let eidGreetingTitle = "Taqabbal Allahu minna wa minkum!"
+    private static let eidGreetingBody = "May Allah accept from us and from you!"
+
     private enum NotificationKind: String {
         case fajr
         case dhuhr
@@ -19,13 +23,14 @@ enum PrayerNotificationScheduler {
         case isha
         case jumuah
         case eid
+        case eidGreeting
     }
 
     private struct NotificationPlan {
         let kind: NotificationKind
-        let prayerName: String
+        let title: String
+        let body: String
         let fireDate: Date
-        let maghribForDay: Date
     }
 
     /// Request notification authorization and schedule prayer notifications.
@@ -81,18 +86,46 @@ enum PrayerNotificationScheduler {
         let hijriParts = formatHijriDateParts(hijriDate)
         let isFriday = Calendar.current.component(.weekday, from: prayerTimes.dhuhr) == 6
 
-        return [
-            NotificationPlan(kind: .fajr, prayerName: "Fajr", fireDate: prayerTimes.fajr, maghribForDay: prayerTimes.maghrib),
+        var plans = [
+            prayerPlan(kind: .fajr, prayerName: "Fajr", fireDate: prayerTimes.fajr, maghribForDay: prayerTimes.maghrib),
             noonPlan(
                 prayerTimes: prayerTimes,
                 duhaStart: snapshot.timeline.duhaStart,
                 isFriday: isFriday,
                 hijriParts: hijriParts
             ),
-            NotificationPlan(kind: .asr, prayerName: "Asr", fireDate: prayerTimes.asr, maghribForDay: prayerTimes.maghrib),
-            NotificationPlan(kind: .maghrib, prayerName: "Maghrib", fireDate: prayerTimes.maghrib, maghribForDay: prayerTimes.maghrib),
-            NotificationPlan(kind: .isha, prayerName: "Isha", fireDate: prayerTimes.isha, maghribForDay: prayerTimes.maghrib),
+            prayerPlan(kind: .asr, prayerName: "Asr", fireDate: prayerTimes.asr, maghribForDay: prayerTimes.maghrib),
+            prayerPlan(kind: .maghrib, prayerName: "Maghrib", fireDate: prayerTimes.maghrib, maghribForDay: prayerTimes.maghrib),
+            prayerPlan(kind: .isha, prayerName: "Isha", fireDate: prayerTimes.isha, maghribForDay: prayerTimes.maghrib),
         ]
+
+        if hijriParts.isEid {
+            plans.append(
+                NotificationPlan(
+                    kind: .eidGreeting,
+                    title: eidGreetingTitle,
+                    body: eidGreetingBody,
+                    fireDate: snapshot.timeline.duhaStart.addingTimeInterval(eidGreetingDelay)
+                )
+            )
+        }
+
+        return plans
+    }
+
+    private static func prayerPlan(
+        kind: NotificationKind,
+        prayerName: String,
+        fireDate: Date,
+        maghribForDay: Date
+    ) -> NotificationPlan {
+        let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghribForDay)
+        return NotificationPlan(
+            kind: kind,
+            title: "\(prayerName) time has begun",
+            body: formatHijriTitle(hijri: hijriDate),
+            fireDate: fireDate
+        )
     }
 
     private static func noonPlan(
@@ -102,7 +135,7 @@ enum PrayerNotificationScheduler {
         hijriParts: (dayMonth: String, year: String, isEid: Bool)
     ) -> NotificationPlan {
         if hijriParts.isEid {
-            return NotificationPlan(
+            return prayerPlan(
                 kind: .eid,
                 prayerName: hijriParts.dayMonth,
                 fireDate: duhaStart,
@@ -110,14 +143,14 @@ enum PrayerNotificationScheduler {
             )
         }
         if isFriday {
-            return NotificationPlan(
+            return prayerPlan(
                 kind: .jumuah,
                 prayerName: "Jumu'ah",
                 fireDate: duhaStart,
                 maghribForDay: prayerTimes.maghrib
             )
         }
-        return NotificationPlan(
+        return prayerPlan(
             kind: .dhuhr,
             prayerName: "Dhuhr",
             fireDate: prayerTimes.dhuhr,
@@ -130,10 +163,9 @@ enum PrayerNotificationScheduler {
     }
 
     private static func makeRequest(plan: NotificationPlan) -> UNNotificationRequest? {
-        let hijriDate = getIslamicDayHijriDate(now: plan.fireDate, todayMaghrib: plan.maghribForDay)
         let content = UNMutableNotificationContent()
-        content.title = "\(plan.prayerName) time has begun"
-        content.body = formatHijriTitle(hijri: hijriDate)
+        content.title = plan.title
+        content.body = plan.body
         content.sound = .default
         content.categoryIdentifier = Self.categoryId
 
@@ -145,7 +177,12 @@ enum PrayerNotificationScheduler {
 
     /// For unit testing notification naming and timing rules.
     static func describeNotificationsForTesting(date: Date, location: Location) -> [(name: String, fireDate: Date)] {
-        (buildPlans(for: date, location: location) ?? []).map { ($0.prayerName, $0.fireDate) }
+        (buildPlans(for: date, location: location) ?? []).map { ($0.title.replacingOccurrences(of: " time has begun", with: ""), $0.fireDate) }
+    }
+
+    /// For unit testing full notification payloads.
+    static func describeNotificationPayloadsForTesting(date: Date, location: Location) -> [(title: String, body: String, fireDate: Date)] {
+        (buildPlans(for: date, location: location) ?? []).map { ($0.title, $0.body, $0.fireDate) }
     }
 
     /// For unit testing notification content format only.
