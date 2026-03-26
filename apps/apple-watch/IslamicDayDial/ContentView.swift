@@ -871,6 +871,7 @@ private struct PhoneSectorTitleSpotlightView: View {
     let source: PhoneSectorSpotlightSource
     let containerSize: CGSize
     let onTap: () -> Void
+    @State private var showsTechnicalDetails = false
 
     private var isPrayerTimingGroup: Bool {
         PHONE_JIBRIL_GROUP_ONE.contains(title)
@@ -942,121 +943,195 @@ private struct PhoneSectorTitleSpotlightView: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
-    var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 4) {
-                Text(sectorCollectionTitle)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(PHONE_READING_TINT)
-                    .tracking(1.0)
-                    .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
-                    .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
-                Text("")
-                if isPrayerTimingGroup {
-                    VStack(spacing: 4) {
-                        hadithArabic(PHONE_JIBRIL_HADITH_AR)
-                        Text("")
-                        hadithEnglish(PHONE_JIBRIL_HADITH_EN)
-                        hadithSource("Sunan Abi Dawud, Hadith 393")
-                        Text("")
-                        calculationHeading("Dhuhr calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Asr.")
-                        Text("")
-                        calculationHeading("Asr calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "when shadow length = object height + noon shadow (at the user’s coordinates)."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Maghrib.")
-                        Text("")
-                        calculationHeading("Maghrib calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "at sunset, when the sun disappears below the horizon (at the user’s coordinates)."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Isha.")
-                        Text("")
-                        calculationHeading("Isha calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates)."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Fajr.")
-                        Text("")
-                        calculationHeading("Fajr calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Sunrise.")
-                    }
-                    .frame(maxWidth: min(containerSize.width - 36, 420))
-                } else if isSunDayGroup {
-                    VStack(spacing: 4) {
-                        hadithArabic(PHONE_DUHA_HADITH_ONE_AR)
-                        Text("")
-                        hadithEnglish(PHONE_DUHA_HADITH_ONE_EN)
-                        hadithSource("Jami` at-Tirmidhi, Hadith 475")
-                        Text("")
-                        hadithArabic(PHONE_DUHA_HADITH_TWO_AR)
-                        Text("")
-                        hadithEnglish(PHONE_DUHA_HADITH_TWO_EN)
-                        hadithSource("Sahih Muslim, Hadith 720")
-                        Text("")
-                        hadithArabic(PHONE_DUHA_HADITH_THREE_AR)
-                        Text("")
-                        hadithEnglish(PHONE_DUHA_HADITH_THREE_EN)
-                        hadithSource("Sahih Muslim, Hadith 832")
-                        Text("")
-                        calculationHeading("Sunrise calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°)."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Duha.")
-                        Text("")
-                        calculationHeading("Duha calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Midday.")
-                        Text("")
-                        calculationHeading("Midday calculation")
-                        calculationLine(label: "Start", detail: "5 minutes before Dhuhr.")
-                        calculationLine(label: "End", detail: "at Dhuhr.")
-                    }
-                    .frame(maxWidth: min(containerSize.width - 36, 420))
-                } else if isLastThird {
-                    VStack(spacing: 4) {
-                        hadithArabic(PHONE_LAST_THIRD_HADITH_AR)
-                        Text("")
-                        hadithEnglish(PHONE_LAST_THIRD_HADITH_EN)
-                        hadithSource("Sahih Muslim, Hadith 758a")
-                        Text("")
-                        calculationHeading("Last 3rd calculation")
-                        calculationLine(
-                            label: "Start",
-                            detail: "time between last Maghrib and Fajr divided by 3."
-                        )
-                        calculationLine(label: "End", detail: "at the start of Fajr.")
-                    }
-                    .frame(maxWidth: min(containerSize.width - 36, 420))
-                }
+    private func technicalDetailsLink() -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showsTechnicalDetails = true
             }
-            .frame(maxWidth: .infinity, alignment: .top)
-            .padding(.top, max(12, containerSize.height * 0.025))
-            .padding(.horizontal, 18)
-            .padding(.bottom, 24)
+        } label: {
+            Text("Technical details")
+                .font(.system(size: 13, weight: .regular, design: .serif))
+                .foregroundColor(PHONE_READING_TINT.opacity(0.7))
+                .underline()
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 10)
+    }
+
+    @ViewBuilder
+    private func mainSpotlightContent() -> some View {
+        VStack(spacing: 4) {
+            Text(sectorCollectionTitle)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(PHONE_READING_TINT)
+                .tracking(1.0)
+                .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
+                .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
+            Text("")
+            if isPrayerTimingGroup {
+                VStack(spacing: 4) {
+                    hadithArabic(PHONE_JIBRIL_HADITH_AR)
+                    Text("")
+                    hadithEnglish(PHONE_JIBRIL_HADITH_EN)
+                    hadithSource("Sunan Abi Dawud, Hadith 393")
+                    technicalDetailsLink()
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            } else if isSunDayGroup {
+                VStack(spacing: 4) {
+                    hadithArabic(PHONE_DUHA_HADITH_ONE_AR)
+                    Text("")
+                    hadithEnglish(PHONE_DUHA_HADITH_ONE_EN)
+                    hadithSource("Jami` at-Tirmidhi, Hadith 475")
+                    Text("")
+                    hadithArabic(PHONE_DUHA_HADITH_TWO_AR)
+                    Text("")
+                    hadithEnglish(PHONE_DUHA_HADITH_TWO_EN)
+                    hadithSource("Sahih Muslim, Hadith 720")
+                    Text("")
+                    hadithArabic(PHONE_DUHA_HADITH_THREE_AR)
+                    Text("")
+                    hadithEnglish(PHONE_DUHA_HADITH_THREE_EN)
+                    hadithSource("Sahih Muslim, Hadith 832")
+                    technicalDetailsLink()
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            } else if isLastThird {
+                VStack(spacing: 4) {
+                    hadithArabic(PHONE_LAST_THIRD_HADITH_AR)
+                    Text("")
+                    hadithEnglish(PHONE_LAST_THIRD_HADITH_EN)
+                    hadithSource("Sahih Muslim, Hadith 758a")
+                    technicalDetailsLink()
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            }
         }
         .frame(maxWidth: .infinity, alignment: .top)
-        .onTapGesture {
-            onTap()
+        .padding(.top, max(12, containerSize.height * 0.025))
+        .padding(.horizontal, 18)
+        .padding(.bottom, 24)
+    }
+
+    @ViewBuilder
+    private func technicalDetailsContent() -> some View {
+        VStack(spacing: 4) {
+            Text(sectorCollectionTitle)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(PHONE_READING_TINT)
+                .tracking(1.0)
+                .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
+                .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
+            Text("")
+            Text("Technical details")
+                .font(.system(size: 15, weight: .regular, design: .serif))
+                .foregroundColor(PHONE_READING_TINT.opacity(0.76))
+                .frame(maxWidth: .infinity, alignment: .center)
+            Text("")
+            if isPrayerTimingGroup {
+                VStack(spacing: 4) {
+                    calculationHeading("Dhuhr calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Asr.")
+                    Text("")
+                    calculationHeading("Asr calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "when shadow length = object height + noon shadow (at the user’s coordinates)."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Maghrib.")
+                    Text("")
+                    calculationHeading("Maghrib calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "at sunset, when the sun disappears below the horizon (at the user’s coordinates)."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Isha.")
+                    Text("")
+                    calculationHeading("Isha calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates)."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Fajr.")
+                    Text("")
+                    calculationHeading("Fajr calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Sunrise.")
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            } else if isSunDayGroup {
+                VStack(spacing: 4) {
+                    calculationHeading("Sunrise calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°)."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Duha.")
+                    Text("")
+                    calculationHeading("Duha calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Midday.")
+                    Text("")
+                    calculationHeading("Midday calculation")
+                    calculationLine(label: "Start", detail: "5 minutes before Dhuhr.")
+                    calculationLine(label: "End", detail: "at Dhuhr.")
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            } else if isLastThird {
+                VStack(spacing: 4) {
+                    calculationHeading("Last 3rd calculation")
+                    calculationLine(
+                        label: "Start",
+                        detail: "time between last Maghrib and Fajr divided by 3."
+                    )
+                    calculationLine(label: "End", detail: "at the start of Fajr.")
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .top)
+        .padding(.top, max(12, containerSize.height * 0.025))
+        .padding(.horizontal, 18)
+        .padding(.bottom, 24)
+    }
+
+    var body: some View {
+        ZStack {
+            ScrollView(showsIndicators: false) {
+                mainSpotlightContent()
+            }
+            .frame(maxWidth: .infinity, alignment: .top)
+            .opacity(showsTechnicalDetails ? 0 : 1)
+            .allowsHitTesting(!showsTechnicalDetails)
+            .onTapGesture {
+                onTap()
+            }
+
+            if showsTechnicalDetails {
+                ScrollView(showsIndicators: false) {
+                    technicalDetailsContent()
+                }
+                .frame(maxWidth: .infinity, alignment: .top)
+                .transition(.opacity)
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        showsTechnicalDetails = false
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .top)
     }
 }
 
