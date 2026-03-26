@@ -5,8 +5,6 @@ private let DIAL_SECTION_HEIGHT: CGFloat = 436
 private let MS_PER_HOUR: Int64 = 3_600_000
 private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 private let INFO_EXPANSION_DURATION = 1.0
-private let FOOTNOTE_REVEAL_DELAY = INFO_EXPANSION_DURATION / 2
-private let FOOTNOTE_REVEAL_DURATION = INFO_EXPANSION_DURATION / 2
 private let PHONE_DATE_INFO_SCALE: CGFloat = 1.25
 private let PHONE_TEXT_GLOW_PULSE_DURATION = 3.0
 let PHONE_READING_TINT = Color(red: 0.9, green: 0.88, blue: 0.8)
@@ -54,6 +52,7 @@ private func phoneSentenceCaseMonth(_ value: String) -> String {
 private enum PhoneSectorSpotlightSource {
     case main
     case separated
+    case months
 }
 
 private func normalizedDialAngle(_ angle: Double) -> Double {
@@ -152,6 +151,58 @@ private func separatedSectorTitle(
     return nil
 }
 
+private func isPhoneMainRingTap(location: CGPoint, containerSize: CGSize) -> Bool {
+    let dialFrameWidth = max(0, containerSize.width - 40)
+    let dialFrameHeight = DIAL_SECTION_HEIGHT
+    let dialSize = min(dialFrameWidth, dialFrameHeight) * 1.28
+    let ringStroke = dialSize * 0.081
+    let ringInnerRadius = dialSize * 0.25125
+    let ringOuterRadius = ringInnerRadius + ringStroke
+    let center = CGPoint(x: containerSize.width / 2, y: containerSize.height / 2 - DIAL_VERTICAL_GAP / 2)
+    let dx = location.x - center.x
+    let dy = location.y - center.y
+    let distance = sqrt(dx * dx + dy * dy)
+    return distance >= ringInnerRadius && distance <= ringOuterRadius
+}
+
+private func isPhoneCurrentSectorTitleTap(location: CGPoint, containerSize: CGSize) -> Bool {
+    let dialFrameWidth = max(0, containerSize.width - 40)
+    let dialFrameHeight = DIAL_SECTION_HEIGHT
+    let dialSize = min(dialFrameWidth, dialFrameHeight) * 1.28
+    let holeTop = dialSize * (0.5 - 0.25125)
+    let holeHeight = dialSize * 0.5025
+    let sectorTop = holeTop + 55 * (holeHeight / 212)
+    let centerOffsetY = dialSize * (-10 / 420)
+    let center = CGPoint(x: containerSize.width / 2, y: containerSize.height / 2 - DIAL_VERTICAL_GAP / 2)
+    let titleWidth = min(dialSize * 0.54, 220)
+    let titleRect = CGRect(
+        x: center.x - titleWidth / 2,
+        y: center.y - dialSize / 2 + centerOffsetY + sectorTop - 4,
+        width: titleWidth,
+        height: 48
+    )
+    return titleRect.contains(location)
+}
+
+private func isPhoneHijriDateTap(location: CGPoint, containerSize: CGSize) -> Bool {
+    let dialFrameWidth = max(0, containerSize.width - 40)
+    let dialFrameHeight = DIAL_SECTION_HEIGHT
+    let dialSize = min(dialFrameWidth, dialFrameHeight) * 1.28
+    let holeTop = dialSize * (0.5 - 0.25125)
+    let holeHeight = dialSize * 0.5025
+    let dateTop = holeTop + 100 * (holeHeight / 212)
+    let centerOffsetY = dialSize * (-10 / 420)
+    let center = CGPoint(x: containerSize.width / 2, y: containerSize.height / 2 - DIAL_VERTICAL_GAP / 2)
+    let dateWidth = min(dialSize * 0.58, 240)
+    let dateRect = CGRect(
+        x: center.x - dateWidth / 2,
+        y: center.y - dialSize / 2 + centerOffsetY + dateTop - 6,
+        width: dateWidth,
+        height: 64
+    )
+    return dateRect.contains(location)
+}
+
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var automaticLocation: Location = .mecca
@@ -167,7 +218,6 @@ struct ContentView: View {
     @State private var showFootnotes = false
     @State private var infoPresentationProgress = 0.0
     @State private var footnoteOpacity = 0.0
-    @State private var footnoteRevealTask: Task<Void, Never>?
     @State private var baseScreenOpacity = 1.0
     @State private var insightOpacity = 0.0
     @State private var sectorSpotlightTitle = ""
@@ -220,13 +270,32 @@ struct ContentView: View {
                             !isInteractionLocked &&
                             (insightOpacity > 0.001 || sectorSpotlightOpacity > 0.001)
                         )
-                        .onTapGesture {
-                            if sectorSpotlightOpacity > 0.001 {
-                                dismissSectorSpotlight()
-                            } else if insightOpacity > 0.001 {
-                                dismissInsightPresentation()
-                            }
-                        }
+                        .gesture(
+                            SpatialTapGesture()
+                                .onEnded { value in
+                                    if sectorSpotlightOpacity > 0.001 {
+                                        dismissSectorSpotlight()
+                                    } else if insightOpacity > 0.001 {
+                                        if let snapshot,
+                                           isPhoneCurrentSectorTitleTap(location: value.location, containerSize: geo.size) {
+                                            beginSectorSpotlight(
+                                                title: getSectorDisplayName(
+                                                    now: effectiveNow,
+                                                    currentPhase: getCurrentPhase(now: effectiveNow, timeline: snapshot.timeline),
+                                                    timeline: (duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr)
+                                                ),
+                                                source: .months
+                                            )
+                                        } else if isPhoneHijriDateTap(location: value.location, containerSize: geo.size) {
+                                            dismissInsightPresentation()
+                                        } else if isPhoneMainRingTap(location: value.location, containerSize: geo.size) {
+                                            beginInfoModeFromInsight()
+                                        } else {
+                                            dismissInsightPresentation()
+                                        }
+                                    }
+                                }
+                        )
                 }
                 .overlay {
                     if !sectorSpotlightTitle.isEmpty {
@@ -275,7 +344,6 @@ struct ContentView: View {
             )
         }
         .onDisappear {
-            footnoteRevealTask?.cancel()
             interactionLockTask?.cancel()
         }
     }
@@ -309,7 +377,7 @@ struct ContentView: View {
                     onDateTap: beginInsightPresentation,
                     onSectorTap: openInfoMode,
                     onSeparatedSectorTap: { title in beginSectorSpotlight(title: title, source: .separated) },
-                    onCurrentSectorTap: { title in beginSectorSpotlight(title: title, source: .main) },
+                    onCurrentSectorTap: { title, source in beginSectorSpotlight(title: title, source: source) },
                     onFootnoteTap: { title in beginSectorSpotlight(title: title, source: .separated) },
                     onBackgroundTap: closeInfoMode
                 )
@@ -324,30 +392,17 @@ struct ContentView: View {
 
     private func openInfoMode() {
         lockInteractions()
-        footnoteRevealTask?.cancel()
         showFootnotes = true
         insightOpacity = 0
-        footnoteOpacity = 0
         baseScreenOpacity = 1
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             infoPresentationProgress = 1
-        }
-
-        footnoteRevealTask = Task {
-            try? await Task.sleep(for: .seconds(FOOTNOTE_REVEAL_DELAY))
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                guard showFootnotes else { return }
-                withAnimation(.easeInOut(duration: FOOTNOTE_REVEAL_DURATION)) {
-                    footnoteOpacity = 1
-                }
-            }
+            footnoteOpacity = 1
         }
     }
 
     private func closeInfoMode() {
         lockInteractions()
-        footnoteRevealTask?.cancel()
         showFootnotes = false
         baseScreenOpacity = 1
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
@@ -360,13 +415,36 @@ struct ContentView: View {
     private func beginInsightPresentation() {
         guard
             !isInteractionLocked,
-            !showFootnotes,
             insightOpacity < 0.001,
             sectorSpotlightOpacity < 0.001
         else { return }
         lockInteractions()
+        if showFootnotes {
+            showFootnotes = false
+            withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+                infoPresentationProgress = 0
+                footnoteOpacity = 0
+                insightOpacity = 1
+            }
+        } else {
+            withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+                insightOpacity = 1
+            }
+        }
+    }
+
+    private func beginInfoModeFromInsight() {
+        guard
+            !isInteractionLocked,
+            insightOpacity > 0.001,
+            sectorSpotlightOpacity < 0.001
+        else { return }
+        lockInteractions()
+        showFootnotes = true
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
-            insightOpacity = 1
+            insightOpacity = 0
+            infoPresentationProgress = 1
+            footnoteOpacity = 1
         }
     }
 
@@ -382,13 +460,16 @@ struct ContentView: View {
         guard
             !isInteractionLocked,
             sectorSpotlightOpacity < 0.001,
-            insightOpacity < 0.001
+            (insightOpacity < 0.001 || source == .months)
         else { return }
         lockInteractions()
         sectorSpotlightTitle = title
         sectorSpotlightSource = source
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             baseScreenOpacity = 0
+            if source == .months {
+                insightOpacity = 0
+            }
             sectorSpotlightOpacity = 1
         }
     }
@@ -398,6 +479,7 @@ struct ContentView: View {
         lockInteractions()
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             baseScreenOpacity = 1
+            insightOpacity = sectorSpotlightSource == .months ? 1 : 0
             sectorSpotlightOpacity = 0
         }
     }
@@ -444,7 +526,7 @@ private struct PhoneDialView: View {
     let onDateTap: () -> Void
     let onSectorTap: () -> Void
     let onSeparatedSectorTap: (String) -> Void
-    let onCurrentSectorTap: (String) -> Void
+    let onCurrentSectorTap: (String, PhoneSectorSpotlightSource) -> Void
     let onFootnoteTap: (String) -> Void
     let onBackgroundTap: () -> Void
 
@@ -460,9 +542,13 @@ private struct PhoneDialView: View {
             let dateTop = holeTop + 100 * (holeHeight / 212)
             let centerOffsetY = dialSize * (-10 / 420)
             let currentSectorTitle = periodLabel(snapshot: snapshot, now: now)
-            let canEnterInsight = interactionsEnabled && infoProgress < 0.01 && !showsInsightOverlay
+            let canEnterInsight = interactionsEnabled
+                && !showsInsightOverlay
+                && (infoProgress < 0.01 || (infoProgress > 0.99 && footnoteOpacity > 0.99))
             let canTapSectors = interactionsEnabled && infoProgress < 0.01 && !showsInsightOverlay
-            let canTapCurrentSector = interactionsEnabled && infoProgress < 0.01 && !showsInsightOverlay
+            let canTapCurrentSector = interactionsEnabled
+                && !showsInsightOverlay
+                && (infoProgress < 0.01 || (infoProgress > 0.99 && footnoteOpacity > 0.99))
             let canTapFootnotes = interactionsEnabled && infoProgress > 0.99 && footnoteOpacity > 0.99 && !showsInsightOverlay
             let canTapSeparatedBackground = interactionsEnabled && infoProgress > 0.99 && footnoteOpacity > 0.99 && !showsInsightOverlay
             let ringStroke = dialSize * 0.081
@@ -542,7 +628,10 @@ private struct PhoneDialView: View {
                     ZStack(alignment: .top) {
                         Color.clear
                         Button {
-                            onCurrentSectorTap(currentSectorTitle)
+                            onCurrentSectorTap(
+                                currentSectorTitle,
+                                infoProgress > 0.99 && footnoteOpacity > 0.99 ? .separated : .main
+                            )
                         } label: {
                             currentPeriodView(snapshot: snapshot, now: now)
                                 .frame(maxWidth: .infinity)
@@ -551,18 +640,16 @@ private struct PhoneDialView: View {
                         }
                         .buttonStyle(.plain)
                         .offset(y: sectorTop)
-                        .opacity(max(0, 1 - infoProgress))
                         .allowsHitTesting(canTapCurrentSector)
                         .zIndex(2)
                         HijriDateLabels(
                             hijriDate: snapshot.hijriDate,
-                            infoProgress: infoProgress,
+                            infoProgress: 0,
                             isInteractive: canEnterInsight,
                             onTap: onDateTap
                         )
                             .frame(maxWidth: .infinity)
                             .offset(y: dateTop)
-                            .opacity(max(0, 1 - infoProgress))
                     }
                     .frame(width: dialSize, height: dialSize)
                     .offset(y: centerOffsetY)
@@ -593,7 +680,9 @@ private struct PhoneDialView: View {
     }
     
     private func periodColor(snapshot snap: ComputedIslamicDay, now: Date) -> Color {
-        Colors.coolLabel
+        periodLabel(snapshot: snap, now: now) == "Jumu'ah"
+            ? Color(red: 0.06, green: 0.73, blue: 0.51)
+            : Colors.coolLabel
     }
 
     private func currentPhase(snapshot snap: ComputedIslamicDay, now: Date) -> IslamicPhaseId {

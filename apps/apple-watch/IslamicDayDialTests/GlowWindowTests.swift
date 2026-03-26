@@ -80,6 +80,17 @@ final class GlowWindowTests: XCTestCase {
         XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .asr_to_maghrib))
     }
 
+    func testJumuahGlowStrength_StartsWeakAtDuhaAndReachesFullByEndOfDhuhr() {
+        let startOfDuha = timeline.duhaStart
+        let endOfDhuhr = timeline.asr.addingTimeInterval(-1)
+        let startStrength = getJumuahGlowStrength(now: startOfDuha, timeline: timeline, currentPhase: .sunrise_to_dhuhr)
+        let endStrength = getJumuahGlowStrength(now: endOfDhuhr, timeline: timeline, currentPhase: .dhuhr_to_asr)
+
+        XCTAssertGreaterThan(startStrength, 0)
+        XCTAssertLessThan(startStrength, 0.5)
+        XCTAssertGreaterThan(endStrength, 0.99)
+    }
+
     // MARK: - Last third phase (for pulsating glow)
 
     func testLastThirdPhase_IsLastThirdToFajr() {

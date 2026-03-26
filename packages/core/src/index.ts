@@ -41,6 +41,7 @@ export {
 } from './formatting.js';
 export {
   isJumuahGlowWindow,
+  getJumuahGlowStrength,
   isLastThirdPhase,
   isInIshaOrLastThirdSector,
   NIGHT_SECTORS_GROUP,

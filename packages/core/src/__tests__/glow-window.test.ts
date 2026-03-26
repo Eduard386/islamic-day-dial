@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  getJumuahGlowStrength,
   isJumuahGlowWindow,
   isLastThirdPhase,
   NIGHT_SECTORS_GROUP,
@@ -10,6 +11,7 @@ describe('isJumuahGlowWindow', () => {
   const timeline = {
     duhaStart: new Date('2025-03-21T04:38:00.000Z'),
     dhuhr: new Date('2025-03-21T09:15:00.000Z'),
+    asr: new Date('2025-03-21T12:30:00.000Z'),
   };
 
   it('returns false when not Friday', () => {
@@ -47,6 +49,17 @@ describe('isJumuahGlowWindow', () => {
   it('returns false on Friday when in asr_to_maghrib', () => {
     const friday = new Date('2025-03-21T14:00:00.000Z');
     expect(isJumuahGlowWindow(friday, timeline, 'asr_to_maghrib')).toBe(false);
+  });
+
+  it('starts weak at the beginning of duha and reaches full strength by end of dhuhr', () => {
+    const startOfDuha = timeline.duhaStart;
+    const endOfDhuhr = new Date(timeline.asr.getTime() - 1000);
+    const startStrength = getJumuahGlowStrength(startOfDuha, timeline, 'sunrise_to_dhuhr');
+    const endStrength = getJumuahGlowStrength(endOfDhuhr, timeline, 'dhuhr_to_asr');
+
+    expect(startStrength).toBeGreaterThan(0);
+    expect(startStrength).toBeLessThan(0.5);
+    expect(endStrength).toBeGreaterThan(0.99);
   });
 });
 

@@ -96,7 +96,10 @@ struct ContentView: View {
     }
 
     private func periodColor(snapshot snap: ComputedIslamicDay, now: Date) -> Color {
-        currentPhase(snapshot: snap, now: now) == .last_third_to_fajr
+        if periodLabel(snapshot: snap, now: now) == "Jumu'ah" {
+            return Color(red: 0.06, green: 0.73, blue: 0.51)
+        }
+        return currentPhase(snapshot: snap, now: now) == .last_third_to_fajr
             ? Color(red: 0.22, green: 0.74, blue: 0.97)
             : Colors.coolLabel
     }

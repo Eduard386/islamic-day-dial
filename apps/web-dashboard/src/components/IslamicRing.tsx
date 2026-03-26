@@ -1,4 +1,5 @@
 import {
+  getJumuahGlowStrength,
   getSunriseToDhuhrSubPeriod,
   isJumuahGlowWindow,
   NIGHT_SECTORS_GROUP,
@@ -50,7 +51,8 @@ const LAST_THIRD_GLOW = { blur: 6, opacity: 0.35, strokeWidth: 10, color: 'rgba(
 const LAST_THIRD_GLOW_PULSE_DURATION = 3;
 
 /**
- * Джума (пятница): яркость, размытие, ширина и пульс подсветки DUHA + MIDDAY + DHUHR.
+ * Джума (пятница): glow идёт от начала DUHA до конца DHUHR,
+ * при этом интенсивность плавно растёт от слабой к полной.
  * (Отдельно от ISHA_GLOW / LAST_THIRD_GLOW — меняйте здесь, не трогая ночные сектора.)
  */
 const JUMU_GLOW = {
@@ -107,6 +109,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
     return { startAngleDeg: fajrAngle, spanDeg: asrToIshaSpanDeg };
   })();
 
+  const jumuahGlowStrength = getJumuahGlowStrength(now, snapshot.timeline, currentPhase);
   const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase);
   const duhaStartMarker = ring.markers.find((m) => m.id === 'duha_start');
   const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
@@ -310,10 +313,10 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
               className="last-third-glow-pulse"
               style={{
                 ['--last-third-glow-pulse-duration' as string]: `${JUMU_GLOW.pulseDuration}s`,
-                ['--last-third-glow-peak-opacity' as string]: String(JUMU_GLOW.peakOpacity),
+                ['--last-third-glow-peak-opacity' as string]: String(JUMU_GLOW.peakOpacity * jumuahGlowStrength),
               }}
             >
-              <g filter="url(#glow-jumu-base)" opacity={JUMU_GLOW.baseOpacity} className="last-third-glow-base">
+              <g filter="url(#glow-jumu-base)" opacity={JUMU_GLOW.baseOpacity * jumuahGlowStrength} className="last-third-glow-base">
                 <path
                   d={pathDuhaToDhuhr}
                   fill="none"

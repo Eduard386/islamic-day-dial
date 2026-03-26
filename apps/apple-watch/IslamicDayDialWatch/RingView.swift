@@ -472,8 +472,9 @@ private struct PhoneNightGlowOverlay: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             let (base, phase) = glowPulsePhase(timeline.date)
-            let jumuBase = base
-            let jumuPeak = phase * 1.0
+            let jumuStrength = getJumuahGlowStrength(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
+            let jumuBase = base * jumuStrength
+            let jumuPeak = phase * jumuStrength
             let lastThirdBase = base
             let lastThirdPeak = phase * 0.92  // Slightly brighter and stronger
 
@@ -481,7 +482,7 @@ private struct PhoneNightGlowOverlay: View {
             let isInIsha = currentPhase == .isha_to_last_third
             let isInLastThird = currentPhase == .last_third_to_fajr
             let showJumuahGlow = phoneInfoProgress <= 0.001
-                && isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
+                && jumuStrength > 0
             let duhaStartMarker = snapshot.ringMarkers.first { $0.id == "duha_start" }
             let dhuhrMarker = snapshot.ringMarkers.first { $0.id == "dhuhr" }
             let asrMarker = snapshot.ringMarkers.first { $0.id == "asr" }

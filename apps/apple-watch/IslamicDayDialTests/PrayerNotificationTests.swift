@@ -2,6 +2,7 @@ import XCTest
 
 /// Notification content format: title = "PrayerName time has begun", body = "day month year".
 final class PrayerNotificationTests: XCTestCase {
+    private let mecca = Location.mecca
 
     private var originalTimeZone: TimeZone!
 
@@ -55,6 +56,61 @@ final class PrayerNotificationTests: XCTestCase {
             XCTAssertEqual(title, "\(name) time has begun")
             XCTAssertFalse(body.isEmpty)
         }
+    }
+
+    func testDescribeNotifications_UsesJumuahInsteadOfDhuhrOnFriday() {
+        let friday = dateFromISO("2026-03-27T12:00:00")
+        let notifications = PrayerNotificationScheduler.describeNotificationsForTesting(date: friday, location: mecca)
+        let snapshot = computeIslamicDaySnapshot(now: friday, location: mecca)
+        let jumuahNotification = notifications.first { $0.name == "Jumu'ah" }
+
+        XCTAssertEqual(notifications.count, 5)
+        XCTAssertTrue(notifications.contains { $0.name == "Jumu'ah" })
+        XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
+        XCTAssertNotNil(snapshot)
+        XCTAssertEqual(
+            Int(jumuahNotification?.fireDate.timeIntervalSince1970 ?? -1),
+            Int(snapshot?.timeline.duhaStart.timeIntervalSince1970 ?? -2)
+        )
+    }
+
+    func testDescribeNotifications_UsesEidInsteadOfDhuhrOnFridayEid() {
+        let eidFriday = dateFromISO("2026-03-20T12:00:00")
+        let notifications = PrayerNotificationScheduler.describeNotificationsForTesting(date: eidFriday, location: mecca)
+        let snapshot = computeIslamicDaySnapshot(now: eidFriday, location: mecca)
+        let eidNotification = notifications.first { $0.name == "EID AL-FITR" }
+
+        XCTAssertEqual(notifications.count, 5)
+        XCTAssertTrue(notifications.contains { $0.name == "EID AL-FITR" })
+        XCTAssertFalse(notifications.contains { $0.name == "Jumu'ah" })
+        XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
+        XCTAssertNotNil(snapshot)
+        XCTAssertEqual(
+            Int(eidNotification?.fireDate.timeIntervalSince1970 ?? -1),
+            Int(snapshot?.timeline.duhaStart.timeIntervalSince1970 ?? -2)
+        )
+    }
+
+    func testDescribeNotifications_UsesEidAtDuhaOnNonFridayEid() {
+        let eidDay = dateFromISO("2026-05-27T12:00:00")
+        let notifications = PrayerNotificationScheduler.describeNotificationsForTesting(date: eidDay, location: mecca)
+        let prayerTimes = getPrayerTimesForDate(date: eidDay, location: mecca)
+        let snapshot = computeIslamicDaySnapshot(now: eidDay, location: mecca)
+        let eidNotification = notifications.first { $0.name == "EID AL-ADHA" }
+
+        XCTAssertEqual(notifications.count, 5)
+        XCTAssertNotNil(eidNotification)
+        XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
+        XCTAssertNotNil(prayerTimes)
+        XCTAssertNotNil(snapshot)
+        XCTAssertEqual(
+            Int(eidNotification?.fireDate.timeIntervalSince1970 ?? -1),
+            Int(snapshot?.timeline.duhaStart.timeIntervalSince1970 ?? -2)
+        )
+        XCTAssertNotEqual(
+            Int(eidNotification?.fireDate.timeIntervalSince1970 ?? -1),
+            Int(prayerTimes?.dhuhr.timeIntervalSince1970 ?? -1)
+        )
     }
 
     private func dateFromISO(_ iso: String) -> Date {

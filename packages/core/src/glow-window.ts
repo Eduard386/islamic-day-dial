@@ -1,25 +1,39 @@
 import type { IslamicPhaseId } from './types.js';
-import { getSunriseToDhuhrSubPeriod } from './formatting.js';
 
 /** Minimal timeline slice needed for glow decisions */
-export type GlowTimelineSlice = { duhaStart: Date; dhuhr: Date };
+export type GlowTimelineSlice = { duhaStart: Date; dhuhr: Date; asr: Date };
+
+const JUMUAH_GLOW_MIN_STRENGTH = 0.3;
 
 /**
- * Jumu'ah (Friday): glow shown only when marker is in DUHA, MIDDAY or DHUHR.
- * Not during SUNRISE, Fajr, night (Maghrib…Last 3rd), Asr→Maghrib.
+ * Jumu'ah (Friday): glow shown from the start of Duha until the end of Dhuhr.
+ * It starts weak at Duha and reaches full strength by the end of Dhuhr.
  */
 export function isJumuahGlowWindow(
   now: Date,
   timeline: GlowTimelineSlice,
   currentPhase: IslamicPhaseId,
 ): boolean {
-  if (now.getDay() !== 5) return false;
-  if (currentPhase === 'dhuhr_to_asr') return true;
-  if (currentPhase === 'sunrise_to_dhuhr') {
-    const sub = getSunriseToDhuhrSubPeriod(now, timeline.duhaStart, timeline.dhuhr);
-    return sub === 'duha' || sub === 'midday';
-  }
-  return false;
+  return getJumuahGlowStrength(now, timeline, currentPhase) > 0;
+}
+
+export function getJumuahGlowStrength(
+  now: Date,
+  timeline: GlowTimelineSlice,
+  currentPhase: IslamicPhaseId,
+): number {
+  if (now.getDay() !== 5) return 0;
+  if (currentPhase !== 'sunrise_to_dhuhr' && currentPhase !== 'dhuhr_to_asr') return 0;
+
+  const start = timeline.duhaStart.getTime();
+  const end = timeline.asr.getTime();
+  const current = now.getTime();
+
+  if (current < start || current >= end) return 0;
+  if (end <= start) return 1;
+
+  const progress = Math.max(0, Math.min(1, (current - start) / (end - start)));
+  return JUMUAH_GLOW_MIN_STRENGTH + (1 - JUMUAH_GLOW_MIN_STRENGTH) * progress;
 }
 
 /** When marker is in last third of night: last-third pulsating glow */
