@@ -5,7 +5,6 @@ final class WidgetPresentationTests: XCTestCase {
     private func makeTimeline(
         lastMaghrib: TimeInterval,
         isha: TimeInterval,
-        islamicMidnight: TimeInterval,
         lastThirdStart: TimeInterval,
         fajr: TimeInterval,
         sunrise: TimeInterval,
@@ -17,7 +16,6 @@ final class WidgetPresentationTests: XCTestCase {
         ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: lastMaghrib),
             isha: Date(timeIntervalSince1970: isha),
-            islamicMidnight: Date(timeIntervalSince1970: islamicMidnight),
             lastThirdStart: Date(timeIntervalSince1970: lastThirdStart),
             fajr: Date(timeIntervalSince1970: fajr),
             sunrise: Date(timeIntervalSince1970: sunrise),
@@ -56,7 +54,6 @@ final class WidgetPresentationTests: XCTestCase {
         let timeline = makeTimeline(
             lastMaghrib: 0,
             isha: 100,
-            islamicMidnight: 200,
             lastThirdStart: 300,
             fajr: 400,
             sunrise: 500,
@@ -77,7 +74,6 @@ final class WidgetPresentationTests: XCTestCase {
         let timeline = makeTimeline(
             lastMaghrib: 0,
             isha: 100,
-            islamicMidnight: 200,
             lastThirdStart: 300,
             fajr: 400,
             sunrise: 500,
@@ -107,7 +103,6 @@ final class WidgetPresentationTests: XCTestCase {
         let timeline = makeTimeline(
             lastMaghrib: 0,
             isha: 100,
-            islamicMidnight: 200,
             lastThirdStart: 300,
             fajr: 400,
             sunrise: 500,

@@ -39,7 +39,7 @@ describe('isJumuahGlowWindow', () => {
 
   it('returns false on Friday when in night phases', () => {
     const friday = new Date('2025-03-21T03:00:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'isha_to_midnight')).toBe(false);
+    expect(isJumuahGlowWindow(friday, timeline, 'isha_to_last_third')).toBe(false);
     expect(isJumuahGlowWindow(friday, timeline, 'last_third_to_fajr')).toBe(false);
     expect(isJumuahGlowWindow(friday, timeline, 'maghrib_to_isha')).toBe(false);
   });
@@ -56,15 +56,15 @@ describe('isLastThirdPhase', () => {
   });
 
   it('returns false for other phases', () => {
-    expect(isLastThirdPhase('isha_to_midnight')).toBe(false);
+    expect(isLastThirdPhase('isha_to_last_third')).toBe(false);
     expect(isLastThirdPhase('dhuhr_to_asr')).toBe(false);
     expect(isLastThirdPhase('maghrib_to_isha')).toBe(false);
   });
 });
 
 describe('NIGHT_SECTORS_GROUP', () => {
-  it('contains isha_to_midnight and last_third_to_fajr', () => {
-    expect(NIGHT_SECTORS_GROUP.has('isha_to_midnight')).toBe(true);
+  it('contains isha_to_last_third and last_third_to_fajr', () => {
+    expect(NIGHT_SECTORS_GROUP.has('isha_to_last_third')).toBe(true);
     expect(NIGHT_SECTORS_GROUP.has('last_third_to_fajr')).toBe(true);
   });
 
@@ -75,8 +75,8 @@ describe('NIGHT_SECTORS_GROUP', () => {
 });
 
 describe('isInIshaOrLastThirdSector', () => {
-  it('returns true for isha_to_midnight (Isha glow + Last Third weak glow)', () => {
-    expect(isInIshaOrLastThirdSector('isha_to_midnight')).toBe(true);
+  it('returns true for isha_to_last_third (Isha glow + Last Third weak glow)', () => {
+    expect(isInIshaOrLastThirdSector('isha_to_last_third')).toBe(true);
   });
 
   it('returns true for last_third_to_fajr (Last Third pulsating + Isha weak glow)', () => {

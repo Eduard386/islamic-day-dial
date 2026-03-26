@@ -31,7 +31,7 @@ private let NIGHT_BLACK_RGB = hexToRGB(0x000000)
 fileprivate func getPaletteForSegment(_ phase: IslamicPhaseId) -> [RGB] {
     switch phase {
     case .maghrib_to_isha: return MAGHRIB_PALETTE
-    case .isha_to_midnight: return [NIGHT_BLACK_RGB]
+    case .isha_to_last_third: return [NIGHT_BLACK_RGB]
     case .last_third_to_fajr: return [NIGHT_BLACK_RGB]
     case .fajr_to_sunrise: return FAJR_SUNRISE_PALETTE
     case .sunrise_to_dhuhr: return [DAY_BLUE_RGB]

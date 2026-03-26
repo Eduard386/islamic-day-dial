@@ -7,8 +7,8 @@
 | ID | Start | End | Label |
 |----|-------|-----|-------|
 | maghrib_to_isha | lastMaghrib | isha | Maghrib |
-| isha_to_midnight | isha | lastThirdStart | Isha |
-| last_third_to_fajr | lastThirdStart | fajr | Isha (neon blue) |
+| isha_to_last_third | isha | lastThirdStart | Isha |
+| last_third_to_fajr | lastThirdStart | fajr | Last 3rd |
 | fajr_to_sunrise | fajr | sunrise | Fajr |
 | sunrise_to_dhuhr | sunrise | dhuhr | Duha |
 | dhuhr_to_asr | dhuhr | asr | Dhuhr |
@@ -16,8 +16,8 @@
 
 ## Formulas
 
-- **Islamic midnight**: `(lastMaghrib + fajr) / 2`
 - **Last third start**: `fajr - (nightDuration / 3)` where `nightDuration = fajr - lastMaghrib`
+- **Isha span in product model**: `isha -> fajr`, with `lastThirdStart -> fajr` rendered as a nested highlighted sub-segment
 - **Progress**: `(now - lastMaghrib) / (nextMaghrib - lastMaghrib)`, clamped 0–1
 - **Angle**: `progress * 360` (0° = top = lastMaghrib, clockwise)
 - **Countdown** (вместо текущего времени): целевое время зависит от фазы:
@@ -42,7 +42,7 @@ From Fajr, a segment of the same **angular span** as Asr→Isha uses a mirrored 
 
 Defined in `apps/web-dashboard/src/lib/segment-gradients.ts`.
 
-- **Night** (isha_to_midnight, last_third_to_fajr): `#000000`
+- **Night** (isha_to_last_third, last_third_to_fajr): `#000000`
 - **Maghrib → Isha**: red sunset `#C84A3A` → black (smooth gradient)
 - **Asr → Maghrib**: blue `#7CB8E8` → red sunset
 - **Mirror segment** (from Fajr, same angular span as Asr→Isha): black → yellow → blue (smooth fade out of night)

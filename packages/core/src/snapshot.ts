@@ -41,7 +41,6 @@ export function computeIslamicDaySnapshot(input: UserContext): ComputedIslamicDa
       isha: timeline.isha,
     },
     derivedMarkers: {
-      islamicMidnight: timeline.islamicMidnight,
       lastThirdStart: timeline.lastThirdStart,
     },
     timeline,

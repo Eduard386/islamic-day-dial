@@ -17,7 +17,7 @@ private let MARKER_DEFS: [(String, KeyPath<ComputedTimeline, Date>, RingMarkerKi
 
 private let SEGMENT_BOUNDARIES: [(IslamicPhaseId, KeyPath<ComputedTimeline, Date>, KeyPath<ComputedTimeline, Date>)] = [
     (.maghrib_to_isha, \.lastMaghrib, \.isha),
-    (.isha_to_midnight, \.isha, \.lastThirdStart),
+    (.isha_to_last_third, \.isha, \.lastThirdStart),
     (.last_third_to_fajr, \.lastThirdStart, \.fajr),
     (.fajr_to_sunrise, \.fajr, \.sunrise),
     (.sunrise_to_dhuhr, \.sunrise, \.dhuhr),

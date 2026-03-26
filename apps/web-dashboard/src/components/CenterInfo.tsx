@@ -1,6 +1,5 @@
 import {
   formatHijriDateParts,
-  formatCountdown,
   getSectorDisplayName,
   type ComputedIslamicDay,
 } from '@islamic-day-dial/core';
@@ -24,7 +23,6 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
   })();
 
   const dateParts = formatHijriDateParts(snapshot.hijriDate);
-  const countdownStr = formatCountdown(snapshot.countdownMs);
   const dayMonthDisplay = dateParts.dayMonth.toUpperCase();
   const compactMonthNames = new Set(['rabi al-awwal', 'rabi al-thani', 'jumada al-ula', 'jumada al-thani']);
   const useCompactDayMonthSize = compactMonthNames.has(snapshot.hijriDate.monthNameEn.toLowerCase());
@@ -43,8 +41,6 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
         </div>
         <div className={`hijri-year hijri-year-sector-style${dateParts.isEid ? ' eid-date' : ''}`}>{dateParts.year}</div>
       </div>
-
-      <div className="countdown countdown-block">{countdownStr}</div>
     </div>
   );
 }

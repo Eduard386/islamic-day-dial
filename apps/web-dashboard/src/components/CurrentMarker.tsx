@@ -73,9 +73,9 @@ const SUN_OUTER_GLOW_NORMAL = {
 
 /** Лёгкий glow для луны (чуть меньше чем у солнца) */
 const MOON_OUTER_GLOW = {
-  strokeWidth: 18,
-  blur: 6,
-  lunar: 'rgba(226, 217, 200, 0.9)',
+  strokeWidth: 22,
+  blur: 8,
+  lunar: 'rgba(255, 255, 255, 0.275)',
 };
 
 /** = JUMU_GLOW (IslamicRing) — неон солнца идентичен дню джума */
@@ -92,7 +92,7 @@ const SUN_NEON = {
 /** Sectors where only moon is visible, ring background shows through */
 const MOON_ONLY_PHASES = new Set<IslamicPhaseId>([
   'maghrib_to_isha',
-  'isha_to_midnight',
+  'isha_to_last_third',
   'last_third_to_fajr',
   'fajr_to_sunrise',
 ]);
@@ -307,16 +307,6 @@ export function CurrentMarker({ x, y, r, size, state, currentPhase, progressAngl
         {/* Night: луна всегда, даже если торчит за риску Sunrise */}
         {isNight && moonPhase && (
           <g>
-            {/* Moon outer glow — fill + stroke для заметного ореола */}
-            <g filter={`url(#moon-outer-glow${suffix})`}>
-              <circle
-                r={innerR}
-                fill="none"
-                stroke={MOON_OUTER_GLOW.lunar}
-                strokeWidth={MOON_OUTER_GLOW.strokeWidth}
-                {...(moonPhase.shadowOffset !== 0 ? { mask: `url(#${crescentMaskId})` } : {})}
-              />
-            </g>
             {isMoonOnlySector ? (
               /* Night: lunar silver-blue, ring background shows through where shadow was */
               moonPhase.shadowOffset === 0 ? (

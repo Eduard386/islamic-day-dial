@@ -4,11 +4,12 @@ private let ROLL_ZONE_DEG: Double = 10
 private let RED_SUN_ZONE_DEG: Double = 8
 private let MIN_REVEAL: Double = 0.12
 private let SUN_PHASES: Set<IslamicPhaseId> = [.sunrise_to_dhuhr, .dhuhr_to_asr, .asr_to_maghrib]
-private let MOON_ONLY_PHASES: Set<IslamicPhaseId> = [.maghrib_to_isha, .isha_to_midnight, .last_third_to_fajr, .fajr_to_sunrise]
+private let MOON_ONLY_PHASES: Set<IslamicPhaseId> = [.maghrib_to_isha, .isha_to_last_third, .last_third_to_fajr, .fajr_to_sunrise]
 private let GAP_SEGMENT_IDS: Set<IslamicPhaseId> = [.last_third_to_fajr]
-private let NIGHT_SECTORS_GROUP: Set<IslamicPhaseId> = [.isha_to_midnight, .last_third_to_fajr]
+private let NIGHT_SECTORS_GROUP: Set<IslamicPhaseId> = [.isha_to_last_third, .last_third_to_fajr]
 private let PRIMARY_MARKER_IDS: Set<String> = ["fajr", "dhuhr", "asr", "maghrib", "isha"]
 private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "last_third_start", "duha_start", "duha_end"]
+private let PHONE_HIDDEN_TICK_IDS: Set<String> = ["duha_start", "duha_end"]
 private let MOON_INNER_R: Double = 0.82
 private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔peak↔base)
 private let PHONE_INFO_RADIUS_EXPANSION_RATIO: CGFloat = 10 / 420
@@ -104,7 +105,7 @@ enum RingRenderVariant {
     case phone
 }
 
-private enum PhoneRingArcKind: String {
+enum PhoneRingArcKind: String {
     case maghribToIsha = "maghrib_to_isha"
     case ishaGroup = "isha_group"
     case fajrToSunrise = "fajr_to_sunrise"
@@ -115,7 +116,7 @@ private enum PhoneRingArcKind: String {
     case asrToMaghrib = "asr_to_maghrib"
 }
 
-private struct PhoneRingArcSpec: Identifiable {
+struct PhoneRingArcSpec: Identifiable {
     let kind: PhoneRingArcKind
     let originalStartAngleDeg: CGFloat
     let originalEndAngleDeg: CGFloat
@@ -155,7 +156,7 @@ private func angleSpan(startDeg: CGFloat, endDeg: CGFloat) -> CGFloat {
     return raw >= 0 ? raw : raw + 360
 }
 
-private func adjustedPhoneMarkerAngle(phoneArcSpecs: [PhoneRingArcSpec], originalAngle: Double) -> Double {
+func adjustedPhoneMarkerAngle(phoneArcSpecs: [PhoneRingArcSpec], originalAngle: Double) -> Double {
     let lookupAngle = CGFloat(originalAngle >= 360 ? 0 : originalAngle)
 
     for spec in phoneArcSpecs {
@@ -180,7 +181,7 @@ private func adjustedArcBounds(startDeg: CGFloat, endDeg: CGFloat, radiusScale: 
     return (midpoint - adjustedSpan / 2, midpoint + adjustedSpan / 2)
 }
 
-private func expandedPhoneRingRadius(baseRadius: CGFloat, size: CGFloat, infoProgress: Double) -> CGFloat {
+func expandedPhoneRingRadius(baseRadius: CGFloat, size: CGFloat, infoProgress: Double) -> CGFloat {
     baseRadius + size * PHONE_INFO_RADIUS_EXPANSION_RATIO * CGFloat(max(0, min(1, infoProgress)))
 }
 
@@ -211,7 +212,7 @@ private func phoneQuakeMetrics(date: Date, progress: Double, size: CGFloat) -> (
     return (x, y, rotation)
 }
 
-private func buildPhoneRingArcSpecs(
+func buildPhoneRingArcSpecs(
     snapshot: ComputedIslamicDay,
     baseRadius: CGFloat,
     ringRadius: CGFloat
@@ -219,7 +220,7 @@ private func buildPhoneRingArcSpecs(
     let byId = Dictionary(uniqueKeysWithValues: snapshot.ringSegments.map { ($0.id, $0) })
     guard
         let maghribToIsha = byId[.maghrib_to_isha],
-        let ishaToMidnight = byId[.isha_to_midnight],
+        let ishaToLastThird = byId[.isha_to_last_third],
         let lastThirdToFajr = byId[.last_third_to_fajr],
         let fajrToSunrise = byId[.fajr_to_sunrise],
         let dhuhrToAsr = byId[.dhuhr_to_asr],
@@ -256,7 +257,7 @@ private func buildPhoneRingArcSpecs(
 
     return [
         makeSpec(kind: .maghribToIsha, start: maghribToIsha.startAngleDeg, end: maghribToIsha.endAngleDeg),
-        makeSpec(kind: .ishaGroup, start: ishaToMidnight.startAngleDeg, end: lastThirdToFajr.endAngleDeg),
+        makeSpec(kind: .ishaGroup, start: ishaToLastThird.startAngleDeg, end: lastThirdToFajr.endAngleDeg),
         makeSpec(kind: .fajrToSunrise, start: fajrToSunrise.startAngleDeg, end: fajrToSunrise.endAngleDeg),
         makeSpec(kind: .sunrise, start: angle(for: timeline.sunrise), end: angle(for: timeline.duhaStart)),
         makeSpec(kind: .duha, start: angle(for: timeline.duhaStart), end: angle(for: timeline.duhaEnd)),
@@ -414,6 +415,8 @@ struct RingView: View {
                     let tickStartR = cInnerCanvas - Double(tickStrokeWidth) / 2
                     let tickEndR = tickStartR - Double(tickLen)
                     for m in snapshot.ringMarkers {
+                        let isHiddenPhoneTick = renderVariant == .phone && PHONE_HIDDEN_TICK_IDS.contains(m.id)
+                        if isHiddenPhoneTick { continue }
                         guard PRIMARY_MARKER_IDS.contains(m.id) || SECONDARY_MARKER_IDS.contains(m.id) else { continue }
                         let innerPt = polarToXY(cx: ccx, cy: ccy, r: tickStartR, angleDeg: m.angleDeg)
                         let outerPt = polarToXY(cx: ccx, cy: ccy, r: tickEndR, angleDeg: m.angleDeg)
@@ -475,7 +478,7 @@ private struct PhoneNightGlowOverlay: View {
             let lastThirdPeak = phase * 0.92  // Slightly brighter and stronger
 
             let nightSegments = snapshot.ringSegments.filter { NIGHT_SECTORS_GROUP.contains($0.id) }
-            let isInIsha = currentPhase == .isha_to_midnight
+            let isInIsha = currentPhase == .isha_to_last_third
             let isInLastThird = currentPhase == .last_third_to_fajr
             let showJumuahGlow = phoneInfoProgress <= 0.001
                 && isJumuahGlowWindow(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
@@ -545,7 +548,7 @@ private struct PhoneNightGlowOverlay: View {
                     )
                     .blur(radius: size * (4 / 420))
                 } else if isInIsha || isInLastThird {
-                    ForEach(nightSegments.filter { isInIsha || $0.id == .isha_to_midnight || $0.id == .last_third_to_fajr }, id: \.id) { seg in
+                    ForEach(nightSegments.filter { isInIsha || $0.id == .isha_to_last_third || $0.id == .last_third_to_fajr }, id: \.id) { seg in
                         let path = arcPath(cx: Double(size / 2), cy: Double(size / 2), r: Double(ringRadius), startDeg: seg.startAngleDeg, endDeg: seg.endAngleDeg)
                         if seg.id == .last_third_to_fajr && isInLastThird {
                             let lastThirdColor = Color(red: 0.231, green: 0.51, blue: 0.965)

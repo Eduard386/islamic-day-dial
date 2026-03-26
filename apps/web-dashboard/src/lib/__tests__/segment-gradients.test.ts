@@ -23,8 +23,8 @@ describe('getSegmentGradientStops', () => {
     expect(stops[0].color).toBe(stops[1].color);
   });
 
-  it('returns night black for isha_to_midnight', () => {
-    const stops = getSegmentGradientStops('isha_to_midnight');
+  it('returns night black for isha_to_last_third', () => {
+    const stops = getSegmentGradientStops('isha_to_last_third');
     expect(stops[0].color).toBe('#000000');
     expect(stops[1].color).toBe('#000000');
   });
@@ -32,7 +32,7 @@ describe('getSegmentGradientStops', () => {
   it('returns stops for all segment ids', () => {
     const ids = [
       'maghrib_to_isha',
-      'isha_to_midnight',
+      'isha_to_last_third',
       'last_third_to_fajr',
       'fajr_to_sunrise',
       'sunrise_to_dhuhr',
@@ -51,7 +51,7 @@ describe('getSegmentGradientStops', () => {
 describe('getConicGradientCss', () => {
   const mockSegments = [
     { id: 'maghrib_to_isha', startAngleDeg: 0, endAngleDeg: 45 },
-    { id: 'isha_to_midnight', startAngleDeg: 45, endAngleDeg: 90 },
+    { id: 'isha_to_last_third', startAngleDeg: 45, endAngleDeg: 90 },
     { id: 'last_third_to_fajr', startAngleDeg: 90, endAngleDeg: 180 },
     { id: 'fajr_to_sunrise', startAngleDeg: 180, endAngleDeg: 200 },
     { id: 'sunrise_to_dhuhr', startAngleDeg: 200, endAngleDeg: 300 },

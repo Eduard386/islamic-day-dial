@@ -21,7 +21,7 @@ type Props = {
 /** Primary: Fajr, Dhuhr, Asr, Maghrib, Isha — short ticks */
 const PRIMARY_MARKER_IDS = new Set<string>(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']);
 
-/** Secondary: Sunrise, Midnight, Last 3rd, Duha boundaries — tick marks */
+/** Secondary: Sunrise, Last 3rd, Duha boundaries — tick marks */
 const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'last_third_start', 'duha_start', 'duha_end']);
 
 const MARKER_STROKE = '#fbeccb';
@@ -30,7 +30,7 @@ const MARKER_STROKE = '#fbeccb';
 const GAP_SEGMENT_IDS = new Set<string>(['last_third_to_fajr']);
 
 /** Both Isha arcs use same dark color (ringGap) */
-const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
+const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_last_third', 'last_third_to_fajr']);
 
 const MARKER_R = 14;
 

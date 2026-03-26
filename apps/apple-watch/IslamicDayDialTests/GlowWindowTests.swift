@@ -25,7 +25,6 @@ final class GlowWindowTests: XCTestCase {
         return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: 1_742_508_000),
             isha: Date(timeIntervalSince1970: 1_742_544_000),
-            islamicMidnight: Date(timeIntervalSince1970: 1_742_616_000),
             lastThirdStart: Date(timeIntervalSince1970: 1_742_670_000),
             fajr: Date(timeIntervalSince1970: 1_742_760_000),
             sunrise: sunrise,
@@ -69,9 +68,9 @@ final class GlowWindowTests: XCTestCase {
     }
 
     func testJumuahGlow_ReturnsFalseOnFridayInNightPhases() {
-        // 2025-03-21 08:16 UTC = Friday, in isha_to_midnight
+        // 2025-03-21 08:16 UTC = Friday, in isha_to_last_third
         let friday = Date(timeIntervalSince1970: 1_742_545_000)
-        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .isha_to_midnight))
+        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .isha_to_last_third))
         XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .last_third_to_fajr))
         XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .maghrib_to_isha))
     }
@@ -91,16 +90,16 @@ final class GlowWindowTests: XCTestCase {
     // MARK: - Isha sector (both Isha and Last Third get glow when in either)
 
     func testNightSectorsGroup_ContainsIshaAndLastThird() {
-        let nightGroup: Set<IslamicPhaseId> = [.isha_to_midnight, .last_third_to_fajr]
-        XCTAssertTrue(nightGroup.contains(.isha_to_midnight))
+        let nightGroup: Set<IslamicPhaseId> = [.isha_to_last_third, .last_third_to_fajr]
+        XCTAssertTrue(nightGroup.contains(.isha_to_last_third))
         XCTAssertTrue(nightGroup.contains(.last_third_to_fajr))
     }
 
     func testIshaGlowDuringLastThird_BothSegmentsHighlighted() {
         // When marker in last_third_to_fajr: Last Third pulsates, Isha gets weak glow
-        // When marker in isha_to_midnight: both get weak glow
+        // When marker in isha_to_last_third: both get weak glow
         // Logic is in RingView NIGHT_SECTORS_GROUP
-        let nightPhases: [IslamicPhaseId] = [.isha_to_midnight, .last_third_to_fajr]
+        let nightPhases: [IslamicPhaseId] = [.isha_to_last_third, .last_third_to_fajr]
         XCTAssertEqual(nightPhases.count, 2)
     }
 }

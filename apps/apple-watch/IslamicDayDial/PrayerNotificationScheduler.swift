@@ -6,8 +6,8 @@ import UserNotifications
 /// Rescheduling runs on app launch and when app returns from background (handles travel).
 ///
 /// Notification format:
-/// - Title: PrayerName + Hijri date, e.g. "Fajr. 5 Shawwal 1447"
-/// - Body: Empty
+/// - Title: "PrayerName time has begun"
+/// - Body: "5 Shawwal 1447"
 enum PrayerNotificationScheduler {
     private static let categoryId = "PRAYER_REMINDER"
     private static let identifierPrefix = "prayer_"
@@ -87,8 +87,8 @@ enum PrayerNotificationScheduler {
 
         let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghribForDay)
         let content = UNMutableNotificationContent()
-        content.title = "\(name). \(formatHijriTitle(hijri: hijriDate))"
-        content.body = ""
+        content.title = "\(name) time has begun"
+        content.body = formatHijriTitle(hijri: hijriDate)
         content.sound = .default
         content.categoryIdentifier = Self.categoryId
 
@@ -101,8 +101,8 @@ enum PrayerNotificationScheduler {
     /// For unit testing notification content format only.
     static func formatContentForTesting(prayerName: String, fireDate: Date, maghrib: Date) -> (title: String, body: String) {
         let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghrib)
-        let title = "\(prayerName). \(hijriDate.day) \(hijriDate.monthNameEn) \(hijriDate.year)"
-        let body = ""
+        let title = "\(prayerName) time has begun"
+        let body = "\(hijriDate.day) \(hijriDate.monthNameEn) \(hijriDate.year)"
         return (title, body)
     }
 }

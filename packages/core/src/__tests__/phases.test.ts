@@ -5,7 +5,6 @@ import type { ComputedTimeline } from '../types.js';
 const timeline: ComputedTimeline = {
   lastMaghrib: new Date('2025-03-15T15:30:00.000Z'),
   isha: new Date('2025-03-15T17:00:00.000Z'),
-  islamicMidnight: new Date('2025-03-15T20:45:00.000Z'),
   lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
   fajr: new Date('2025-03-16T02:00:00.000Z'),
   sunrise: new Date('2025-03-16T03:15:00.000Z'),
@@ -22,14 +21,14 @@ describe('getCurrentPhase', () => {
     expect(getCurrentPhase(now, timeline)).toBe('maghrib_to_isha');
   });
 
-  it('returns isha_to_midnight after Isha', () => {
+  it('returns isha_to_last_third after Isha', () => {
     const now = new Date('2025-03-15T17:30:00.000Z');
-    expect(getCurrentPhase(now, timeline)).toBe('isha_to_midnight');
+    expect(getCurrentPhase(now, timeline)).toBe('isha_to_last_third');
   });
 
-  it('returns isha_to_midnight until last third start (sector Isha 1/2 removed)', () => {
-    const now = new Date('2025-03-15T21:00:00.000Z'); // between islamic midnight and last third
-    expect(getCurrentPhase(now, timeline)).toBe('isha_to_midnight');
+  it('returns isha_to_last_third until last third start', () => {
+    const now = new Date('2025-03-15T21:00:00.000Z');
+    expect(getCurrentPhase(now, timeline)).toBe('isha_to_last_third');
   });
 
   it('returns last_third_to_fajr after last third start', () => {
@@ -61,8 +60,8 @@ describe('getCurrentPhase', () => {
     expect(getCurrentPhase(timeline.lastMaghrib, timeline)).toBe('maghrib_to_isha');
   });
 
-  it('returns isha_to_midnight exactly at Isha', () => {
-    expect(getCurrentPhase(timeline.isha, timeline)).toBe('isha_to_midnight');
+  it('returns isha_to_last_third exactly at Isha', () => {
+    expect(getCurrentPhase(timeline.isha, timeline)).toBe('isha_to_last_third');
   });
 });
 

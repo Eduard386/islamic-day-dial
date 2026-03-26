@@ -114,7 +114,6 @@ func buildTimeline(
     return ComputedTimeline(
         lastMaghrib: nightPT.maghrib,
         isha: nightPT.isha,
-        islamicMidnight: getIslamicMidnight(lastMaghrib: nightPT.maghrib, fajr: dayPT.fajr),
         lastThirdStart: getLastThirdStart(lastMaghrib: nightPT.maghrib, fajr: dayPT.fajr),
         fajr: dayPT.fajr,
         sunrise: dayPT.sunrise,

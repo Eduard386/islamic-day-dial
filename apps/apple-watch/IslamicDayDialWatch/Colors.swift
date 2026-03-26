@@ -37,7 +37,7 @@ enum Colors {
 
 /// Segment colors for watch (simplified). All 3 Isha arcs = same dark color.
 func segmentColor(phase: IslamicPhaseId, isActive: Bool) -> Color {
-    let ishaDark: Set<IslamicPhaseId> = [.isha_to_midnight, .last_third_to_fajr]
+    let ishaDark: Set<IslamicPhaseId> = [.isha_to_last_third, .last_third_to_fajr]
     if ishaDark.contains(phase) { return RING_GAP }
 
     switch phase {

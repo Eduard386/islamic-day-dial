@@ -10,7 +10,6 @@ function makeTimeline(entries: Record<string, number>): ComputedTimeline {
   return {
     lastMaghrib: toDate(entries.lastMaghrib ?? 0),
     isha: toDate(entries.isha ?? 0),
-    islamicMidnight: toDate(entries.islamicMidnight ?? 0),
     lastThirdStart: toDate(entries.lastThirdStart ?? 0),
     fajr: toDate(entries.fajr ?? 0),
     sunrise: toDate(sunrise),
@@ -28,7 +27,7 @@ describe('getCountdownTarget', () => {
     const dhuhr = 200000;
     const tl = makeTimeline({
       fajr: 80000, sunrise, dhuhr,
-      lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+      lastMaghrib: 0, isha: 10000, lastThirdStart: 30000,
       asr: 250000, nextMaghrib: 300000,
     });
     const now = new Date(90000); // in fajr_to_sunrise
@@ -39,7 +38,7 @@ describe('getCountdownTarget', () => {
   it('Maghrib sector: target is Isha', () => {
     const isha = 50000;
     const tl = makeTimeline({
-      lastMaghrib: 0, isha, islamicMidnight: 60000, lastThirdStart: 70000,
+      lastMaghrib: 0, isha, lastThirdStart: 70000,
       fajr: 80000, sunrise: 100000, dhuhr: 150000, asr: 200000, nextMaghrib: 300000,
     });
     const now = new Date(25000); // in maghrib_to_isha
@@ -50,10 +49,10 @@ describe('getCountdownTarget', () => {
   it('Isha sectors: target is Fajr', () => {
     const fajr = 80000;
     const tl = makeTimeline({
-      lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+      lastMaghrib: 0, isha: 10000, lastThirdStart: 30000,
       fajr, sunrise: 100000, dhuhr: 150000, asr: 200000, nextMaghrib: 300000,
     });
-    const now = new Date(25000); // in isha_to_midnight
+    const now = new Date(25000); // in isha_to_last_third
     const target = getCountdownTarget(now, tl);
     expect(target.getTime()).toBe(fajr);
   });
@@ -65,7 +64,7 @@ describe('getCountdownTarget', () => {
     const duhaEnd = dhuhr - 5 * 60 * 1000;
     const tl = makeTimeline({
       fajr: 80000, sunrise, duhaStart, dhuhr,
-      lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+      lastMaghrib: 0, isha: 10000, lastThirdStart: 30000,
       asr: 2500000, nextMaghrib: 3000000,
     });
     // Sunrise sub: countdown to Duha

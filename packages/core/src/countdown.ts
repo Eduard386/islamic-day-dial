@@ -19,7 +19,7 @@ export function getCountdownTarget(now: Date, timeline: ComputedTimeline): Date 
   switch (phase) {
     case 'maghrib_to_isha':
       return timeline.isha;
-    case 'isha_to_midnight':
+    case 'isha_to_last_third':
     case 'last_third_to_fajr':
       return timeline.fajr;
     case 'fajr_to_sunrise':

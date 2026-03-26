@@ -7,8 +7,8 @@ describe('isNightPeriod', () => {
     expect(isNightPeriod('maghrib_to_isha')).toBe(true);
   });
 
-  it('returns true for isha_to_midnight', () => {
-    expect(isNightPeriod('isha_to_midnight')).toBe(true);
+  it('returns true for isha_to_last_third', () => {
+    expect(isNightPeriod('isha_to_last_third')).toBe(true);
   });
 
   it('returns true for last_third_to_fajr', () => {
@@ -41,7 +41,7 @@ describe('getCurrentMarkerVisualState', () => {
   };
 
   it('returns isNight true for night phases', () => {
-    const state = getCurrentMarkerVisualState('isha_to_midnight', mockHijriDate);
+    const state = getCurrentMarkerVisualState('isha_to_last_third', mockHijriDate);
     expect(state.isNight).toBe(true);
   });
 
@@ -51,19 +51,19 @@ describe('getCurrentMarkerVisualState', () => {
   });
 
   it('returns moonPhase only at night', () => {
-    const nightState = getCurrentMarkerVisualState('isha_to_midnight', mockHijriDate);
+    const nightState = getCurrentMarkerVisualState('isha_to_last_third', mockHijriDate);
     const dayState = getCurrentMarkerVisualState('dhuhr_to_asr', mockHijriDate);
     expect(nightState.moonPhase).not.toBeNull();
     expect(dayState.moonPhase).toBeNull();
   });
 
   it('uses hijriDate.day by default', () => {
-    const state = getCurrentMarkerVisualState('isha_to_midnight', mockHijriDate);
+    const state = getCurrentMarkerVisualState('isha_to_last_third', mockHijriDate);
     expect(state.hijriDayUsed).toBe(15);
   });
 
   it('uses debugHijriDay when provided', () => {
-    const state = getCurrentMarkerVisualState('isha_to_midnight', mockHijriDate, 7);
+    const state = getCurrentMarkerVisualState('isha_to_last_third', mockHijriDate, 7);
     expect(state.hijriDayUsed).toBe(7);
     expect(state.moonPhase?.id).toBe('waxing_crescent');
   });

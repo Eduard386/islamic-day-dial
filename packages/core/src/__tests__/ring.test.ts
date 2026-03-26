@@ -49,7 +49,6 @@ describe('getMarkers', () => {
   const timeline: ComputedTimeline = {
     lastMaghrib: new Date('2025-03-15T15:30:00.000Z'),
     isha: new Date('2025-03-15T17:00:00.000Z'),
-    islamicMidnight: new Date('2025-03-15T20:45:00.000Z'),
     lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
     fajr: new Date('2025-03-16T02:00:00.000Z'),
     sunrise: new Date('2025-03-16T03:15:00.000Z'),
@@ -90,7 +89,6 @@ describe('getRingSegments', () => {
   const timeline: ComputedTimeline = {
     lastMaghrib: new Date('2025-03-15T15:30:00.000Z'),
     isha: new Date('2025-03-15T17:00:00.000Z'),
-    islamicMidnight: new Date('2025-03-15T20:45:00.000Z'),
     lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
     fajr: new Date('2025-03-16T02:00:00.000Z'),
     sunrise: new Date('2025-03-16T03:15:00.000Z'),

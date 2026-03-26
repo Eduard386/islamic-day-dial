@@ -117,6 +117,8 @@ struct PhoneDialFootnotesView: View {
     let dialSize: CGFloat
     let dialCenter: CGPoint
     let bounds: CGSize
+    var isInteractive: Bool = false
+    var onLabelTap: ((String) -> Void)? = nil
 
     private var dialOrigin: CGPoint {
         CGPoint(x: dialCenter.x - dialSize / 2, y: dialCenter.y - dialSize / 2)
@@ -124,6 +126,7 @@ struct PhoneDialFootnotesView: View {
 
     private var labelFont: CGFloat { max(9, dialSize * (10.9 / 420)) }
     private var labelWidth: CGFloat { max(56, dialSize * 0.17) }
+    private var labelHeight: CGFloat { max(28, labelFont * 2.4) }
     private var lineColor: Color { Color(red: 0.984, green: 0.925, blue: 0.796).opacity(0.45) }
 
     private var topLineY: CGFloat { dialOrigin.y - dialSize * 0.07 }
@@ -145,6 +148,7 @@ struct PhoneDialFootnotesView: View {
                     context.stroke(path, with: .color(lineColor), lineWidth: max(0.8, dialSize / 420))
                 }
             }
+            .allowsHitTesting(false)
 
             ForEach(items) { item in
                 Text(item.label)
@@ -155,12 +159,17 @@ struct PhoneDialFootnotesView: View {
                     .multilineTextAlignment(.center)
                     .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
                     .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
-                    .frame(width: item.labelWidth)
-                    .position(item.labelPosition)
+                    .frame(width: item.labelWidth, height: labelHeight)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        guard isInteractive else { return }
+                        onLabelTap?(item.label)
+                    }
+                .position(item.labelPosition)
+                .allowsHitTesting(isInteractive)
             }
         }
         .frame(width: bounds.width, height: bounds.height)
-        .allowsHitTesting(false)
     }
 
     private func buildItems() -> [VerticalFootnoteItem] {

@@ -2,7 +2,6 @@ import SwiftUI
 
 private let WATCH_DIAL_SIZE_SCALE: CGFloat = 1.28
 private let WATCH_CURRENT_PERIOD_FONT_RATIO: CGFloat = 20 / 420
-private let WATCH_COUNTDOWN_FONT_RATIO: CGFloat = 17 / 420
 private let WATCH_HIJRI_COMPACT_FONT_RATIO: CGFloat = 15 / 420
 private let WATCH_HIJRI_REGULAR_FONT_RATIO: CGFloat = 18 / 420
 private let WATCH_HIJRI_YEAR_FONT_RATIO: CGFloat = 14 / 420
@@ -24,7 +23,6 @@ struct ContentView: View {
                     let holeHeight = dialSize * 0.5025
                     let sectorTop = holeTop + 55 * (holeHeight / 212)
                     let dateTop = holeTop + 100 * (holeHeight / 212)
-                    let countdownTop = holeTop + 165 * (holeHeight / 212)
                     let centerOffsetY = dialSize * (-10 / 420)  // Web: -10px nudge
                     ZStack {
                         RingView(snapshot: snap, now: now)
@@ -37,12 +35,6 @@ struct ContentView: View {
                             HijriDateLabels(hijriDate: snap.hijriDate, dialSize: dialSize)
                                 .frame(maxWidth: .infinity)
                                 .offset(y: dateTop)
-                            Text(formatCountdown(countdownMs(snapshot: snap)))
-                                .font(.system(size: dialSize * WATCH_COUNTDOWN_FONT_RATIO, weight: .light, design: .monospaced))
-                                .monospacedDigit()
-                                .foregroundColor(Colors.softUtility)
-                                .frame(maxWidth: .infinity)
-                                .offset(y: countdownTop)
                         }
                         .frame(width: dialSize, height: dialSize)
                         .offset(y: centerOffsetY)
@@ -86,11 +78,6 @@ struct ContentView: View {
         return max(1, refreshAt.timeIntervalSince(date) + 0.25)
     }
 
-    private func countdownMs(snapshot snap: ComputedIslamicDay) -> Int64 {
-        let target = getCountdownTarget(now: now, timeline: snap.timeline)
-        return Int64(max(0, target.timeIntervalSince(now) * 1000))
-    }
-    
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date, dialSize: CGFloat) -> some View {
         let phase = currentPhase(snapshot: snap, now: now)

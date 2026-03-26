@@ -5,6 +5,8 @@ private let DIAL_SECTION_HEIGHT: CGFloat = 436
 private let MS_PER_HOUR: Int64 = 3_600_000
 private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 private let INFO_EXPANSION_DURATION = 1.0
+private let FOOTNOTE_REVEAL_DELAY = INFO_EXPANSION_DURATION / 2
+private let FOOTNOTE_REVEAL_DURATION = INFO_EXPANSION_DURATION / 2
 private let PHONE_DATE_INFO_SCALE: CGFloat = 1.25
 private let PHONE_TEXT_GLOW_PULSE_DURATION = 3.0
 let PHONE_READING_TINT = Color(red: 0.9, green: 0.88, blue: 0.8)
@@ -16,6 +18,24 @@ private let PHONE_HIJRI_MONTH_NAMES = [
     "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Shaban",
     "Ramadan", "Shawwal", "Dhul Qadah", "Dhul Hijjah"
 ]
+private let PHONE_JIBRIL_GROUP_ONE: Set<String> = ["Dhuhr", "Asr", "Maghrib", "Isha", "Fajr"]
+private let PHONE_JIBRIL_GROUP_TWO: Set<String> = ["Sunrise", "Duha", "Midday"]
+private let PHONE_JIBRIL_HADITH_AR = "قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أَمَّنِي جِبْرِيلُ عَلَيْهِ السَّلاَمُ عِنْدَ الْبَيْتِ مَرَّتَيْنِ فَصَلَّى بِيَ الظُّهْرَ حِينَ زَالَتِ الشَّمْسُ وَكَانَتْ قَدْرَ الشِّرَاكِ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ - يَعْنِي الْمَغْرِبَ - حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ حِينَ غَابَ الشَّفَقُ وَصَلَّى بِيَ الْفَجْرَ حِينَ حَرُمَ الطَّعَامُ وَالشَّرَابُ عَلَى الصَّائِمِ فَلَمَّا كَانَ الْغَدُ صَلَّى بِيَ الظُّهْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَيْهِ وَصَلَّى بِيَ الْمَغْرِبَ حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ إِلَى ثُلُثِ اللَّيْلِ وَصَلَّى بِيَ الْفَجْرَ فَأَسْفَرَ ثُمَّ الْتَفَتَ إِلَىَّ فَقَالَ يَا مُحَمَّدُ هَذَا وَقْتُ الأَنْبِيَاءِ مِنْ قَبْلِكَ وَالْوَقْتُ مَا بَيْنَ هَذَيْنِ الْوَقْتَيْنِ ‏\"‏ ‏."
+private let PHONE_JIBRIL_HADITH_EN = """
+The Messenger of Allah (ﷺ) said: Gabriel (ﷺ) led me in prayer at the House (i.e. the Ka'bah). He prayed the noon prayer with me when the sun had passed the meridian to the extent of the thong of a sandal; he prayed the afternoon prayer with me when the shadow of everything was as long as itself; he prayed the sunset prayer with me when one who is fasting breaks the fast; he prayed the night prayer with me when the twilight had ended; and he prayed the dawn prayer with me when food and drink become forbidden to one who is keeping the fast.
+
+On the following day he prayed the noon prayer with me when his shadow was as long as himself; he prayed the afternoon prayer with me when his shadow was twice as long as himself; he prayed the sunset prayer at the time when one who is fasting breaks the fast; he prayed the night prayer with me when about the third of the night had passed; and he prayed the dawn prayer with me when there was a fair amount of light.
+
+Then turning to me he said: Muhammad, this is the time observed by the prophets before you, and the time is anywhere between two times.
+"""
+private let PHONE_DUHA_HADITH_ONE_AR = "حَدَّثَنَا أَبُو جَعْفَرٍ السِّمْنَانِيُّ، حَدَّثَنَا أَبُو مُسْهِرٍ، حَدَّثَنَا إِسْمَاعِيلُ بْنُ عَيَّاشٍ، عَنْ بَحِيرِ بْنِ سَعْدٍ، عَنْ خَالِدِ بْنِ مَعْدَانَ، عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، عَنْ أَبِي الدَّرْدَاءِ، وَأَبِي، ذَرٍّ عَنْ رَسُولِ اللَّهِ صلى الله عليه وسلم ‏ \"‏ عَنِ اللَّهِ، عَزَّ وَجَلَّ أَنَّهُ قَالَ ابْنَ آدَمَ ارْكَعْ لِي مِنْ أَوَّلِ النَّهَارِ أَرْبَعَ رَكَعَاتٍ أَكْفِكَ آخِرَهُ ‏\"‏."
+private let PHONE_DUHA_HADITH_ONE_EN = "Allah's Messenger narrated that Allah, Blessed and Most High said: \"Son of Adam: Perform four Rak'ah for Me in the beginning of the day it will suffice you for the latter part of it\"."
+private let PHONE_DUHA_HADITH_TWO_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مُحَمَّدِ بْنِ أَسْمَاءَ الضُّبَعِيُّ، حَدَّثَنَا مَهْدِيٌّ، - وَهُوَ ابْنُ مَيْمُونٍ - حَدَّثَنَا وَاصِلٌ، مَوْلَى أَبِي عُيَيْنَةَ عَنْ يَحْيَى بْنِ عُقَيْلٍ، عَنْ يَحْيَى بْنِ يَعْمَرَ، عَنْ أَبِي الأَسْوَدِ الدُّؤَلِيِّ، عَنْ أَبِي ذَرٍّ، عَنِ النَّبِيِّ صلى الله عليه وسلم أَنَّهُ قَالَ ‏ \"‏ يُصْبِحُ عَلَى كُلِّ سُلاَمَى مِنْ أَحَدِكُمْ صَدَقَةٌ فَكُلُّ تَسْبِيحَةٍ صَدَقَةٌ وَكُلُّ تَحْمِيدَةٍ صَدَقَةٌ وَكُلُّ تَهْلِيلَةٍ صَدَقَةٌ وَكُلُّ تَكْبِيرَةٍ صَدَقَةٌ وَأَمْرٌ بِالْمَعْرُوفِ صَدَقَةٌ وَنَهْىٌ عَنِ الْمُنْكَرِ صَدَقَةٌ وَيُجْزِئُ مِنْ ذَلِكَ رَكْعَتَانِ يَرْكَعُهُمَا مِنَ الضُّحَى‏\"."
+private let PHONE_DUHA_HADITH_TWO_EN = "Abu Dharr reported Allah's Apostle (ﷺ) as saying: \"In the morning charity is due from every bone in the body of every one of you. Every utterance of Allah's glorification is an act of charity. Every utterance of praise of Him is an act of charity, every utterance of profession of His Oneness is an act of charity, every utterance of profession of His Greatness is an act of charity, enjoining good is an act of charity, forbidding what is distreputable is an act of charity, and two rak'ahs which one prays in the forenoon will suffice\"."
+private let PHONE_DUHA_HADITH_THREE_AR = "قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏صَلِّ صَلاَةَ الصُّبْحِ ثُمَّ أَقْصِرْ عَنِ الصَّلاَةِ حَتَّى تَطْلُعَ الشَّمْسُ حَتَّى تَرْتَفِعَ فَإِنَّهَا تَطْلُعُ حِينَ تَطْلُعُ بَيْنَ قَرْنَىْ شَيْطَانٍ وَحِينَئِذٍ يَسْجُدُ لَهَا الْكُفَّارُ ثُمَّ صَلِّ فَإِنَّ الصَّلاَةَ مَشْهُودَةٌ مَحْضُورَةٌ حَتَّى يَسْتَقِلَّ الظِّلُّ بِالرُّمْحِ ثُمَّ أَقْصِرْ عَنِ الصَّلاَةِ فَإِنَّ حِينَئِذٍ تُسْجَرُ جَهَنَّمُ”"
+private let PHONE_DUHA_HADITH_THREE_EN = "Messenger of Allah (ﷺ) said: “Observe the dawn prayer, then stop praying when the sun is rising till it is fully up, for when it rises it comes up between the horns of Satan, and the unbelievers prostrate themselves to it at that time. Then pray, for the prayer is witnessed and attended (by angels) till the shadow becomes about the length of a lance; then cease prayer, for at that time Hell is heated up.”"
+private let PHONE_LAST_THIRD_HADITH_AR = "أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ فَيَقُولُ مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ وَمَنْ يَسْأَلُنِي فَأُعْطِيَهُ وَمَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ ‏\"‏.‏"
+private let PHONE_LAST_THIRD_HADITH_EN = "Allah's Messenger (ﷺ) said, \"Our Lord, the Blessed and the Exalted, descends every night to the lowest heaven when one-third of the latter part of the night is left, and says: Who supplicates Me so that I may answer him? Who asks Me so that I may give to him? Who asks Me forgiveness so that I may forgive him?\""
 
 private func phoneGlowPulsePhase(_ date: Date) -> (base: Double, phase: Double) {
     let seconds = date.timeIntervalSince1970.truncatingRemainder(dividingBy: PHONE_TEXT_GLOW_PULSE_DURATION)
@@ -29,6 +49,107 @@ private func phoneSentenceCaseMonth(_ value: String) -> String {
     let lower = value.lowercased()
     guard let first = lower.first else { return value }
     return String(first).uppercased() + String(lower.dropFirst())
+}
+
+private enum PhoneSectorSpotlightSource {
+    case main
+    case separated
+}
+
+private func normalizedDialAngle(_ angle: Double) -> Double {
+    let remainder = angle.truncatingRemainder(dividingBy: 360)
+    return remainder >= 0 ? remainder : remainder + 360
+}
+
+private func phoneAngleContains(_ angle: Double, start: Double, end: Double) -> Bool {
+    let normalizedAngle = normalizedDialAngle(angle)
+    let normalizedStart = normalizedDialAngle(start)
+    let normalizedEnd = normalizedDialAngle(end)
+
+    if normalizedStart <= normalizedEnd {
+        return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd
+    }
+
+    return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd
+}
+
+private func phoneAngle(for point: CGPoint, size: CGFloat) -> Double {
+    let dx = point.x - size / 2
+    let dy = point.y - size / 2
+    let angle = atan2(dy, dx) * 180 / .pi + 90
+    return normalizedDialAngle(angle)
+}
+
+private func adjustedTimelineAngle(
+    timestamp: Date,
+    snapshot: ComputedIslamicDay,
+    phoneArcSpecs: [PhoneRingArcSpec]
+) -> Double {
+    let originalAngle = timestampToAngle(
+        timestamp: timestamp,
+        lastMaghrib: snapshot.timeline.lastMaghrib,
+        nextMaghrib: snapshot.timeline.nextMaghrib
+    )
+    return adjustedPhoneMarkerAngle(phoneArcSpecs: phoneArcSpecs, originalAngle: originalAngle)
+}
+
+private func separatedSectorTitle(
+    angle: Double,
+    snapshot: ComputedIslamicDay,
+    phoneArcSpecs: [PhoneRingArcSpec]
+) -> String? {
+    let specByKind = Dictionary(uniqueKeysWithValues: phoneArcSpecs.map { ($0.kind, $0) })
+
+    if let maghrib = specByKind[.maghribToIsha],
+       phoneAngleContains(angle, start: maghrib.startAngleDeg, end: maghrib.endAngleDeg) {
+        return "Maghrib"
+    }
+
+    if let ishaGroup = specByKind[.ishaGroup] {
+        let lastThirdStartAngle = adjustedTimelineAngle(
+            timestamp: snapshot.timeline.lastThirdStart,
+            snapshot: snapshot,
+            phoneArcSpecs: phoneArcSpecs
+        )
+        if phoneAngleContains(angle, start: ishaGroup.startAngleDeg, end: lastThirdStartAngle) {
+            return "Isha"
+        }
+        if phoneAngleContains(angle, start: lastThirdStartAngle, end: ishaGroup.endAngleDeg) {
+            return "Last 3rd"
+        }
+    }
+
+    if let fajr = specByKind[.fajrToSunrise],
+       phoneAngleContains(angle, start: fajr.startAngleDeg, end: fajr.endAngleDeg) {
+        return "Fajr"
+    }
+
+    if let sunrise = specByKind[.sunrise],
+       phoneAngleContains(angle, start: sunrise.startAngleDeg, end: sunrise.endAngleDeg) {
+        return "Sunrise"
+    }
+
+    if let duha = specByKind[.duha],
+       phoneAngleContains(angle, start: duha.startAngleDeg, end: duha.endAngleDeg) {
+        return "Duha"
+    }
+
+    if let midday = specByKind[.midday],
+       phoneAngleContains(angle, start: midday.startAngleDeg, end: midday.endAngleDeg) {
+        return "Midday"
+    }
+
+    if let dhuhr = specByKind[.dhuhrToAsr],
+       phoneAngleContains(angle, start: dhuhr.startAngleDeg, end: dhuhr.endAngleDeg) {
+        return "Dhuhr"
+    }
+
+    if let asr = specByKind[.asrToMaghrib],
+       phoneAngleContains(angle, start: asr.startAngleDeg, end: asr.endAngleDeg) {
+        return "Asr"
+    }
+
+    return nil
 }
 
 struct ContentView: View {
@@ -47,10 +168,13 @@ struct ContentView: View {
     @State private var infoPresentationProgress = 0.0
     @State private var footnoteOpacity = 0.0
     @State private var footnoteRevealTask: Task<Void, Never>?
-    @State private var dialContentOpacity = 1.0
+    @State private var baseScreenOpacity = 1.0
     @State private var insightOpacity = 0.0
-    @State private var showInsightOverlay = false
-    @State private var insightTransitionTask: Task<Void, Never>?
+    @State private var sectorSpotlightTitle = ""
+    @State private var sectorSpotlightOpacity = 0.0
+    @State private var sectorSpotlightSource: PhoneSectorSpotlightSource = .main
+    @State private var isInteractionLocked = false
+    @State private var interactionLockTask: Task<Void, Never>?
 
     private var effectiveNow: Date {
         if timeOffsetMs == 0 { return now }
@@ -65,6 +189,12 @@ struct ContentView: View {
                     dialSection
                     Spacer(minLength: 0)
                 }
+                .opacity(baseScreenOpacity)
+                .allowsHitTesting(
+                    !isInteractionLocked &&
+                    insightOpacity < 0.001 &&
+                    sectorSpotlightOpacity < 0.001
+                )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.horizontal, 20)
                 .background(Color.black.ignoresSafeArea())
@@ -74,36 +204,40 @@ struct ContentView: View {
                         .allowsHitTesting(false)
                 }
                 .overlay {
-                    if let snapshot, showInsightOverlay || insightOpacity > 0.001 {
-                        ZStack {
-                            PhoneDialInsightView(
-                                snapshot: snapshot,
-                                containerSize: geo.size
-                            )
-                            .opacity(insightOpacity)
-
-                            Color.clear
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    dismissInsightPresentation(toMainScreen: false)
-                                }
-                        }
+                    if let snapshot {
+                        PhoneDialInsightView(
+                            snapshot: snapshot,
+                            containerSize: geo.size
+                        )
+                        .opacity(insightOpacity)
+                        .allowsHitTesting(false)
                     }
                 }
-                .overlay(alignment: .bottomTrailing) {
-                    if snapshot != nil {
-                        Button {
-                            toggleInfoMode()
-                        } label: {
-                            Image(systemName: "info.circle")
-                                .font(.system(size: 26, weight: .regular))
-                                .foregroundStyle(Colors.secondaryGold)
-                                .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                .overlay {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .allowsHitTesting(
+                            !isInteractionLocked &&
+                            (insightOpacity > 0.001 || sectorSpotlightOpacity > 0.001)
+                        )
+                        .onTapGesture {
+                            if sectorSpotlightOpacity > 0.001 {
+                                dismissSectorSpotlight()
+                            } else if insightOpacity > 0.001 {
+                                dismissInsightPresentation()
+                            }
                         }
-                        .buttonStyle(.plain)
-                        .padding(.trailing, 18)
-                        .padding(.bottom, 20)
-                        .accessibilityLabel("Prayer labels")
+                }
+                .overlay {
+                    if !sectorSpotlightTitle.isEmpty {
+                        PhoneSectorTitleSpotlightView(
+                            title: sectorSpotlightTitle,
+                            source: sectorSpotlightSource,
+                            containerSize: geo.size,
+                            onTap: dismissSectorSpotlight
+                        )
+                        .opacity(sectorSpotlightOpacity)
+                        .allowsHitTesting(true)
                     }
                 }
             }
@@ -142,7 +276,7 @@ struct ContentView: View {
         }
         .onDisappear {
             footnoteRevealTask?.cancel()
-            insightTransitionTask?.cancel()
+            interactionLockTask?.cancel()
         }
     }
     
@@ -170,9 +304,14 @@ struct ContentView: View {
                     now: effectiveNow,
                     infoProgress: infoPresentationProgress,
                     footnoteOpacity: footnoteOpacity,
-                    dialContentOpacity: dialContentOpacity,
-                    showsInsightOverlay: showInsightOverlay,
-                    onDateTap: beginInsightPresentation
+                    showsInsightOverlay: insightOpacity > 0.001,
+                    interactionsEnabled: !isInteractionLocked,
+                    onDateTap: beginInsightPresentation,
+                    onSectorTap: openInfoMode,
+                    onSeparatedSectorTap: { title in beginSectorSpotlight(title: title, source: .separated) },
+                    onCurrentSectorTap: { title in beginSectorSpotlight(title: title, source: .main) },
+                    onFootnoteTap: { title in beginSectorSpotlight(title: title, source: .separated) },
+                    onBackgroundTap: closeInfoMode
                 )
                     .frame(height: DIAL_SECTION_HEIGHT)
             } else {
@@ -183,103 +322,96 @@ struct ContentView: View {
         .padding(.bottom, DIAL_VERTICAL_GAP)
     }
 
-    private func toggleInfoMode() {
+    private func openInfoMode() {
+        lockInteractions()
         footnoteRevealTask?.cancel()
-        insightTransitionTask?.cancel()
-
-        if showInsightOverlay || insightOpacity > 0.001 {
-            dismissInsightPresentation(toMainScreen: true)
-            return
-        }
-
-        if showFootnotes {
-            showFootnotes = false
-            withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
-                dialContentOpacity = 1
-                insightOpacity = 0
-                infoPresentationProgress = 0
-                footnoteOpacity = 0
-            }
-            return
-        }
-
         showFootnotes = true
-        showInsightOverlay = false
         insightOpacity = 0
-        dialContentOpacity = 1
         footnoteOpacity = 0
+        baseScreenOpacity = 1
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             infoPresentationProgress = 1
         }
 
         footnoteRevealTask = Task {
-            try? await Task.sleep(for: .seconds(INFO_EXPANSION_DURATION))
+            try? await Task.sleep(for: .seconds(FOOTNOTE_REVEAL_DELAY))
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 guard showFootnotes else { return }
-                withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+                withAnimation(.easeInOut(duration: FOOTNOTE_REVEAL_DURATION)) {
                     footnoteOpacity = 1
                 }
             }
+        }
+    }
+
+    private func closeInfoMode() {
+        lockInteractions()
+        footnoteRevealTask?.cancel()
+        showFootnotes = false
+        baseScreenOpacity = 1
+        withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+            insightOpacity = 0
+            infoPresentationProgress = 0
+            footnoteOpacity = 0
         }
     }
 
     private func beginInsightPresentation() {
         guard
-            showFootnotes,
-            infoPresentationProgress > 0.99,
-            footnoteOpacity > 0.99,
-            dialContentOpacity > 0.99,
-            !showInsightOverlay
+            !isInteractionLocked,
+            !showFootnotes,
+            insightOpacity < 0.001,
+            sectorSpotlightOpacity < 0.001
         else { return }
-
-        insightTransitionTask?.cancel()
-        showInsightOverlay = true
-        insightOpacity = 0
-
+        lockInteractions()
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
-            dialContentOpacity = 0
-        }
-
-        insightTransitionTask = Task {
-            try? await Task.sleep(for: .seconds(INFO_EXPANSION_DURATION))
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                guard showInsightOverlay else { return }
-                withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
-                    insightOpacity = 1
-                }
-            }
+            insightOpacity = 1
         }
     }
 
-    private func dismissInsightPresentation(toMainScreen: Bool) {
-        guard showInsightOverlay || insightOpacity > 0.001 else { return }
-
-        insightTransitionTask?.cancel()
+    private func dismissInsightPresentation() {
+        guard insightOpacity > 0.001 else { return }
+        lockInteractions()
         withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
             insightOpacity = 0
         }
+    }
 
-        insightTransitionTask = Task {
+    private func beginSectorSpotlight(title: String, source: PhoneSectorSpotlightSource) {
+        guard
+            !isInteractionLocked,
+            sectorSpotlightOpacity < 0.001,
+            insightOpacity < 0.001
+        else { return }
+        lockInteractions()
+        sectorSpotlightTitle = title
+        sectorSpotlightSource = source
+        withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+            baseScreenOpacity = 0
+            sectorSpotlightOpacity = 1
+        }
+    }
+
+    private func dismissSectorSpotlight() {
+        guard sectorSpotlightOpacity > 0.001 else { return }
+        lockInteractions()
+        withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+            baseScreenOpacity = 1
+            sectorSpotlightOpacity = 0
+        }
+    }
+
+    private func lockInteractions() {
+        interactionLockTask?.cancel()
+        isInteractionLocked = true
+        interactionLockTask = Task {
             try? await Task.sleep(for: .seconds(INFO_EXPANSION_DURATION))
             guard !Task.isCancelled else { return }
             await MainActor.run {
-                showInsightOverlay = false
-                dialContentOpacity = 0
-
-                if toMainScreen {
-                    showFootnotes = false
-                    infoPresentationProgress = 0
-                    footnoteOpacity = 0
-                } else {
-                    showFootnotes = true
-                    infoPresentationProgress = 1
-                    footnoteOpacity = 1
-                }
-
-                withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
-                    dialContentOpacity = 1
+                isInteractionLocked = false
+                if sectorSpotlightOpacity < 0.001 {
+                    sectorSpotlightTitle = ""
                 }
             }
         }
@@ -307,9 +439,14 @@ private struct PhoneDialView: View {
     let now: Date
     let infoProgress: Double
     let footnoteOpacity: Double
-    let dialContentOpacity: Double
     let showsInsightOverlay: Bool
+    let interactionsEnabled: Bool
     let onDateTap: () -> Void
+    let onSectorTap: () -> Void
+    let onSeparatedSectorTap: (String) -> Void
+    let onCurrentSectorTap: (String) -> Void
+    let onFootnoteTap: (String) -> Void
+    let onBackgroundTap: () -> Void
 
     var body: some View {
         GeometryReader { geo in
@@ -322,28 +459,101 @@ private struct PhoneDialView: View {
             let sectorTop = holeTop + 55 * (holeHeight / 212)
             let dateTop = holeTop + 100 * (holeHeight / 212)
             let centerOffsetY = dialSize * (-10 / 420)
-            let canEnterInsight = infoProgress > 0.99
-                && footnoteOpacity > 0.99
-                && dialContentOpacity > 0.99
-                && !showsInsightOverlay
+            let currentSectorTitle = periodLabel(snapshot: snapshot, now: now)
+            let canEnterInsight = interactionsEnabled && infoProgress < 0.01 && !showsInsightOverlay
+            let canTapSectors = interactionsEnabled && infoProgress < 0.01 && !showsInsightOverlay
+            let canTapCurrentSector = interactionsEnabled && infoProgress < 0.01 && !showsInsightOverlay
+            let canTapFootnotes = interactionsEnabled && infoProgress > 0.99 && footnoteOpacity > 0.99 && !showsInsightOverlay
+            let canTapSeparatedBackground = interactionsEnabled && infoProgress > 0.99 && footnoteOpacity > 0.99 && !showsInsightOverlay
+            let ringStroke = dialSize * 0.081
+            let baseRingInnerRadius = dialSize * 0.25125
+            let baseRingRadius = baseRingInnerRadius + ringStroke / 2
+            let expandedRingRadius = expandedPhoneRingRadius(baseRadius: baseRingRadius, size: dialSize, infoProgress: infoProgress)
+            let ringOuterRadius = baseRingInnerRadius + ringStroke
+            let ringInnerRadius = baseRingInnerRadius
+            let separatedRingInnerRadius = max(0, expandedRingRadius - ringStroke / 2)
+            let separatedRingOuterRadius = expandedRingRadius + ringStroke / 2
+            let phoneArcSpecs = buildPhoneRingArcSpecs(
+                snapshot: snapshot,
+                baseRadius: baseRingRadius,
+                ringRadius: expandedRingRadius
+            )
+            let canTapSeparatedSectors = canTapSeparatedBackground && !phoneArcSpecs.isEmpty
 
             ZStack {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .allowsHitTesting(canTapSeparatedBackground)
+                    .onTapGesture {
+                        onBackgroundTap()
+                    }
+
                 PhoneDialFootnotesView(
                     snapshot: snapshot,
                     dialSize: dialSize,
                     dialCenter: dialCenter,
-                    bounds: geo.size
+                    bounds: geo.size,
+                    isInteractive: canTapFootnotes,
+                    onLabelTap: onFootnoteTap
                 )
-                .opacity(footnoteOpacity * dialContentOpacity)
+                .opacity(footnoteOpacity)
+                .zIndex(3)
                 ZStack {
                     PhoneRingView(snapshot: snapshot, now: now, phoneInfoProgress: infoProgress)
                         .frame(width: dialSize, height: dialSize)
+                    Color.clear
+                        .frame(width: dialSize, height: dialSize)
+                        .contentShape(
+                            PhoneRingTapShape(
+                                innerRadius: separatedRingInnerRadius,
+                                outerRadius: separatedRingOuterRadius
+                            ),
+                            eoFill: true
+                        )
+                        .allowsHitTesting(canTapSeparatedSectors)
+                        .gesture(
+                            SpatialTapGesture()
+                                .onEnded { value in
+                                    guard canTapSeparatedSectors else { return }
+                                    let title = separatedSectorTitle(
+                                        angle: phoneAngle(for: value.location, size: dialSize),
+                                        snapshot: snapshot,
+                                        phoneArcSpecs: phoneArcSpecs
+                                    )
+                                    guard let title else { return }
+                                    onSeparatedSectorTap(title)
+                                }
+                        )
+                    Color.clear
+                        .frame(width: dialSize, height: dialSize)
+                        .contentShape(Rectangle())
+                        .allowsHitTesting(canTapSectors)
+                        .gesture(
+                            SpatialTapGesture()
+                                .onEnded { value in
+                                    guard canTapSectors else { return }
+                                    let dx = value.location.x - dialSize / 2
+                                    let dy = value.location.y - dialSize / 2
+                                    let distance = sqrt(dx * dx + dy * dy)
+                                    guard distance >= ringInnerRadius && distance <= ringOuterRadius else { return }
+                                    onSectorTap()
+                                }
+                        )
                     ZStack(alignment: .top) {
                         Color.clear
-                        currentPeriodView(snapshot: snapshot, now: now)
-                            .frame(maxWidth: .infinity)
-                            .offset(y: sectorTop)
-                            .opacity(max(0, 1 - infoProgress))
+                        Button {
+                            onCurrentSectorTap(currentSectorTitle)
+                        } label: {
+                            currentPeriodView(snapshot: snapshot, now: now)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 16)
+                        }
+                        .buttonStyle(.plain)
+                        .offset(y: sectorTop)
+                        .opacity(max(0, 1 - infoProgress))
+                        .allowsHitTesting(canTapCurrentSector)
+                        .zIndex(2)
                         HijriDateLabels(
                             hijriDate: snapshot.hijriDate,
                             infoProgress: infoProgress,
@@ -352,13 +562,14 @@ private struct PhoneDialView: View {
                         )
                             .frame(maxWidth: .infinity)
                             .offset(y: dateTop)
+                            .opacity(max(0, 1 - infoProgress))
                     }
                     .frame(width: dialSize, height: dialSize)
                     .offset(y: centerOffsetY)
                 }
                 .frame(width: dialSize, height: dialSize)
                 .position(dialCenter)
-                .opacity(dialContentOpacity)
+                .zIndex(1)
             }
             .frame(width: w, height: h)
         }
@@ -469,7 +680,7 @@ private struct HijriDateLabels: View {
                     .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
                 Text(parts.year)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Colors.secondaryGold)
+                    .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.secondaryGold)
                     .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
             }
             .scaleEffect(scale)
@@ -490,50 +701,311 @@ private struct PhoneDialInsightView: View {
     let snapshot: ComputedIslamicDay
     let containerSize: CGSize
 
+    private var translationFontSize: CGFloat {
+        min(containerSize.width * 0.04, 17)
+    }
+
+    private var translationFont: Font {
+        .system(size: translationFontSize, weight: .regular, design: .serif)
+    }
+
+    private var dialSize: CGFloat {
+        min(max(0, containerSize.width - 40), DIAL_SECTION_HEIGHT) * 1.28
+    }
+
+    private var ringTop: CGFloat { containerSize.height / 2 - dialSize / 2 }
+    private var ringBottom: CGFloat { containerSize.height / 2 + dialSize / 2 }
+    private var ayahTop: CGFloat { containerSize.height * 0.05 }
+    private var monthsTop: CGFloat { ringBottom - containerSize.height * 0.07 }
+    private var columnWidth: CGFloat { min((containerSize.width - 44) / 2, 170) }
+
     var body: some View {
-        let listWidth = min(containerSize.width - 52, 292)
-
-        VStack(spacing: containerSize.height * 0.012) {
-            Text(PHONE_INSIGHT_AYAH_AR)
-                .font(.system(size: min(containerSize.width * 0.052, 22), weight: .medium, design: .serif))
-                .foregroundColor(PHONE_READING_TINT)
-                .multilineTextAlignment(.center)
-                .lineSpacing(containerSize.height * 0.006)
-                .frame(maxWidth: min(containerSize.width - 36, 420))
-
-            Text(PHONE_INSIGHT_AYAH_EN)
-                .font(.system(size: min(containerSize.width * 0.04, 17), weight: .regular, design: .serif))
-                .foregroundColor(PHONE_READING_TINT)
-                .multilineTextAlignment(.center)
-                .lineSpacing(containerSize.height * 0.003)
-                .frame(maxWidth: min(containerSize.width - 56, 360))
-
-            Color.clear
-                .frame(height: containerSize.height * 0.03)
-
-            VStack(alignment: .leading, spacing: containerSize.height * 0.005) {
-                ForEach(Array(PHONE_HIJRI_MONTH_NAMES.enumerated()), id: \.offset) { index, monthName in
-                    HStack(alignment: .firstTextBaseline, spacing: 10) {
-                        Text("\(index + 1).")
-                            .font(.system(size: 18, weight: .regular, design: .rounded))
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .frame(width: 34, alignment: .trailing)
-                        Text(phoneSentenceCaseMonth(monthName))
-                            .font(.system(size: 18, weight: .regular))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                    }
+        ZStack(alignment: .top) {
+            VStack(spacing: containerSize.height * 0.012) {
+                Text(PHONE_INSIGHT_AYAH_AR)
+                    .font(.system(size: min(containerSize.width * 0.052, 22), weight: .medium, design: .serif))
                     .foregroundColor(PHONE_READING_TINT)
-                    .modifier(HijriEngravedLabelsModifier(isEid: false))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(containerSize.height * 0.006)
+                    .frame(maxWidth: min(containerSize.width - 36, 420))
+
+                Text(PHONE_INSIGHT_AYAH_EN)
+                    .font(translationFont)
+                    .foregroundColor(PHONE_READING_TINT)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(containerSize.height * 0.003)
+                    .frame(maxWidth: min(containerSize.width - 56, 360))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, ayahTop)
+            .padding(.horizontal, 18)
+
+            HStack(alignment: .top, spacing: 12) {
+                monthColumn(indices: 0..<6)
+                monthColumn(indices: 6..<12)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, monthsTop)
+            .padding(.horizontal, 16)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private func monthColumn(indices: Range<Int>) -> some View {
+        VStack(alignment: .leading, spacing: containerSize.height * 0.005) {
+            ForEach(indices, id: \.self) { index in
+                let monthName = PHONE_HIJRI_MONTH_NAMES[index]
+                let isCurrentMonth = snapshot.hijriDate.monthNumber == index + 1
+
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text("\(index + 1).")
+                        .font(translationFont)
+                        .lineLimit(1)
+                        .frame(width: 34, alignment: .trailing)
+                    Text(phoneSentenceCaseMonth(monthName))
+                        .font(translationFont)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .foregroundColor(isCurrentMonth ? Colors.primaryGold : PHONE_READING_TINT)
+                .modifier(HijriEngravedLabelsModifier(isEid: false))
+            }
+        }
+        .frame(width: columnWidth, alignment: .leading)
+    }
+}
+
+private struct PhoneSectorTitleSpotlightView: View {
+    let title: String
+    let source: PhoneSectorSpotlightSource
+    let containerSize: CGSize
+    let onTap: () -> Void
+
+    private var isPrayerTimingGroup: Bool {
+        PHONE_JIBRIL_GROUP_ONE.contains(title)
+    }
+
+    private var isSunDayGroup: Bool {
+        PHONE_JIBRIL_GROUP_TWO.contains(title)
+    }
+
+    private var isLastThird: Bool {
+        title == "Last 3rd"
+    }
+
+    private var sectorCollectionTitle: String {
+        if isPrayerTimingGroup {
+            return "Dhuhr, Asr, Maghrib, Isha, Fajr"
+        }
+        if isSunDayGroup {
+            return "Sunrise, Duha, Midday"
+        }
+        return title.uppercased()
+    }
+
+    private func calculationHeading(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 15, weight: .medium, design: .serif))
+            .foregroundColor(PHONE_READING_TINT)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    private func calculationLine(label: String, detail: String) -> some View {
+        (
+            Text("\(label): ")
+                .font(.system(size: 15, weight: .medium, design: .serif))
+                .foregroundColor(PHONE_READING_TINT)
+            +
+            Text(detail)
+                .font(.system(size: 13, weight: .regular, design: .serif))
+                .italic()
+                .foregroundColor(PHONE_READING_TINT.opacity(0.85))
+        )
+        .multilineTextAlignment(.leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func hadithArabic(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 16, weight: .regular, design: .serif))
+            .foregroundColor(PHONE_READING_TINT)
+            .multilineTextAlignment(.trailing)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    private func hadithEnglish(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 15, weight: .medium, design: .serif))
+            .foregroundColor(PHONE_READING_TINT)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func hadithSource(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 13, weight: .regular))
+            .italic()
+            .foregroundColor(PHONE_READING_TINT.opacity(0.85))
+            .multilineTextAlignment(.trailing)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 4) {
+                Text(sectorCollectionTitle)
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(PHONE_READING_TINT)
+                    .tracking(1.0)
+                    .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
+                    .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
+                Text("")
+                if isPrayerTimingGroup {
+                    VStack(spacing: 4) {
+                        hadithArabic(PHONE_JIBRIL_HADITH_AR)
+                        Text("")
+                        hadithEnglish(PHONE_JIBRIL_HADITH_EN)
+                        hadithSource("Sunan Abi Dawud, Hadith 393")
+                        Text("")
+                        calculationHeading("Dhuhr calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Asr.")
+                        Text("")
+                        calculationHeading("Asr calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "when shadow length = object height + noon shadow (at the user’s coordinates)."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Maghrib.")
+                        Text("")
+                        calculationHeading("Maghrib calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "at sunset, when the sun disappears below the horizon (at the user’s coordinates)."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Isha.")
+                        Text("")
+                        calculationHeading("Isha calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates)."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Fajr.")
+                        Text("")
+                        calculationHeading("Fajr calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Sunrise.")
+                    }
+                    .frame(maxWidth: min(containerSize.width - 36, 420))
+                } else if isSunDayGroup {
+                    VStack(spacing: 4) {
+                        hadithArabic(PHONE_DUHA_HADITH_ONE_AR)
+                        Text("")
+                        hadithEnglish(PHONE_DUHA_HADITH_ONE_EN)
+                        hadithSource("Jami` at-Tirmidhi, Hadith 475")
+                        Text("")
+                        hadithArabic(PHONE_DUHA_HADITH_TWO_AR)
+                        Text("")
+                        hadithEnglish(PHONE_DUHA_HADITH_TWO_EN)
+                        hadithSource("Sahih Muslim, Hadith 720")
+                        Text("")
+                        hadithArabic(PHONE_DUHA_HADITH_THREE_AR)
+                        Text("")
+                        hadithEnglish(PHONE_DUHA_HADITH_THREE_EN)
+                        hadithSource("Sahih Muslim, Hadith 832")
+                        Text("")
+                        calculationHeading("Sunrise calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°)."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Duha.")
+                        Text("")
+                        calculationHeading("Duha calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Midday.")
+                        Text("")
+                        calculationHeading("Midday calculation")
+                        calculationLine(label: "Start", detail: "5 minutes before Dhuhr.")
+                        calculationLine(label: "End", detail: "at Dhuhr.")
+                    }
+                    .frame(maxWidth: min(containerSize.width - 36, 420))
+                } else if isLastThird {
+                    VStack(spacing: 4) {
+                        hadithArabic(PHONE_LAST_THIRD_HADITH_AR)
+                        Text("")
+                        hadithEnglish(PHONE_LAST_THIRD_HADITH_EN)
+                        hadithSource("Sahih Muslim, Hadith 758a")
+                        Text("")
+                        calculationHeading("Last 3rd calculation")
+                        calculationLine(
+                            label: "Start",
+                            detail: "time between last Maghrib and Fajr divided by 3."
+                        )
+                        calculationLine(label: "End", detail: "at the start of Fajr.")
+                    }
+                    .frame(maxWidth: min(containerSize.width - 36, 420))
                 }
             }
-            .frame(width: listWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .top)
+            .padding(.top, max(12, containerSize.height * 0.025))
+            .padding(.horizontal, 18)
+            .padding(.bottom, 24)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding(.top, containerSize.height * 0.15)
-        .padding(.horizontal, 18)
-        .allowsHitTesting(false)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .onTapGesture {
+            onTap()
+        }
+    }
+}
+
+private struct RingTapShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let innerRatio = 0.25125 / (0.25125 + 0.081)
+        let inset = rect.width * (1 - innerRatio) / 2
+        var path = Path()
+        path.addEllipse(in: rect)
+        path.addEllipse(in: rect.insetBy(dx: inset, dy: inset))
+        return path
+    }
+}
+
+private struct PhoneRingTapShape: Shape {
+    let innerRadius: CGFloat
+    let outerRadius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let outerDiameter = outerRadius * 2
+        let innerDiameter = innerRadius * 2
+        let outerRect = CGRect(
+            x: rect.midX - outerRadius,
+            y: rect.midY - outerRadius,
+            width: outerDiameter,
+            height: outerDiameter
+        )
+        let innerRect = CGRect(
+            x: rect.midX - innerRadius,
+            y: rect.midY - innerRadius,
+            width: innerDiameter,
+            height: innerDiameter
+        )
+
+        var path = Path()
+        path.addEllipse(in: outerRect)
+        path.addEllipse(in: innerRect)
+        return path
     }
 }
 

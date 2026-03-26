@@ -34,7 +34,6 @@ data class PrayerTimesData(
 data class ComputedTimeline(
     val lastMaghrib: Date,
     val isha: Date,
-    val islamicMidnight: Date,
     val lastThirdStart: Date,
     val fajr: Date,
     val sunrise: Date,
@@ -45,7 +44,7 @@ data class ComputedTimeline(
 
 enum class IslamicPhaseId {
     MAGHRIB_TO_ISHA,
-    ISHA_TO_MIDNIGHT,
+    ISHA_TO_LAST_THIRD,
     LAST_THIRD_TO_FAJR,
     FAJR_TO_SUNRISE,
     SUNRISE_TO_DHUHR,
@@ -88,7 +87,7 @@ private val MONTH_NAMES_EN = arrayOf(
 
 private val PHASE_BOUNDARIES = listOf(
     Triple(IslamicPhaseId.MAGHRIB_TO_ISHA, "lastMaghrib", "isha"),
-    Triple(IslamicPhaseId.ISHA_TO_MIDNIGHT, "isha", "lastThirdStart"),
+    Triple(IslamicPhaseId.ISHA_TO_LAST_THIRD, "isha", "lastThirdStart"),
     Triple(IslamicPhaseId.LAST_THIRD_TO_FAJR, "lastThirdStart", "fajr"),
     Triple(IslamicPhaseId.FAJR_TO_SUNRISE, "fajr", "sunrise"),
     Triple(IslamicPhaseId.SUNRISE_TO_DHUHR, "sunrise", "dhuhr"),
@@ -135,10 +134,6 @@ fun addDays(date: Date, days: Int): Date {
     return cal.time
 }
 
-fun getIslamicMidnight(lastMaghrib: Date, fajr: Date): Date {
-    return Date((lastMaghrib.time + fajr.time) / 2)
-}
-
 fun getLastThirdStart(lastMaghrib: Date, fajr: Date): Date {
     val nightDuration = fajr.time - lastMaghrib.time
     return Date(fajr.time - nightDuration / 3)
@@ -156,7 +151,6 @@ fun buildTimeline(
     return ComputedTimeline(
         lastMaghrib = nightPT.maghrib,
         isha = nightPT.isha,
-        islamicMidnight = getIslamicMidnight(nightPT.maghrib, dayPT.fajr),
         lastThirdStart = getLastThirdStart(nightPT.maghrib, dayPT.fajr),
         fajr = dayPT.fajr,
         sunrise = dayPT.sunrise,
@@ -193,7 +187,6 @@ fun getCurrentPhase(now: Date, timeline: ComputedTimeline): IslamicPhaseId {
         val start = when (startKey) {
             "lastMaghrib" -> timeline.lastMaghrib
             "isha" -> timeline.isha
-            "islamicMidnight" -> timeline.islamicMidnight
             "lastThirdStart" -> timeline.lastThirdStart
             "fajr" -> timeline.fajr
             "sunrise" -> timeline.sunrise
@@ -203,7 +196,6 @@ fun getCurrentPhase(now: Date, timeline: ComputedTimeline): IslamicPhaseId {
         }.time
         val end = when (endKey) {
             "isha" -> timeline.isha
-            "islamicMidnight" -> timeline.islamicMidnight
             "lastThirdStart" -> timeline.lastThirdStart
             "fajr" -> timeline.fajr
             "sunrise" -> timeline.sunrise
@@ -220,7 +212,6 @@ fun getCurrentPhase(now: Date, timeline: ComputedTimeline): IslamicPhaseId {
 fun getNextTransition(now: Date, timeline: ComputedTimeline): Pair<String, Date> {
     val ordered = listOf(
         "isha" to timeline.isha,
-        "islamic_midnight" to timeline.islamicMidnight,
         "last_third_start" to timeline.lastThirdStart,
         "fajr" to timeline.fajr,
         "sunrise" to timeline.sunrise,
@@ -247,7 +238,7 @@ fun getCountdownTarget(now: Date, timeline: ComputedTimeline): Date {
 
     return when (phase) {
         IslamicPhaseId.MAGHRIB_TO_ISHA -> timeline.isha
-        IslamicPhaseId.ISHA_TO_MIDNIGHT, IslamicPhaseId.LAST_THIRD_TO_FAJR -> timeline.fajr
+        IslamicPhaseId.ISHA_TO_LAST_THIRD, IslamicPhaseId.LAST_THIRD_TO_FAJR -> timeline.fajr
         IslamicPhaseId.FAJR_TO_SUNRISE -> timeline.sunrise
         IslamicPhaseId.SUNRISE_TO_DHUHR -> when {
             t < duhaStart -> Date(duhaStart)
@@ -284,7 +275,6 @@ fun getMarkers(timeline: ComputedTimeline): List<RingMarker> {
         val ts = when (key) {
             "lastMaghrib" -> timeline.lastMaghrib
             "isha" -> timeline.isha
-            "islamicMidnight" -> timeline.islamicMidnight
             "lastThirdStart" -> timeline.lastThirdStart
             "fajr" -> timeline.fajr
             "sunrise" -> timeline.sunrise
@@ -301,7 +291,6 @@ fun getRingSegments(timeline: ComputedTimeline): List<RingSegment> {
         val start = when (startKey) {
             "lastMaghrib" -> timeline.lastMaghrib
             "isha" -> timeline.isha
-            "islamicMidnight" -> timeline.islamicMidnight
             "lastThirdStart" -> timeline.lastThirdStart
             "fajr" -> timeline.fajr
             "sunrise" -> timeline.sunrise
@@ -311,7 +300,6 @@ fun getRingSegments(timeline: ComputedTimeline): List<RingSegment> {
         }
         val end = when (endKey) {
             "isha" -> timeline.isha
-            "islamicMidnight" -> timeline.islamicMidnight
             "lastThirdStart" -> timeline.lastThirdStart
             "fajr" -> timeline.fajr
             "sunrise" -> timeline.sunrise

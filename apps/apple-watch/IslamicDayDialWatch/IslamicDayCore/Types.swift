@@ -35,7 +35,6 @@ public struct PrayerTimesData {
 public struct ComputedTimeline {
     public let lastMaghrib: Date
     public let isha: Date
-    public let islamicMidnight: Date
     public let lastThirdStart: Date
     public let fajr: Date
     public let sunrise: Date
@@ -48,7 +47,7 @@ public struct ComputedTimeline {
 
 public enum IslamicPhaseId: String, CaseIterable {
     case maghrib_to_isha
-    case isha_to_midnight
+    case isha_to_last_third
     case last_third_to_fajr
     case fajr_to_sunrise
     case sunrise_to_dhuhr

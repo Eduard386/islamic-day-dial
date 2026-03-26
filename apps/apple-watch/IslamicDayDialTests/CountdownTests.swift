@@ -20,7 +20,6 @@ final class CountdownTests: XCTestCase {
     private func makeTimeline(
         lastMaghrib: TimeInterval,
         isha: TimeInterval,
-        islamicMidnight: TimeInterval,
         lastThirdStart: TimeInterval,
         fajr: TimeInterval,
         sunrise: TimeInterval,
@@ -34,7 +33,6 @@ final class CountdownTests: XCTestCase {
         return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: lastMaghrib),
             isha: Date(timeIntervalSince1970: isha),
-            islamicMidnight: Date(timeIntervalSince1970: islamicMidnight),
             lastThirdStart: Date(timeIntervalSince1970: lastThirdStart),
             fajr: Date(timeIntervalSince1970: fajr),
             sunrise: Date(timeIntervalSince1970: sunrise),
@@ -50,7 +48,7 @@ final class CountdownTests: XCTestCase {
         let sunrise: TimeInterval = 100000
         let dhuhr: TimeInterval = 200000
         let tl = makeTimeline(
-            lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+            lastMaghrib: 0, isha: 10000, lastThirdStart: 30000,
             fajr: 80000, sunrise: sunrise, dhuhr: dhuhr,
             asr: 250000, nextMaghrib: 300000
         )
@@ -62,7 +60,7 @@ final class CountdownTests: XCTestCase {
     func testMaghribSector_TargetIsIsha() {
         let isha: TimeInterval = 50000
         let tl = makeTimeline(
-            lastMaghrib: 0, isha: isha, islamicMidnight: 60000, lastThirdStart: 70000,
+            lastMaghrib: 0, isha: isha, lastThirdStart: 70000,
             fajr: 80000, sunrise: 100000, dhuhr: 150000, asr: 200000, nextMaghrib: 300000
         )
         let now = Date(timeIntervalSince1970: 25000)
@@ -73,7 +71,7 @@ final class CountdownTests: XCTestCase {
     func testIshaSectors_TargetIsFajr() {
         let fajr: TimeInterval = 80000
         let tl = makeTimeline(
-            lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+            lastMaghrib: 0, isha: 10000, lastThirdStart: 30000,
             fajr: fajr, sunrise: 100000, dhuhr: 150000, asr: 200000, nextMaghrib: 300000
         )
         let now = Date(timeIntervalSince1970: 25000)
@@ -87,7 +85,7 @@ final class CountdownTests: XCTestCase {
         let duhaStart = sunrise + 23 * 60
         let duhaEnd = dhuhr - 5 * 60
         let tl = makeTimeline(
-            lastMaghrib: 0, isha: 10000, islamicMidnight: 20000, lastThirdStart: 30000,
+            lastMaghrib: 0, isha: 10000, lastThirdStart: 30000,
             fajr: 80000, sunrise: sunrise, duhaStart: duhaStart, dhuhr: dhuhr,
             asr: 2500000, nextMaghrib: 3000000
         )

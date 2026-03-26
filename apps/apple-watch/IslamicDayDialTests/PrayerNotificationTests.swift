@@ -1,6 +1,6 @@
 import XCTest
 
-/// Notification content format: "PrayerName. day month year" in title and empty body.
+/// Notification content format: title = "PrayerName time has begun", body = "day month year".
 final class PrayerNotificationTests: XCTestCase {
 
     private var originalTimeZone: TimeZone!
@@ -16,7 +16,7 @@ final class PrayerNotificationTests: XCTestCase {
         super.tearDown()
     }
 
-    func testFormatContent_TitleContainsPrayerAndHijriDate() {
+    func testFormatContent_TitleContainsPrayerStartMessage() {
         let fireDate = dateFromISO("2026-03-20T04:30:00")
         let maghrib = dateFromISO("2026-03-19T18:00:00")
         let (title, _) = PrayerNotificationScheduler.formatContentForTesting(
@@ -24,15 +24,10 @@ final class PrayerNotificationTests: XCTestCase {
             fireDate: fireDate,
             maghrib: maghrib
         )
-        XCTAssertTrue(title.hasPrefix("Fajr. "))
-        XCTAssertTrue(title.contains("1447") || title.contains("1448"))
-        XCTAssertTrue(
-            title.contains("Ramadan") || title.contains("Shaban") ||
-            title.contains("Rabi") || title.contains("Shawwal")
-        )
+        XCTAssertEqual(title, "Fajr time has begun")
     }
 
-    func testFormatContent_BodyIsEmpty() {
+    func testFormatContent_BodyContainsHijriDate() {
         let fireDate = dateFromISO("2026-03-20T04:30:00")
         let maghrib = dateFromISO("2026-03-20T18:00:00")
         let (_, body) = PrayerNotificationScheduler.formatContentForTesting(
@@ -40,7 +35,11 @@ final class PrayerNotificationTests: XCTestCase {
             fireDate: fireDate,
             maghrib: maghrib
         )
-        XCTAssertEqual(body, "")
+        XCTAssertTrue(body.contains("1447") || body.contains("1448"))
+        XCTAssertTrue(
+            body.contains("Ramadan") || body.contains("Shaban") ||
+            body.contains("Rabi") || body.contains("Shawwal")
+        )
     }
 
     func testFormatContent_AllFivePrayers() {
@@ -53,8 +52,8 @@ final class PrayerNotificationTests: XCTestCase {
                 fireDate: fireDate,
                 maghrib: maghrib
             )
-            XCTAssertTrue(title.hasPrefix("\(name). "))
-            XCTAssertEqual(body, "")
+            XCTAssertEqual(title, "\(name) time has begun")
+            XCTAssertFalse(body.isEmpty)
         }
     }
 

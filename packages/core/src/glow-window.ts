@@ -28,7 +28,7 @@ export function isLastThirdPhase(currentPhase: IslamicPhaseId): boolean {
 }
 
 /** When marker is in Isha sector: both Isha and Last Third segments get glow */
-export const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_midnight', 'last_third_to_fajr']);
+export const NIGHT_SECTORS_GROUP = new Set<string>(['isha_to_last_third', 'last_third_to_fajr']);
 
 /** Is marker in Isha or Last Third (either gets night glow) */
 export function isInIshaOrLastThirdSector(currentPhase: IslamicPhaseId): boolean {

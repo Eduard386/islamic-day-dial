@@ -31,7 +31,6 @@ export function getNextTransition(
 
   const orderedPoints: Array<{ id: string; at: Date }> = [
     { id: 'isha', at: timeline.isha },
-    { id: 'islamic_midnight', at: timeline.islamicMidnight },
     { id: 'last_third_start', at: timeline.lastThirdStart },
     { id: 'fajr', at: timeline.fajr },
     { id: 'sunrise', at: timeline.sunrise },

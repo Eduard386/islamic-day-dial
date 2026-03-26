@@ -44,7 +44,7 @@ class SnapshotTest {
 
         val tl = snapshot.timeline
         val times = listOf(
-            tl.lastMaghrib, tl.isha, tl.islamicMidnight, tl.lastThirdStart,
+            tl.lastMaghrib, tl.isha, tl.lastThirdStart,
             tl.fajr, tl.sunrise, tl.dhuhr, tl.asr, tl.nextMaghrib
         )
         for (i in 1 until times.size) {
@@ -80,16 +80,15 @@ class SnapshotTest {
         assertTrue(snapshot.hijriDate.monthNameEn.isNotEmpty())
 
         assertTrue(snapshot.ringProgress in 0.0..1.0)
-        assertEquals(8, snapshot.ringMarkers.size)
-        assertEquals(8, snapshot.ringSegments.size)
+        assertEquals(7, snapshot.ringMarkers.size)
+        assertEquals(7, snapshot.ringSegments.size)
 
         assertTrue(snapshot.countdownMs >= 0)
         assertTrue(snapshot.nextTransitionId.isNotEmpty())
 
         val tl = snapshot.timeline
         assertTrue(tl.lastMaghrib.time < tl.isha.time)
-        assertTrue(tl.isha.time < tl.islamicMidnight.time)
-        assertTrue(tl.islamicMidnight.time < tl.lastThirdStart.time)
+        assertTrue(tl.isha.time < tl.lastThirdStart.time)
         assertTrue(tl.lastThirdStart.time < tl.fajr.time)
         assertTrue(tl.fajr.time < tl.sunrise.time)
         assertTrue(tl.sunrise.time < tl.dhuhr.time)

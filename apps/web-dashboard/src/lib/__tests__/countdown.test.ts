@@ -68,12 +68,12 @@ describe('countdown targets next sector start (web)', () => {
 
   it('Isha sector: countdown targets Fajr', () => {
     const ctx: UserContext = {
-      now: new Date('2025-03-15T20:00:00.000Z'), // isha_to_midnight
+      now: new Date('2025-03-15T20:00:00.000Z'), // isha_to_last_third
       location: { latitude: 21.4225, longitude: 39.8262 },
       timezone: 'Asia/Riyadh',
     };
     const snapshot = computeIslamicDaySnapshot(ctx);
-    expect(['isha_to_midnight', 'last_third_to_fajr']).toContain(snapshot.currentPhase);
+    expect(['isha_to_last_third', 'last_third_to_fajr']).toContain(snapshot.currentPhase);
     const target = getCountdownTarget(ctx.now, snapshot.timeline);
     expect(target.getTime()).toBe(snapshot.timeline.fajr.getTime());
   });

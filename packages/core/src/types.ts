@@ -27,13 +27,12 @@ export type PrayerTimesData = {
 };
 
 export type DerivedMarkers = {
-  islamicMidnight: Date;
   lastThirdStart: Date;
 };
 
 export type IslamicPhaseId =
   | 'maghrib_to_isha'
-  | 'isha_to_midnight'
+  | 'isha_to_last_third'
   | 'last_third_to_fajr'
   | 'fajr_to_sunrise'
   | 'sunrise_to_dhuhr'
@@ -45,7 +44,6 @@ export type RingMarkerKind = 'primary' | 'secondary';
 export type RingMarkerId =
   | 'maghrib'
   | 'isha'
-  | 'islamic_midnight'
   | 'last_third_start'
   | 'fajr'
   | 'sunrise'
@@ -76,7 +74,6 @@ export type RingSegment = {
 export type ComputedTimeline = {
   lastMaghrib: Date;
   isha: Date;
-  islamicMidnight: Date;
   lastThirdStart: Date;
   fajr: Date;
   sunrise: Date;
@@ -107,7 +104,7 @@ export type ComputedIslamicDay = {
 
 export const PHASE_ORDER: readonly IslamicPhaseId[] = [
   'maghrib_to_isha',
-  'isha_to_midnight',
+  'isha_to_last_third',
   'last_third_to_fajr',
   'fajr_to_sunrise',
   'sunrise_to_dhuhr',
@@ -126,7 +123,7 @@ export const PHASE_BOUNDARIES: ReadonlyArray<{
   endKey: TimelineKey;
 }> = [
   { id: 'maghrib_to_isha', startKey: 'lastMaghrib', endKey: 'isha' },
-  { id: 'isha_to_midnight', startKey: 'isha', endKey: 'lastThirdStart' },
+  { id: 'isha_to_last_third', startKey: 'isha', endKey: 'lastThirdStart' },
   { id: 'last_third_to_fajr', startKey: 'lastThirdStart', endKey: 'fajr' },
   { id: 'fajr_to_sunrise', startKey: 'fajr', endKey: 'sunrise' },
   { id: 'sunrise_to_dhuhr', startKey: 'sunrise', endKey: 'dhuhr' },

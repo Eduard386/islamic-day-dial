@@ -9,7 +9,6 @@ class PhasesTest {
     private val timeline = ComputedTimeline(
         lastMaghrib = Date(1742052600000L),   // 2025-03-15T15:30:00.000Z
         isha = Date(1742058000000L),         // 2025-03-15T17:00:00.000Z
-        islamicMidnight = Date(1742069100000L),
         lastThirdStart = Date(1742074200000L),
         fajr = Date(1742090400000L),         // 2025-03-16T02:00:00.000Z
         sunrise = Date(1742094900000L),
@@ -25,15 +24,15 @@ class PhasesTest {
     }
 
     @Test
-    fun getCurrentPhase_returnsIshaToMidnightAfterIsha() {
+    fun getCurrentPhase_returnsIshaToLastThirdAfterIsha() {
         val now = Date(1742059800000L) // 17:30
-        assertEquals(IslamicPhaseId.ISHA_TO_MIDNIGHT, getCurrentPhase(now, timeline))
+        assertEquals(IslamicPhaseId.ISHA_TO_LAST_THIRD, getCurrentPhase(now, timeline))
     }
 
     @Test
-    fun getCurrentPhase_returnsIshaToMidnightUntilLastThirdStart() {
-        val now = Date(1742070000000L) // 21:00 — between islamic midnight and last third
-        assertEquals(IslamicPhaseId.ISHA_TO_MIDNIGHT, getCurrentPhase(now, timeline))
+    fun getCurrentPhase_returnsIshaToLastThirdUntilLastThirdStart() {
+        val now = Date(1742070000000L) // 21:00
+        assertEquals(IslamicPhaseId.ISHA_TO_LAST_THIRD, getCurrentPhase(now, timeline))
     }
 
     @Test
@@ -72,8 +71,8 @@ class PhasesTest {
     }
 
     @Test
-    fun getCurrentPhase_returnsIshaToMidnightExactlyAtIsha() {
-        assertEquals(IslamicPhaseId.ISHA_TO_MIDNIGHT, getCurrentPhase(timeline.isha, timeline))
+    fun getCurrentPhase_returnsIshaToLastThirdExactlyAtIsha() {
+        assertEquals(IslamicPhaseId.ISHA_TO_LAST_THIRD, getCurrentPhase(timeline.isha, timeline))
     }
 
     @Test

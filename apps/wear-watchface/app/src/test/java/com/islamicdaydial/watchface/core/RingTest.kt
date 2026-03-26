@@ -59,7 +59,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -76,7 +75,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -95,7 +93,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -114,7 +111,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -128,11 +124,10 @@ class RingTest {
     }
 
     @Test
-    fun getRingSegments_returns8Segments() {
+    fun getRingSegments_returns7Segments() {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -141,7 +136,7 @@ class RingTest {
             nextMaghrib = nextMaghrib
         )
         val segments = getRingSegments(timeline)
-        assertEquals(8, segments.size)
+        assertEquals(7, segments.size)
     }
 
     @Test
@@ -149,7 +144,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -166,7 +160,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),
@@ -183,7 +176,6 @@ class RingTest {
         val timeline = ComputedTimeline(
             lastMaghrib = lastMaghrib,
             isha = Date(1742058000000L),
-            islamicMidnight = Date(1742069100000L),
             lastThirdStart = Date(1742074200000L),
             fajr = Date(1742090400000L),
             sunrise = Date(1742094900000L),

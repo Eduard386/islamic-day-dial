@@ -1,5 +1,5 @@
 import type { PrayerTimesData, ComputedTimeline, Location } from './types.js';
-import { getIslamicMidnight, getLastThirdStart } from './night-markers.js';
+import { getLastThirdStart } from './night-markers.js';
 
 export type IslamicDayBounds = {
   lastMaghrib: Date;
@@ -60,7 +60,6 @@ export function buildTimeline(
   return {
     lastMaghrib,
     isha: nightPT.isha,
-    islamicMidnight: getIslamicMidnight(lastMaghrib, fajr),
     lastThirdStart: getLastThirdStart(lastMaghrib, fajr),
     fajr,
     sunrise,
