@@ -81,7 +81,7 @@ final class GlowWindowTests: XCTestCase {
     }
 
     func testJumuahGlowStrength_StartsWeakAtDuhaAndReachesFullByEndOfDhuhr() {
-        let startOfDuha = timeline.duhaStart
+        let startOfDuha = timeline.duhaStart.addingTimeInterval(1)
         let endOfDhuhr = timeline.asr.addingTimeInterval(-1)
         let startStrength = getJumuahGlowStrength(now: startOfDuha, timeline: timeline, currentPhase: .sunrise_to_dhuhr)
         let endStrength = getJumuahGlowStrength(now: endOfDhuhr, timeline: timeline, currentPhase: .dhuhr_to_asr)
@@ -89,6 +89,36 @@ final class GlowWindowTests: XCTestCase {
         XCTAssertGreaterThan(startStrength, 0)
         XCTAssertLessThan(startStrength, 0.5)
         XCTAssertGreaterThan(endStrength, 0.99)
+    }
+
+    func testJumuahGlowSweep_FillsOnlyDuhaToCurrentBeforeDhuhr() {
+        let now = timeline.duhaStart.addingTimeInterval((timeline.asr.timeIntervalSince(timeline.duhaStart)) * 0.25)
+        let sweep = getJumuahGlowSweepAngles(
+            now: now,
+            timeline: timeline,
+            currentPhase: .sunrise_to_dhuhr,
+            duhaStartAngleDeg: 100,
+            dhuhrAngleDeg: 200,
+            asrAngleDeg: 300
+        )
+
+        XCTAssertEqual(sweep.duhaToDhuhrEndAngleDeg ?? 0, 150, accuracy: 0.001)
+        XCTAssertNil(sweep.dhuhrToAsrEndAngleDeg)
+    }
+
+    func testJumuahGlowSweep_ContinuesIntoDhuhrToAsrAfterDhuhr() {
+        let now = timeline.duhaStart.addingTimeInterval((timeline.asr.timeIntervalSince(timeline.duhaStart)) * 0.75)
+        let sweep = getJumuahGlowSweepAngles(
+            now: now,
+            timeline: timeline,
+            currentPhase: .dhuhr_to_asr,
+            duhaStartAngleDeg: 100,
+            dhuhrAngleDeg: 200,
+            asrAngleDeg: 300
+        )
+
+        XCTAssertEqual(sweep.duhaToDhuhrEndAngleDeg ?? 0, 200, accuracy: 0.001)
+        XCTAssertEqual(sweep.dhuhrToAsrEndAngleDeg ?? 0, 250, accuracy: 0.001)
     }
 
     // MARK: - Last third phase (for pulsating glow)

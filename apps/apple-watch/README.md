@@ -1,18 +1,17 @@
 # Islamic Day Dial — Apple Platforms
 
-This Xcode project now ships four Apple surfaces in one product:
+This Xcode project now ships three Apple surfaces in one product:
 
 - `IslamicDayDial` — the main iPhone app with the full dial, location presets, status cards, and prayer times
 - `IslamicDayDialWatch` — the watchOS companion app
 - `IslamicDayDialWidget` — an iPhone Home Screen widget
-- `IslamicDayDialWatchWidget` — a watchOS WidgetKit extension for complications and Smart Stack widgets
 
 The web dashboard in `apps/web-dashboard` remains the visual source of truth.
 
 Important product note:
 
 - this is not a custom watch face
-- users install one app bundle, then manually add the complication/widget to an Apple Watch face or to Smart Stack
+- users install one app bundle, then launch the app directly on Apple Watch
 
 ## Setup
 
@@ -54,7 +53,7 @@ then **Apple is blocking** installation of the watchOS app onto a **physical** A
 **What to do:**
 
 1. Enroll in the **Apple Developer Program** (paid membership).
-2. In Xcode **Signing & Capabilities** for **both** `IslamicDayDial` and `IslamicDayDialWatch` (and the watch widget extension if signing issues appear), select the **paid team** (not “Personal Team”).
+2. In Xcode **Signing & Capabilities** for **both** `IslamicDayDial` and `IslamicDayDialWatch`, select the **paid team** (not “Personal Team”).
 3. **Xcode → Settings → Accounts** → your Apple ID → **Download Manual Profiles** (or let automatic signing refresh).
 4. **Product → Clean Build Folder**, then **Run** the iOS app on the device again so the watch app is re-embedded and reinstalled.
 
@@ -73,7 +72,7 @@ If **Devices and Simulators** shows the watch under **Disconnected** with *“Ti
 
 From a typical **appconduitd** log while Xcode / Bridge pushes the companion:
 
-- **Transfer size:** on the order of **3–4 MB compressed** over the phone ↔ watch link (example: ~3.7 MB in ~85 s at ~40 KiB/s). The **installed size on the Watch** is larger (uncompressed binary, embedded widget extension, assets). Check **Watch → Settings → General → Storage** for the real number.
+- **Transfer size:** on the order of a few MB compressed over the phone ↔ watch link. The **installed size on the Watch** is larger (uncompressed binary and assets). Check **Watch → Settings → General → Storage** for the real number.
 - **Duration:** often **tens of seconds to a few minutes**, strongly dependent on **Bluetooth/Wi‑Fi**, radio congestion, watch model, and whether the phone is busy. It is **not** a fixed “bug” if one run is much slower.
 - **Dropped link:** yes, the transport can stall or retry; keep **iPhone and Watch unlocked/awake**, **USB** to the phone for Xcode deploy, and follow the tunnel tips above. System-side detail appears under process **appconduitd** (transfer progress, install start).
 
@@ -101,7 +100,7 @@ What it includes:
 - location presets with automatic fallback
 - prayer times list
 - **local notifications** for Fajr, Asr, Maghrib, Isha, plus the special `Dhuhr / Jumu'ah / Eid` slot (rescheduled on app launch and when returning from background)
-- embedded watch companion and widget extension
+- embedded watch companion
 
 ### iPhone dial interactions
 
@@ -121,21 +120,11 @@ What it includes:
 
 The companion watchOS app. It reuses the same dial logic and rendering files that power the iPhone app.
 
-### `IslamicDayDialWatchWidget`
-
-The watch WidgetKit extension. It reuses the shared Swift core and ring renderer for:
-
-- `.accessoryCircular`
-- `.accessoryRectangular`
-- `.accessoryInline`
-
-Use this target for Apple Watch complications and Smart Stack widgets. It is embedded in the watch app, not the iPhone app.
-
 ### Prayer notifications (iOS)
 
 `PrayerNotificationScheduler` schedules local notifications for Fajr, Asr, Maghrib, Isha, plus a midday special slot. On normal days that slot is `Dhuhr` at `Dhuhr`. On Fridays it becomes `Jumu'ah` at `Duha`, with no `Dhuhr` notification later. On Eid it becomes the Eid name at `Duha`, with no `Dhuhr` notification later, including when Eid falls on Friday. Eid days also get an extra greeting notification 2 hours after `Duha`: title `Taqabbal Allahu minna wa minkum!`, body `May Allah accept from us and from you!`. Titles use the marker name and bodies use the Hijri date unless the notification is this fixed Eid greeting. Rescheduled on app launch and when returning from background (handles travel).
 
-Apple Watch complications/widgets do not replace prayer notifications. Phase 1 keeps notification scheduling on iPhone and relies on normal iPhone-to-Watch mirroring behavior when system settings allow it.
+Apple Watch app presence does not replace prayer notifications. Phase 1 keeps notification scheduling on iPhone and relies on normal iPhone-to-Watch mirroring behavior when system settings allow it.
 
 ### `IslamicDayDialWidget`
 
@@ -150,7 +139,7 @@ The following Swift files are compiled into multiple targets through `project.ym
 - `IslamicDayDialWatch/Geometry.swift`
 - `IslamicDayDialWatch/Colors.swift`
 
-This keeps the ring math and display behavior aligned across iPhone, iPhone widget, watch app, and watch complication/widget surfaces without duplicating algorithms.
+This keeps the ring math and display behavior aligned across iPhone, iPhone widget, and watch app without duplicating algorithms.
 
 ## Run on device
 
@@ -225,12 +214,6 @@ If Xcode’s deploy or signing seems broken on the Mac, grant **Full Disk Access
 **F. iOS and watchOS versions**
 
 The **iPhone** and **paired Apple Watch** should be on **compatible** OS generations (same major release track, e.g. both current stable or both same beta). A very new **iPhone** OS with an old **watchOS** (or the opposite) often causes **companion install** failures that show only as generic errors on the watch.
-
-### Watch complication / Smart Stack widget
-
-- Run the `IslamicDayDialWatch` scheme once so the watch app bundle installs
-- On Apple Watch, edit the current watch face or open Smart Stack widget editing
-- Add `Islamic Day Dial`
 
 ### Widget
 

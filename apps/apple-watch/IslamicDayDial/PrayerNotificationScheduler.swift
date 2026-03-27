@@ -33,11 +33,19 @@ enum PrayerNotificationScheduler {
         let fireDate: Date
     }
 
+    private static var authorizationOptions: UNAuthorizationOptions {
+        #if os(watchOS)
+        return [.alert, .sound]
+        #else
+        return [.alert, .sound, .badge]
+        #endif
+    }
+
     /// Request notification authorization and schedule prayer notifications.
     /// Call when app has resolved user location.
     static func requestAndSchedule(location: Location) async {
         let center = UNUserNotificationCenter.current()
-        guard (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) == true else { return }
+        guard (try? await center.requestAuthorization(options: authorizationOptions)) == true else { return }
         await schedule(location: location)
     }
 
@@ -173,6 +181,28 @@ enum PrayerNotificationScheduler {
         let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
         let id = "\(Self.identifierPrefix)\(plan.kind.rawValue)_\(comps.year ?? 0)_\(comps.month ?? 0)_\(comps.day ?? 0)_\(comps.hour ?? 0)_\(comps.minute ?? 0)"
         return UNNotificationRequest(identifier: id, content: content, trigger: trigger)
+    }
+
+    static func sendRandomDebugNotification(date: Date, location: Location) async {
+        let center = UNUserNotificationCenter.current()
+        guard (try? await center.requestAuthorization(options: authorizationOptions)) == true else { return }
+
+        let sourcePlans = buildPlans(for: date, location: location) ?? []
+        guard let selected = sourcePlans.randomElement() else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = selected.title
+        content.body = selected.body
+        content.sound = .default
+        content.categoryIdentifier = Self.categoryId
+
+        let request = UNNotificationRequest(
+            identifier: "\(Self.identifierPrefix)debug_\(UUID().uuidString)",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+
+        try? await center.add(request)
     }
 
     /// For unit testing notification naming and timing rules.

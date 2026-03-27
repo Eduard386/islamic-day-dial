@@ -13,6 +13,8 @@ private let PHONE_HIDDEN_TICK_IDS: Set<String> = ["duha_start", "duha_end"]
 private let MOON_INNER_R: Double = 0.82
 private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔peak↔base)
 private let PHONE_INFO_RADIUS_EXPANSION_RATIO: CGFloat = 10 / 420
+private let PHONE_RING_DRIFT_DURATION: Double = 132
+private let PHONE_RING_DRIFT_BAND_DEG: CGFloat = 18
 
 private struct MoonPhaseParams {
     let shadowOffset: Double
@@ -100,6 +102,17 @@ private enum SunRenderStyle {
     case maghrib
 }
 
+private extension SunRenderStyle {
+    var stableId: String {
+        switch self {
+        case .normal: return "normal"
+        case .sunrise: return "sunrise"
+        case .midday: return "midday"
+        case .maghrib: return "maghrib"
+        }
+    }
+}
+
 enum RingRenderVariant {
     case watch
     case phone
@@ -179,6 +192,42 @@ private func adjustedArcBounds(startDeg: CGFloat, endDeg: CGFloat, radiusScale: 
     let midpoint = startDeg + span / 2
     let adjustedSpan = span * radiusScale
     return (midpoint - adjustedSpan / 2, midpoint + adjustedSpan / 2)
+}
+
+private func phoneNormalizedAngle(_ angle: CGFloat) -> CGFloat {
+    let remainder = angle.truncatingRemainder(dividingBy: 360)
+    return remainder >= 0 ? remainder : remainder + 360
+}
+
+private func phoneAngleIntervals(startDeg: CGFloat, endDeg: CGFloat) -> [(CGFloat, CGFloat)] {
+    let start = phoneNormalizedAngle(startDeg)
+    let end = phoneNormalizedAngle(endDeg)
+    if abs(start - end) < 0.001 { return [] }
+    if start < end { return [(start, end)] }
+    return [(start, 360), (0, end)]
+}
+
+private func phoneArcOverlapSegments(
+    startDeg: CGFloat,
+    endDeg: CGFloat,
+    highlightStartDeg: CGFloat,
+    highlightEndDeg: CGFloat
+) -> [(CGFloat, CGFloat)] {
+    let arcIntervals = phoneAngleIntervals(startDeg: startDeg, endDeg: endDeg)
+    let highlightIntervals = phoneAngleIntervals(startDeg: highlightStartDeg, endDeg: highlightEndDeg)
+    guard !arcIntervals.isEmpty, !highlightIntervals.isEmpty else { return [] }
+
+    var overlaps: [(CGFloat, CGFloat)] = []
+    for arc in arcIntervals {
+        for highlight in highlightIntervals {
+            let lower = max(arc.0, highlight.0)
+            let upper = min(arc.1, highlight.1)
+            if upper - lower > 0.15 {
+                overlaps.append((lower, upper))
+            }
+        }
+    }
+    return overlaps
 }
 
 func expandedPhoneRingRadius(baseRadius: CGFloat, size: CGFloat, infoProgress: Double) -> CGFloat {
@@ -274,6 +323,141 @@ private struct SunMarkerStyle {
     let strongGlow: Bool
 }
 
+private struct PhoneRingSurfaceUnderlay: View {
+    let ringGradient: AngularGradient
+    let phoneArcSpecs: [PhoneRingArcSpec]
+    let size: CGFloat
+    let ringRadius: CGFloat
+    let cStroke: CGFloat
+
+    private var coloredArcSpecs: [PhoneRingArcSpec] {
+        phoneArcSpecs.filter { $0.kind != .ishaGroup }
+    }
+
+    var body: some View {
+        ZStack {
+            ForEach(coloredArcSpecs) { spec in
+                PhoneRingArcShape(
+                    radius: ringRadius + cStroke * 0.5,
+                    startAngleDeg: spec.startAngleDeg,
+                    endAngleDeg: spec.endAngleDeg
+                )
+                .stroke(
+                    Color(red: 1, green: 0.95, blue: 0.82).opacity(0.045),
+                    style: StrokeStyle(lineWidth: max(0.6, size * (0.72 / 420)), lineCap: .butt, lineJoin: .miter)
+                )
+                .blur(radius: size * (1.15 / 420))
+
+                PhoneRingArcShape(
+                    radius: ringRadius + cStroke * 0.46,
+                    startAngleDeg: spec.startAngleDeg,
+                    endAngleDeg: spec.endAngleDeg
+                )
+                .stroke(
+                    ringGradient,
+                    style: StrokeStyle(lineWidth: max(0.5, size * (0.55 / 420)), lineCap: .butt, lineJoin: .miter)
+                )
+                .opacity(0.03)
+                .blur(radius: size * (0.95 / 420))
+            }
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+private struct PhoneRingSurfaceFinishOverlay: View {
+    let ringGradient: AngularGradient
+    let phoneArcSpecs: [PhoneRingArcSpec]
+    let size: CGFloat
+    let ringRadius: CGFloat
+    let cStroke: CGFloat
+    let phoneInfoProgress: Double
+
+    private var coloredArcSpecs: [PhoneRingArcSpec] {
+        phoneArcSpecs.filter { $0.kind != .ishaGroup }
+    }
+
+    var body: some View {
+        let isEnhancedSurfaceActive = phoneInfoProgress < 0.01
+        Group {
+            if isEnhancedSurfaceActive {
+                TimelineView(.periodic(from: .now, by: 1.0)) { timeline in
+                    let t = timeline.date.timeIntervalSince1970.truncatingRemainder(dividingBy: PHONE_RING_DRIFT_DURATION)
+                    let centerAngle = CGFloat(t / PHONE_RING_DRIFT_DURATION) * 360
+                    finishBody(
+                        highlightStart: centerAngle - PHONE_RING_DRIFT_BAND_DEG / 2,
+                        highlightEnd: centerAngle + PHONE_RING_DRIFT_BAND_DEG / 2
+                    )
+                }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private func finishBody(highlightStart: CGFloat?, highlightEnd: CGFloat?) -> some View {
+        ZStack {
+            ForEach(coloredArcSpecs) { spec in
+                PhoneRingArcShape(
+                    radius: ringRadius + cStroke * 0.34,
+                    startAngleDeg: spec.startAngleDeg,
+                    endAngleDeg: spec.endAngleDeg
+                )
+                .stroke(
+                    ringGradient,
+                    style: StrokeStyle(lineWidth: max(1.0, size * (1.18 / 420)), lineCap: .butt, lineJoin: .miter)
+                )
+                .opacity(0.2)
+
+                PhoneRingArcShape(
+                    radius: ringRadius + cStroke * 0.37,
+                    startAngleDeg: spec.startAngleDeg,
+                    endAngleDeg: spec.endAngleDeg
+                )
+                .stroke(
+                    Color.white.opacity(0.075),
+                    style: StrokeStyle(lineWidth: max(0.65, size * (0.72 / 420)), lineCap: .butt, lineJoin: .miter)
+                )
+                .blur(radius: size * (0.45 / 420))
+            }
+
+            if let highlightStart, let highlightEnd {
+                ForEach(Array(coloredArcSpecs.enumerated()), id: \.offset) { _, spec in
+                    let overlaps = phoneArcOverlapSegments(
+                        startDeg: spec.startAngleDeg,
+                        endDeg: spec.endAngleDeg,
+                        highlightStartDeg: highlightStart,
+                        highlightEndDeg: highlightEnd
+                    )
+                    ForEach(Array(overlaps.enumerated()), id: \.offset) { _, overlap in
+                        PhoneRingArcShape(
+                            radius: ringRadius + cStroke * 0.29,
+                            startAngleDeg: overlap.0,
+                            endAngleDeg: overlap.1
+                        )
+                        .stroke(
+                            Color.white.opacity(0.07),
+                            style: StrokeStyle(lineWidth: max(0.95, size * (1.05 / 420)), lineCap: .butt, lineJoin: .miter)
+                        )
+                        .blur(radius: size * (1.2 / 420))
+
+                        PhoneRingArcShape(
+                            radius: ringRadius + cStroke * 0.24,
+                            startAngleDeg: overlap.0,
+                            endAngleDeg: overlap.1
+                        )
+                        .stroke(
+                            Color(red: 1, green: 0.94, blue: 0.8).opacity(0.06),
+                            style: StrokeStyle(lineWidth: max(1.45, size * (1.55 / 420)), lineCap: .butt, lineJoin: .miter)
+                        )
+                        .blur(radius: size * (1.95 / 420))
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct RingView: View {
     let snapshot: ComputedIslamicDay
     var now: Date = Date()
@@ -300,7 +484,7 @@ struct RingView: View {
         let distToMag = normAngle(maghribAngle - progressAngle)
         
         // Web maghrib zone: red disk + red glow.
-        if distToMag <= RED_SUN_ZONE_DEG {
+        if currentPhase == .asr_to_maghrib && distToMag <= RED_SUN_ZONE_DEG {
             return SunMarkerStyle(style: .maghrib, color: SUN_RED, glowColor: SUN_RED, strongGlow: true)
         }
         // Web sunrise sub-period: orange disk + orange glow.
@@ -362,6 +546,16 @@ struct RingView: View {
             ZStack(alignment: .center) {
                 if renderVariant == .phone {
                     ZStack(alignment: .center) {
+                        if !phoneArcSpecs.isEmpty && phoneInfoProgress < 0.01 {
+                            PhoneRingSurfaceUnderlay(
+                                ringGradient: ringGradient,
+                                phoneArcSpecs: phoneArcSpecs,
+                                size: cs,
+                                ringRadius: ringRadius,
+                                cStroke: cStroke
+                            )
+                        }
+
                         PhoneNightGlowOverlay(
                             snapshot: snapshot,
                             now: now,
@@ -385,6 +579,14 @@ struct RingView: View {
                                     style: StrokeStyle(lineWidth: cStroke, lineCap: .butt, lineJoin: .miter)
                                 )
                             }
+                            PhoneRingSurfaceFinishOverlay(
+                                ringGradient: ringGradient,
+                                phoneArcSpecs: phoneArcSpecs,
+                                size: cs,
+                                ringRadius: ringRadius,
+                                cStroke: cStroke,
+                                phoneInfoProgress: phoneInfoProgress
+                            )
                         } else {
                             Circle()
                                 .stroke(
@@ -473,8 +675,8 @@ private struct PhoneNightGlowOverlay: View {
         TimelineView(.animation) { timeline in
             let (base, phase) = glowPulsePhase(timeline.date)
             let jumuStrength = getJumuahGlowStrength(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
-            let jumuBase = base * jumuStrength
-            let jumuPeak = phase * jumuStrength
+            let jumuBaseOpacity = min(1, 0.12 + 0.28 * jumuStrength + 0.16 * base)
+            let jumuPeakOpacity = min(1, 0.16 + 0.42 * jumuStrength + 0.28 * phase)
             let lastThirdBase = base
             let lastThirdPeak = phase * 0.92  // Slightly brighter and stronger
 
@@ -512,28 +714,28 @@ private struct PhoneNightGlowOverlay: View {
                     let jumuColor = Color(red: 0.486, green: 0.722, blue: 0.910)
                     ZStack {
                         pathDuhaToDhuhr
-                        .stroke(
-                            jumuColor.opacity(jumuBase),
-                            style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
-                        )
-                        .blur(radius: size * (3 / 420))
+                            .stroke(
+                                jumuColor.opacity(jumuBaseOpacity),
+                                style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                            )
+                            .blur(radius: size * (3 / 420))
                         pathDhuhrToAsr
-                        .stroke(
-                            jumuColor.opacity(jumuBase),
-                            style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
-                        )
-                        .blur(radius: size * (3 / 420))
+                            .stroke(
+                                jumuColor.opacity(jumuBaseOpacity),
+                                style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                            )
+                            .blur(radius: size * (3 / 420))
                         pathDuhaToDhuhr
-                        .stroke(
-                            jumuColor.opacity(jumuPeak),
-                            style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
-                        )
-                        .blur(radius: size * (5 / 420))
+                            .stroke(
+                                jumuColor.opacity(jumuPeakOpacity),
+                                style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
+                            )
+                            .blur(radius: size * (5 / 420))
                         pathDhuhrToAsr
-                        .stroke(
-                            jumuColor.opacity(jumuPeak),
-                            style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
-                        )
+                            .stroke(
+                                jumuColor.opacity(jumuPeakOpacity),
+                                style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
+                            )
                             .blur(radius: size * (5 / 420))
                     }
                 }
@@ -656,6 +858,7 @@ private struct CurrentMarkerOverlay: View {
                 dialCenter: CGPoint(x: ccx, y: ccy),
                 renderVariant: renderVariant
             )
+            .id("\(state.style.stableId)-\(Int(markerCenter.x.rounded()))-\(Int(markerCenter.y.rounded()))")
         }
     }
 

@@ -210,6 +210,12 @@ private func isPhoneHijriDateTap(location: CGPoint, containerSize: CGSize) -> Bo
     return dateRect.contains(location)
 }
 
+private func isPhoneUpwardDismissSwipe(_ value: DragGesture.Value) -> Bool {
+    let dx = value.translation.width
+    let dy = value.translation.height
+    return dy < -34 && abs(dy) > abs(dx) * 1.15
+}
+
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var automaticLocation: Location = .mecca
@@ -303,6 +309,17 @@ struct ContentView: View {
                                     }
                                 }
                         )
+                        .simultaneousGesture(
+                            DragGesture(minimumDistance: 22)
+                                .onEnded { value in
+                                    guard
+                                        sectorSpotlightOpacity < 0.001,
+                                        insightOpacity > 0.001,
+                                        isPhoneUpwardDismissSwipe(value)
+                                    else { return }
+                                    dismissInsightPresentation(triggerHaptic: true)
+                                }
+                        )
                 }
                 .overlay {
                     if !sectorSpotlightTitle.isEmpty {
@@ -386,7 +403,8 @@ struct ContentView: View {
                     onSeparatedSectorTap: { _ in closeInfoMode(triggerHaptic: true) },
                     onCurrentSectorTap: { title, source in beginSectorSpotlight(title: title, source: source) },
                     onFootnoteTap: { title in beginSectorSpotlight(title: title, source: .separated) },
-                    onBackgroundTap: { closeInfoMode(triggerHaptic: false) }
+                    onBackgroundTap: { closeInfoMode(triggerHaptic: false) },
+                    onSeparatedSwipeUp: { closeInfoMode(triggerHaptic: true) }
                 )
                     .frame(height: DIAL_SECTION_HEIGHT)
             } else {
@@ -547,6 +565,7 @@ private struct PhoneDialView: View {
     let onCurrentSectorTap: (String, PhoneSectorSpotlightSource) -> Void
     let onFootnoteTap: (String) -> Void
     let onBackgroundTap: () -> Void
+    let onSeparatedSwipeUp: () -> Void
 
     var body: some View {
         GeometryReader { geo in
@@ -591,6 +610,13 @@ private struct PhoneDialView: View {
                     .onTapGesture {
                         onBackgroundTap()
                     }
+                    .gesture(
+                        DragGesture(minimumDistance: 22)
+                            .onEnded { value in
+                                guard canTapSeparatedBackground, isPhoneUpwardDismissSwipe(value) else { return }
+                                onSeparatedSwipeUp()
+                            }
+                    )
 
                 PhoneDialFootnotesView(
                     snapshot: snapshot,
@@ -683,8 +709,10 @@ private struct PhoneDialView: View {
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date) -> some View {
         let phase = currentPhase(snapshot: snap, now: now)
+        let fontSize: CGFloat = 20
         Text(periodLabel(snapshot: snap, now: now).uppercased())
-            .font(.system(size: 20, weight: .light))
+            .font(.system(size: fontSize, weight: .light))
+            .tracking(fontSize * 0.1)
             .foregroundColor(periodColor(snapshot: snap, now: now))
             .modifier(IshaShadowModifier(phase: phase))
     }
@@ -752,6 +780,47 @@ private struct HijriEngravedLabelsModifier: ViewModifier {
     }
 }
 
+private struct PhoneHijriDimensionalGoldModifier: ViewModifier {
+    let isEid: Bool
+    let secondary: Bool
+
+    func body(content: Content) -> some View {
+        if isEid {
+            content
+                .foregroundStyle(Color(red: 0.06, green: 0.73, blue: 0.51))
+                .modifier(HijriEngravedLabelsModifier(isEid: true))
+        } else {
+            let top = secondary
+                ? Color(red: 0.9, green: 0.8, blue: 0.55)
+                : Color(red: 0.95, green: 0.84, blue: 0.58)
+            let mid = secondary
+                ? Color(red: 0.77, green: 0.61, blue: 0.24)
+                : Color(red: 0.83, green: 0.66, blue: 0.24)
+            let bottom = secondary
+                ? Color(red: 0.49, green: 0.36, blue: 0.12)
+                : Color(red: 0.57, green: 0.41, blue: 0.1)
+            let topLight = Color.white.opacity(0.12)
+            let warmLift = Color(red: 1, green: 0.95, blue: 0.78).opacity(0.06)
+            let innerGlow = (secondary ? Colors.secondaryGold : Colors.primaryGold).opacity(0.07)
+            let shade = Color.black.opacity(0.42)
+
+            content
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [top, mid, bottom],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .shadow(color: topLight, radius: 0, x: 0, y: -0.7)
+                .shadow(color: warmLift, radius: 1.0, x: 0, y: -0.2)
+                .shadow(color: innerGlow, radius: 2.8)
+                .shadow(color: shade, radius: 0, x: 0, y: 1.0)
+                .shadow(color: shade.opacity(0.5), radius: 1.6, x: 0, y: 1.4)
+        }
+    }
+}
+
 private struct HijriDateLabels: View {
     private let parts: (dayMonth: String, year: String, isEid: Bool)
     private let useCompactDayMonth: Bool
@@ -783,12 +852,10 @@ private struct HijriDateLabels: View {
                     .font(.system(size: useCompactDayMonth ? 15 : 18, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
-                    .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
+                    .modifier(PhoneHijriDimensionalGoldModifier(isEid: parts.isEid, secondary: false))
                 Text(parts.year)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.secondaryGold)
-                    .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
+                    .modifier(PhoneHijriDimensionalGoldModifier(isEid: parts.isEid, secondary: true))
             }
             .scaleEffect(scale)
             .brightness(-0.01 + phase * 0.04)

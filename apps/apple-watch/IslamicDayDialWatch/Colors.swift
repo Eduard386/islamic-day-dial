@@ -24,6 +24,8 @@ enum Colors {
 
     static let primaryGold = Color(red: 200 / 255, green: 155 / 255, blue: 44 / 255)   // #C89B2C
     static let secondaryGold = Color(red: 184 / 255, green: 138 / 255, blue: 52 / 255) // #B88A34
+    static let primaryGoldBright = Color(red: 216 / 255, green: 174 / 255, blue: 74 / 255)
+    static let secondaryGoldBright = Color(red: 203 / 255, green: 161 / 255, blue: 78 / 255)
     static let coolLabel = Color(red: 193 / 255, green: 198 / 255, blue: 216 / 255)    // #C1C6D8
     static let softUtility = Color(red: 221 / 255, green: 214 / 255, blue: 201 / 255)  // #DDD6C9
     static let warmSacredWhite = Color(red: 242 / 255, green: 238 / 255, blue: 227 / 255) // #F2EEE3

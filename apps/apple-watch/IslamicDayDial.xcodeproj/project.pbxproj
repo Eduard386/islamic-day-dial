@@ -18,36 +18,24 @@
 		0F10DD651B41E8C61096504B /* PrayerTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F5B9A474256B02329F10A /* PrayerTimes.swift */; };
 		10278AB76290AFED0ECE8A02 /* HijriCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989E92A33AE03F1F7B667BB3 /* HijriCalendar.swift */; };
 		141F981E50D3BAC565BDA59F /* SegmentGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ED668A9504CB6EEA590651 /* SegmentGradients.swift */; };
-		14D80D631D5D39B69A7BA66E /* Phases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07ABDBDD6F4BE7BCF35137A3 /* Phases.swift */; };
-		157E982D230730A3D7334296 /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAD5540EF57FCEDAA17DC /* GeoResolver.swift */; };
 		1716D0502C718926D05D0829 /* RingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF66B027AD9605B046537D5C /* RingView.swift */; };
 		1802F5AD2A65F39985A196D7 /* PrayerTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F5B9A474256B02329F10A /* PrayerTimes.swift */; };
-		1A5C8A78BA6030376AE216AF /* PrayerTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F5B9A474256B02329F10A /* PrayerTimes.swift */; };
-		1BC1DFA30FB219B8A7DBCE3D /* Ring.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE030CA39FCD2B8F31EBC648 /* Ring.swift */; };
 		20B4D9EF4A97BD6696C6B7FB /* NightMarkers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E5667D030F7E223C0843AA /* NightMarkers.swift */; };
 		22B5C81BCF45649BC4398731 /* Phases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07ABDBDD6F4BE7BCF35137A3 /* Phases.swift */; };
-		23C666D6B83408BF75D50C3F /* HijriCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989E92A33AE03F1F7B667BB3 /* HijriCalendar.swift */; };
 		24A21DD3C075F6A397DBECA8 /* HijriCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989E92A33AE03F1F7B667BB3 /* HijriCalendar.swift */; };
-		24FC93D76CE6FCBB78557910 /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79B56F348C4ADA801BAF7367 /* Snapshot.swift */; };
-		280ED957B2DBC2144C461EB7 /* GlowWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA021D65C59110B9A94019A /* GlowWindow.swift */; };
 		2A278CB3259D8350579FFD4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD29CDA7D639629AC0DDFBBD /* Assets.xcassets */; };
 		2C3711A0994237BAA6C29522 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 97B7F54DCBC457A3C0362B68 /* Adhan */; };
 		2E9114ABC3C7FABAC6F59367 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539BD8D8A54274C6B53853BE /* Formatting.swift */; };
 		3074983A1AD94B1C49A774F1 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA39891D6B8C6BF0329D13AC /* Colors.swift */; };
-		30ACF88BC517571D1A76AB33 /* NightMarkers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E5667D030F7E223C0843AA /* NightMarkers.swift */; };
 		33CF69558C9C089365771950 /* WatchInstallDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = E584BDFFBE091FB788332E35 /* WatchInstallDiagnostics.swift */; };
 		33E18E8F7774DC57F89B1529 /* PrayerNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */; };
 		341891A80978D13891E688CE /* WidgetPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0B21B31BF8332146622E0F /* WidgetPresentation.swift */; };
 		349471C3CDDB1D4EB3AE5442 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6A12D330BFFD3A8D8269E5 /* Types.swift */; };
 		383FB7A48BD21CC12D96103F /* GlowWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA021D65C59110B9A94019A /* GlowWindow.swift */; };
-		3B6DF0A43E0BFD82687F253E /* DayBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926DDF68987C449EA796E817 /* DayBounds.swift */; };
 		3F0BE68AA581F0490E19F0DF /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539BD8D8A54274C6B53853BE /* Formatting.swift */; };
 		3F541F4176A6F91F212D4C85 /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAD5540EF57FCEDAA17DC /* GeoResolver.swift */; };
-		405BFE8C4F0A1AAECA886F81 /* RingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF66B027AD9605B046537D5C /* RingView.swift */; };
 		4171830354B5513901C5B226 /* HijriCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 989E92A33AE03F1F7B667BB3 /* HijriCalendar.swift */; };
 		435015DF58F2C307C8CC1D16 /* IslamicDayDialApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2730D4B1BE1EE2C49777CA1D /* IslamicDayDialApp.swift */; };
-		455840F4FA146EA4AD4092C1 /* SegmentGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ED668A9504CB6EEA590651 /* SegmentGradients.swift */; };
-		478684781D0D8823493EDF14 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59AB0259162CFF8E8BFF885 /* Geometry.swift */; };
 		47B039798C56322D8EF14BB5 /* Phases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07ABDBDD6F4BE7BCF35137A3 /* Phases.swift */; };
 		48EE0993CB6085AEA16157F6 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = F73B0D2D4A5AE685A6A15696 /* Adhan */; };
 		4C1A78CC44DEFFEC04293568 /* IslamicDayDialWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FC7B4E3A74A600017506DB /* IslamicDayDialWatchApp.swift */; };
@@ -55,16 +43,13 @@
 		4F6313AB0881CE566C7CFACD /* GlowWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE978CCE5827A9F804A61F80 /* GlowWindowTests.swift */; };
 		5079444D0E866B0AFAD1E8F1 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6A12D330BFFD3A8D8269E5 /* Types.swift */; };
 		5271F368DCCE4984A0539855 /* NightMarkers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E5667D030F7E223C0843AA /* NightMarkers.swift */; };
-		543AC7FA46E6C8E037A29583 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA39891D6B8C6BF0329D13AC /* Colors.swift */; };
 		5790BA1FD04C701E6712B8E9 /* SegmentGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19ED668A9504CB6EEA590651 /* SegmentGradients.swift */; };
-		5A6633B109AFA23AB8F111BF /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539BD8D8A54274C6B53853BE /* Formatting.swift */; };
 		63BF9894EB3F7078E18D35B5 /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAD5540EF57FCEDAA17DC /* GeoResolver.swift */; };
 		690503D63E3FC627743A926A /* IslamicDayDialWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 06322A748CFC2A9CF44046DB /* IslamicDayDialWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6BB14E128BC16999D9075506 /* IslamicDayDialWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 198C5249B9FCCCFE7493AC60 /* IslamicDayDialWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		71C32E5ADA9EDB41D92EA55D /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAD5540EF57FCEDAA17DC /* GeoResolver.swift */; };
 		73280AD028CD2729217828F8 /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6AFD71C2DB37C124D06B287 /* GeometryTests.swift */; };
 		7398FB63978F1BB6AC70AA86 /* VisitTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915B3BBEE071FE6FED33633D /* VisitTracker.swift */; };
-		7399EDDACF5DA03DC768C571 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 5E4757AC62D1D39B112079B5 /* Adhan */; };
 		75AE222AD747118DF48DB6B6 /* Config.xcconfig.example in Resources */ = {isa = PBXBuildFile; fileRef = 6BADD107DFD9B46327A36775 /* Config.xcconfig.example */; };
 		792327177B12AA2A2EC14911 /* NightMarkers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E5667D030F7E223C0843AA /* NightMarkers.swift */; };
 		7E171A9F3E9163CFF26ACE1C /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6A12D330BFFD3A8D8269E5 /* Types.swift */; };
@@ -73,13 +58,11 @@
 		82EC924BF141C2E4DC1ECFA2 /* GeoResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAD5540EF57FCEDAA17DC /* GeoResolver.swift */; };
 		85721C419FCCE26E33B74CB4 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA39891D6B8C6BF0329D13AC /* Colors.swift */; };
 		86402B0A62962DD834292878 /* DayBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926DDF68987C449EA796E817 /* DayBounds.swift */; };
-		8B5D612AEB72EA0E2DF1E452 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6A12D330BFFD3A8D8269E5 /* Types.swift */; };
 		9449F5EEC636A30E809B03AF /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59AB0259162CFF8E8BFF885 /* Geometry.swift */; };
 		965239DF50905820CFB96494 /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79B56F348C4ADA801BAF7367 /* Snapshot.swift */; };
 		968A5F9EEDB70C3FCD62A349 /* GlowWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA021D65C59110B9A94019A /* GlowWindow.swift */; };
 		9D731049BBCF1C76F4876FA1 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA39891D6B8C6BF0329D13AC /* Colors.swift */; };
 		9E655BD1E73E685E1BBA27F4 /* IslamicDayDialWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EEC3B1FDAE79A2CA8FD05F4 /* IslamicDayDialWidget.swift */; };
-		9F67A2C11BB6F09382B2B974 /* IslamicDayDialWatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0663CA25AB23B7F07B0316 /* IslamicDayDialWatchWidget.swift */; };
 		A1032BBF36E430E8C22E2387 /* CountdownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338B2525DABD91818C833DF3 /* CountdownTests.swift */; };
 		A160B42D0ED9489527DE901B /* RingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF66B027AD9605B046537D5C /* RingView.swift */; };
 		A1B9C9459906F0B9651C0EB1 /* Phases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07ABDBDD6F4BE7BCF35137A3 /* Phases.swift */; };
@@ -87,7 +70,6 @@
 		A62F357B92DD6F7C1F4F9868 /* Ring.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE030CA39FCD2B8F31EBC648 /* Ring.swift */; };
 		A798DBABEDF4DF9320973420 /* PrayerTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F5B9A474256B02329F10A /* PrayerTimes.swift */; };
 		A7E5D7EDD1B1F73EF614630A /* DayBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926DDF68987C449EA796E817 /* DayBounds.swift */; };
-		AAAFE90A1FC7F34369894133 /* WidgetPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0B21B31BF8332146622E0F /* WidgetPresentation.swift */; };
 		AB036FAA64B3DCFA48835235 /* DayBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926DDF68987C449EA796E817 /* DayBounds.swift */; };
 		B24D58C27A11DF086C6BF912 /* GeoResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CDE66D7D65BB546EBCE261 /* GeoResolverTests.swift */; };
 		B8D1059B8CBA9B77B03878E5 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F59AB0259162CFF8E8BFF885 /* Geometry.swift */; };
@@ -107,8 +89,8 @@
 		E7462FD9B08CB4DEB54C1CA4 /* Ring.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE030CA39FCD2B8F31EBC648 /* Ring.swift */; };
 		E9CB8398821E7DB7C1403BAC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F87FA27B91FD24BFD5E996 /* ContentView.swift */; };
 		EA8F4F70A642C6AFD78EBCF7 /* PrayerTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089F5B9A474256B02329F10A /* PrayerTimes.swift */; };
-		EE74A53AC0E37CC27F0CE631 /* IslamicDayDialWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CC57459B9316C2BC695014FE /* IslamicDayDialWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EF5BE1265CBBFFD0BC1D4C4D /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 6CB10D9B7CE35A7489E830C8 /* Adhan */; };
+		F21F3C8CF604FC468522CE98 /* PrayerNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */; };
 		F62AA3D50BAF56B8E955F143 /* DuhaStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F618B8CDAF9F87887992E08F /* DuhaStartTests.swift */; };
 		F90BFD32DE8B324951AF7CB8 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539BD8D8A54274C6B53853BE /* Formatting.swift */; };
 		FA71A797EA9E5AFFA412C369 /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79B56F348C4ADA801BAF7367 /* Snapshot.swift */; };
@@ -134,13 +116,6 @@
 			remoteGlobalIDString = 7C9B98C9CD992966F3C237BC;
 			remoteInfo = IslamicDayDialWidget;
 		};
-		DB839DC7FF48B9A071019F52 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 285930909565B75856EF09F6 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 34AFDB7E06085D18AB4F8F70;
-			remoteInfo = IslamicDayDialWatchWidget;
-		};
 		F6658BBDCE20607227315717 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 285930909565B75856EF09F6 /* Project object */;
@@ -151,17 +126,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		5EBF6FB05651F4524C29417F /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				EE74A53AC0E37CC27F0CE631 /* IslamicDayDialWatchWidget.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E8E567B4692C691705F37E7B /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -210,16 +174,13 @@
 		926DDF68987C449EA796E817 /* DayBounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayBounds.swift; sourceTree = "<group>"; };
 		980A19E58FF771E3ADFC7D4D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		989E92A33AE03F1F7B667BB3 /* HijriCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HijriCalendar.swift; sourceTree = "<group>"; };
-		9F0663CA25AB23B7F07B0316 /* IslamicDayDialWatchWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWatchWidget.swift; sourceTree = "<group>"; };
 		A6AFD71C2DB37C124D06B287 /* GeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		AA39891D6B8C6BF0329D13AC /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
-		AD406526767A754BB9492B0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AE978CCE5827A9F804A61F80 /* GlowWindowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlowWindowTests.swift; sourceTree = "<group>"; };
 		B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerNotificationScheduler.swift; sourceTree = "<group>"; };
 		B4F87FA27B91FD24BFD5E996 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B8D4E76B6C1A49D289148AA3 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		BF66B027AD9605B046537D5C /* RingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingView.swift; sourceTree = "<group>"; };
-		CC57459B9316C2BC695014FE /* IslamicDayDialWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = IslamicDayDialWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE030CA39FCD2B8F31EBC648 /* Ring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ring.swift; sourceTree = "<group>"; };
 		D3715B31AE84BE3336BA0F3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DD29CDA7D639629AC0DDFBBD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -250,14 +211,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9B429B4051748C0008942C5D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7399EDDACF5DA03DC768C571 /* Adhan in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C24EAD95666D223A5DBEB452 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -284,7 +237,6 @@
 				D3F7A7FEBDDB39980DFF0083 /* IslamicDayDialTests */,
 				488BA7746BDC874901ABC964 /* IslamicDayDialWatch */,
 				F95DA3AF9B1C09650C2C85BA /* IslamicDayDialWatchAssets */,
-				C51671DC8E39100250E9A0EA /* IslamicDayDialWatchWidget */,
 				4B492DED048AD20FEBA1D6A1 /* IslamicDayDialWidget */,
 				ABC8255F13EA673563001A54 /* Products */,
 			);
@@ -334,19 +286,9 @@
 				E227165691AC83CDEE71442D /* IslamicDayDial.app */,
 				388E2C9F52BF2B1B0CF87B22 /* IslamicDayDialTests.xctest */,
 				06322A748CFC2A9CF44046DB /* IslamicDayDialWatch.app */,
-				CC57459B9316C2BC695014FE /* IslamicDayDialWatchWidget.appex */,
 				198C5249B9FCCCFE7493AC60 /* IslamicDayDialWidget.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		C51671DC8E39100250E9A0EA /* IslamicDayDialWatchWidget */ = {
-			isa = PBXGroup;
-			children = (
-				AD406526767A754BB9492B0E /* Info.plist */,
-				9F0663CA25AB23B7F07B0316 /* IslamicDayDialWatchWidget.swift */,
-			);
-			path = IslamicDayDialWatchWidget;
 			sourceTree = "<group>";
 		};
 		D3F7A7FEBDDB39980DFF0083 /* IslamicDayDialTests */ = {
@@ -394,25 +336,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		34AFDB7E06085D18AB4F8F70 /* IslamicDayDialWatchWidget */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7D07437BCAC27259D2585CD4 /* Build configuration list for PBXNativeTarget "IslamicDayDialWatchWidget" */;
-			buildPhases = (
-				63B18D5BAA60B6F9792722B9 /* Sources */,
-				9B429B4051748C0008942C5D /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = IslamicDayDialWatchWidget;
-			packageProductDependencies = (
-				5E4757AC62D1D39B112079B5 /* Adhan */,
-			);
-			productName = IslamicDayDialWatchWidget;
-			productReference = CC57459B9316C2BC695014FE /* IslamicDayDialWatchWidget.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		41A754A24988CF1466BAD77D /* IslamicDayDial */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2A640E1E99B4EF28898216BC /* Build configuration list for PBXNativeTarget "IslamicDayDial" */;
@@ -463,12 +386,10 @@
 				709CF398A4AABC00D43351B3 /* Sources */,
 				5F8B4C1524EC300970EBFFB1 /* Resources */,
 				C24EAD95666D223A5DBEB452 /* Frameworks */,
-				5EBF6FB05651F4524C29417F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				6D017009F18144C69C556839 /* PBXTargetDependency */,
 			);
 			name = IslamicDayDialWatch;
 			packageProductDependencies = (
@@ -507,10 +428,6 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					34AFDB7E06085D18AB4F8F70 = {
-						DevelopmentTeam = FB736M6KFV;
-						ProvisioningStyle = Automatic;
-					};
 					41A754A24988CF1466BAD77D = {
 						DevelopmentTeam = FB736M6KFV;
 						ProvisioningStyle = Automatic;
@@ -549,7 +466,6 @@
 				41A754A24988CF1466BAD77D /* IslamicDayDial */,
 				A5AD7DBE20441AE9D098AE3D /* IslamicDayDialTests */,
 				7E88FAF3E6FF7619F73AD82F /* IslamicDayDialWatch */,
-				34AFDB7E06085D18AB4F8F70 /* IslamicDayDialWatchWidget */,
 				7C9B98C9CD992966F3C237BC /* IslamicDayDialWidget */,
 			);
 		};
@@ -600,30 +516,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		63B18D5BAA60B6F9792722B9 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				543AC7FA46E6C8E037A29583 /* Colors.swift in Sources */,
-				3B6DF0A43E0BFD82687F253E /* DayBounds.swift in Sources */,
-				5A6633B109AFA23AB8F111BF /* Formatting.swift in Sources */,
-				157E982D230730A3D7334296 /* GeoResolver.swift in Sources */,
-				478684781D0D8823493EDF14 /* Geometry.swift in Sources */,
-				280ED957B2DBC2144C461EB7 /* GlowWindow.swift in Sources */,
-				23C666D6B83408BF75D50C3F /* HijriCalendar.swift in Sources */,
-				9F67A2C11BB6F09382B2B974 /* IslamicDayDialWatchWidget.swift in Sources */,
-				30ACF88BC517571D1A76AB33 /* NightMarkers.swift in Sources */,
-				14D80D631D5D39B69A7BA66E /* Phases.swift in Sources */,
-				1A5C8A78BA6030376AE216AF /* PrayerTimes.swift in Sources */,
-				1BC1DFA30FB219B8A7DBCE3D /* Ring.swift in Sources */,
-				405BFE8C4F0A1AAECA886F81 /* RingView.swift in Sources */,
-				455840F4FA146EA4AD4092C1 /* SegmentGradients.swift in Sources */,
-				24FC93D76CE6FCBB78557910 /* Snapshot.swift in Sources */,
-				8B5D612AEB72EA0E2DF1E452 /* Types.swift in Sources */,
-				AAAFE90A1FC7F34369894133 /* WidgetPresentation.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		709CF398A4AABC00D43351B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -639,6 +531,7 @@
 				4C1A78CC44DEFFEC04293568 /* IslamicDayDialWatchApp.swift in Sources */,
 				C6A4C42E2E2DDCAA3D5C915E /* NightMarkers.swift in Sources */,
 				A35760C640757099EC28FF90 /* Phases.swift in Sources */,
+				F21F3C8CF604FC468522CE98 /* PrayerNotificationScheduler.swift in Sources */,
 				1802F5AD2A65F39985A196D7 /* PrayerTimes.swift in Sources */,
 				A62F357B92DD6F7C1F4F9868 /* Ring.swift in Sources */,
 				096E576C84B7C1D92C6C1970 /* RingView.swift in Sources */,
@@ -713,11 +606,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		6D017009F18144C69C556839 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 34AFDB7E06085D18AB4F8F70 /* IslamicDayDialWatchWidget */;
-			targetProxy = DB839DC7FF48B9A071019F52 /* PBXContainerItemProxy */;
-		};
 		846FEDF2B816BEFD4DB20225 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7E88FAF3E6FF7619F73AD82F /* IslamicDayDialWatch */;
@@ -736,28 +624,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		0AC2FB2974DCE99A86DA70DB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
-				ENABLE_DEBUG_DYLIB = NO;
-				INFOPLIST_FILE = IslamicDayDialWatchWidget/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.islamicdaydial.ios.watch.widget;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = 4;
-			};
-			name = Debug;
-		};
 		132680E5B1E77270A2DC933E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B8D4E76B6C1A49D289148AA3 /* Config.xcconfig */;
@@ -774,11 +640,9 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Islamic Day Dial uses your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_SupabaseAnonKey = "$(SUPABASE_ANON_KEY)";
 				INFOPLIST_KEY_SupabaseURL = "$(SUPABASE_URL)";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -885,28 +749,6 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IslamicDayDial.app/IslamicDayDial";
-			};
-			name = Release;
-		};
-		38CE0002B24C16E70494D6EF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
-				ENABLE_DEBUG_DYLIB = NO;
-				INFOPLIST_FILE = IslamicDayDialWatchWidget/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.islamicdaydial.ios.watch.widget;
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Release;
 		};
@@ -1077,11 +919,9 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Islamic Day Dial uses your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_SupabaseAnonKey = "$(SUPABASE_ANON_KEY)";
 				INFOPLIST_KEY_SupabaseURL = "$(SUPABASE_URL)";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1110,15 +950,6 @@
 			buildConfigurations = (
 				705AAEE500DBD3B0E698DA29 /* Debug */,
 				29AE36DFA69EE63A361FD640 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		7D07437BCAC27259D2585CD4 /* Build configuration list for PBXNativeTarget "IslamicDayDialWatchWidget" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0AC2FB2974DCE99A86DA70DB /* Debug */,
-				38CE0002B24C16E70494D6EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1164,11 +995,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		5E4757AC62D1D39B112079B5 /* Adhan */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 294742C9CA7BA74EEDEDC36D /* XCRemoteSwiftPackageReference "Adhan-Swift" */;
-			productName = Adhan;
-		};
 		6CB10D9B7CE35A7489E830C8 /* Adhan */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 294742C9CA7BA74EEDEDC36D /* XCRemoteSwiftPackageReference "Adhan-Swift" */;
