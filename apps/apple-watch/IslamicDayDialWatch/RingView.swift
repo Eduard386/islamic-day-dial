@@ -15,6 +15,7 @@ private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔pe
 private let PHONE_INFO_RADIUS_EXPANSION_RATIO: CGFloat = 10 / 420
 private let PHONE_RING_DRIFT_DURATION: Double = 132
 private let PHONE_RING_DRIFT_BAND_DEG: CGFloat = 18
+private let PHONE_DUHA_CLUSTER_GAP_FACTOR: CGFloat = 0.24
 
 private struct MoonPhaseParams {
     let shadowOffset: Double
@@ -304,7 +305,7 @@ func buildPhoneRingArcSpecs(
         )
     }
 
-    return [
+    let specs = [
         makeSpec(kind: .maghribToIsha, start: maghribToIsha.startAngleDeg, end: maghribToIsha.endAngleDeg),
         makeSpec(kind: .ishaGroup, start: ishaToLastThird.startAngleDeg, end: lastThirdToFajr.endAngleDeg),
         makeSpec(kind: .fajrToSunrise, start: fajrToSunrise.startAngleDeg, end: fajrToSunrise.endAngleDeg),
@@ -314,6 +315,52 @@ func buildPhoneRingArcSpecs(
         makeSpec(kind: .dhuhrToAsr, start: dhuhrToAsr.startAngleDeg, end: dhuhrToAsr.endAngleDeg),
         makeSpec(kind: .asrToMaghrib, start: asrToMaghrib.startAngleDeg, end: asrToMaghrib.endAngleDeg),
     ]
+
+    guard ringRadius > baseRadius else { return specs }
+
+    return tightenedPhoneDuhaCluster(specs: specs, gapFactor: PHONE_DUHA_CLUSTER_GAP_FACTOR)
+}
+
+private func tightenedPhoneDuhaCluster(specs: [PhoneRingArcSpec], gapFactor: CGFloat) -> [PhoneRingArcSpec] {
+    var adjusted = specs
+    let indices = Dictionary(uniqueKeysWithValues: adjusted.enumerated().map { ($0.element.kind, $0.offset) })
+
+    func tightenGap(left: PhoneRingArcKind, right: PhoneRingArcKind) {
+        guard
+            let leftIndex = indices[left],
+            let rightIndex = indices[right]
+        else { return }
+
+        let currentGap = angleSpan(
+            startDeg: adjusted[leftIndex].endAngleDeg,
+            endDeg: adjusted[rightIndex].startAngleDeg
+        )
+        guard currentGap > 0.01, currentGap < 40 else { return }
+
+        let desiredGap = currentGap * gapFactor
+        let delta = (currentGap - desiredGap) / 2
+
+        adjusted[leftIndex] = PhoneRingArcSpec(
+            kind: adjusted[leftIndex].kind,
+            originalStartAngleDeg: adjusted[leftIndex].originalStartAngleDeg,
+            originalEndAngleDeg: adjusted[leftIndex].originalEndAngleDeg,
+            startAngleDeg: adjusted[leftIndex].startAngleDeg,
+            endAngleDeg: adjusted[leftIndex].endAngleDeg + delta
+        )
+
+        adjusted[rightIndex] = PhoneRingArcSpec(
+            kind: adjusted[rightIndex].kind,
+            originalStartAngleDeg: adjusted[rightIndex].originalStartAngleDeg,
+            originalEndAngleDeg: adjusted[rightIndex].originalEndAngleDeg,
+            startAngleDeg: adjusted[rightIndex].startAngleDeg - delta,
+            endAngleDeg: adjusted[rightIndex].endAngleDeg
+        )
+    }
+
+    tightenGap(left: .sunrise, right: .duha)
+    tightenGap(left: .duha, right: .midday)
+
+    return adjusted
 }
 
 private struct SunMarkerStyle {

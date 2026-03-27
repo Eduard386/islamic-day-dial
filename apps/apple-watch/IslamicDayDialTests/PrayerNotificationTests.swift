@@ -1,6 +1,6 @@
 import XCTest
 
-/// Notification content format: title = "PrayerName time has begun", body = "day month year".
+/// Notification content format: body = "day month year", with prayer-specific observable titles.
 final class PrayerNotificationTests: XCTestCase {
     private let mecca = Location.mecca
 
@@ -17,7 +17,7 @@ final class PrayerNotificationTests: XCTestCase {
         super.tearDown()
     }
 
-    func testFormatContent_TitleContainsPrayerStartMessage() {
+    func testFormatContent_FajrUsesObservableTitle() {
         let fireDate = dateFromISO("2026-03-20T04:30:00")
         let maghrib = dateFromISO("2026-03-19T18:00:00")
         let (title, _) = PrayerNotificationScheduler.formatContentForTesting(
@@ -25,7 +25,7 @@ final class PrayerNotificationTests: XCTestCase {
             fireDate: fireDate,
             maghrib: maghrib
         )
-        XCTAssertEqual(title, "Fajr time has begun")
+        XCTAssertEqual(title, "The sky is brightening, look to the east.")
     }
 
     func testFormatContent_BodyContainsHijriDate() {
@@ -46,14 +46,20 @@ final class PrayerNotificationTests: XCTestCase {
     func testFormatContent_AllFivePrayers() {
         let fireDate = dateFromISO("2026-03-20T12:00:00")
         let maghrib = dateFromISO("2026-03-20T18:00:00")
-        let prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
-        for name in prayers {
+        let expectedTitles = [
+            "Fajr": "The sky is brightening, look to the east.",
+            "Dhuhr": "Is your shadow lengthening again?",
+            "Asr": "Compare the object and its shadow after the noon minimum.",
+            "Maghrib": "Look west. Has the sun gone down?",
+            "Isha": "Check the sky to see if the last twilight has disappeared."
+        ]
+        for (name, expectedTitle) in expectedTitles {
             let (title, body) = PrayerNotificationScheduler.formatContentForTesting(
                 prayerName: name,
                 fireDate: fireDate,
                 maghrib: maghrib
             )
-            XCTAssertEqual(title, "\(name) time has begun")
+            XCTAssertEqual(title, expectedTitle)
             XCTAssertFalse(body.isEmpty)
         }
     }
@@ -62,11 +68,12 @@ final class PrayerNotificationTests: XCTestCase {
         let friday = dateFromISO("2026-03-27T12:00:00")
         let notifications = PrayerNotificationScheduler.describeNotificationsForTesting(date: friday, location: mecca)
         let snapshot = computeIslamicDaySnapshot(now: friday, location: mecca)
-        let jumuahNotification = notifications.first { $0.name == "Jumu'ah" }
+        let jumuahTitle = "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutba."
+        let jumuahNotification = notifications.first { $0.title == jumuahTitle }
 
         XCTAssertEqual(notifications.count, 5)
-        XCTAssertTrue(notifications.contains { $0.name == "Jumu'ah" })
-        XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
+        XCTAssertTrue(notifications.contains { $0.title == jumuahTitle })
+        XCTAssertFalse(notifications.contains { $0.title == "Is your shadow lengthening again?" })
         XCTAssertNotNil(snapshot)
         XCTAssertEqual(
             Int(jumuahNotification?.fireDate.timeIntervalSince1970 ?? -1),
@@ -78,12 +85,13 @@ final class PrayerNotificationTests: XCTestCase {
         let eidFriday = dateFromISO("2026-03-20T12:00:00")
         let notifications = PrayerNotificationScheduler.describeNotificationsForTesting(date: eidFriday, location: mecca)
         let snapshot = computeIslamicDaySnapshot(now: eidFriday, location: mecca)
-        let eidNotification = notifications.first { $0.name == "EID AL-FITR" }
+        let eidTitle = "Eid al-Fitr prayer time has started."
+        let eidNotification = notifications.first { $0.title == eidTitle }
 
         XCTAssertEqual(notifications.count, 6)
-        XCTAssertTrue(notifications.contains { $0.name == "EID AL-FITR" })
-        XCTAssertFalse(notifications.contains { $0.name == "Jumu'ah" })
-        XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
+        XCTAssertTrue(notifications.contains { $0.title == eidTitle })
+        XCTAssertFalse(notifications.contains { $0.title == "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutba." })
+        XCTAssertFalse(notifications.contains { $0.title == "Is your shadow lengthening again?" })
         XCTAssertNotNil(snapshot)
         XCTAssertEqual(
             Int(eidNotification?.fireDate.timeIntervalSince1970 ?? -1),
@@ -96,11 +104,13 @@ final class PrayerNotificationTests: XCTestCase {
         let notifications = PrayerNotificationScheduler.describeNotificationsForTesting(date: eidDay, location: mecca)
         let prayerTimes = getPrayerTimesForDate(date: eidDay, location: mecca)
         let snapshot = computeIslamicDaySnapshot(now: eidDay, location: mecca)
-        let eidNotification = notifications.first { $0.name == "EID AL-ADHA" }
+        let eidTitle = "Eid al-Adha prayer time has started."
+        let eidNotification = notifications.first { $0.title == eidTitle }
 
         XCTAssertEqual(notifications.count, 6)
         XCTAssertNotNil(eidNotification)
-        XCTAssertFalse(notifications.contains { $0.name == "Dhuhr" })
+        XCTAssertTrue(notifications.contains { $0.title == eidTitle })
+        XCTAssertFalse(notifications.contains { $0.title == "Is your shadow lengthening again?" })
         XCTAssertNotNil(prayerTimes)
         XCTAssertNotNil(snapshot)
         XCTAssertEqual(

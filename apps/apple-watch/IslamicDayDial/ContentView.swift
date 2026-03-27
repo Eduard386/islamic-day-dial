@@ -10,8 +10,8 @@ private let PHONE_DATE_INFO_SCALE: CGFloat = 1.25
 private let PHONE_TEXT_GLOW_PULSE_DURATION = 3.0
 let PHONE_READING_TINT = Color(red: 0.9, green: 0.88, blue: 0.8)
 let PHONE_READING_GLOW = Color(red: 0.99, green: 0.88, blue: 0.38)
-private let PHONE_INSIGHT_AYAH_AR = "إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
-private let PHONE_INSIGHT_AYAH_EN = "\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
+private let PHONE_INSIGHT_AYAH_AR = "قال الله تعالى: ﴿إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
+private let PHONE_INSIGHT_AYAH_EN = "Allah, the Exalted, said: \"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
 private let PHONE_HIJRI_MONTH_NAMES = [
     "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
     "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Shaban",
@@ -35,6 +35,14 @@ private let PHONE_DUHA_HADITH_THREE_AR = "قَالَ رَسُولُ اللَّه
 private let PHONE_DUHA_HADITH_THREE_EN = "Messenger of Allah (ﷺ) said: “Observe the dawn prayer, then stop praying when the sun is rising till it is fully up, for when it rises it comes up between the horns of Satan, and the unbelievers prostrate themselves to it at that time. Then pray, for the prayer is witnessed and attended (by angels) till the shadow becomes about the length of a lance; then cease prayer, for at that time Hell is heated up.”"
 private let PHONE_LAST_THIRD_HADITH_AR = "أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ فَيَقُولُ مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ وَمَنْ يَسْأَلُنِي فَأُعْطِيَهُ وَمَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ ‏\"‏.‏"
 private let PHONE_LAST_THIRD_HADITH_EN = "Allah's Messenger (ﷺ) said, \"Our Lord, the Blessed and the Exalted, descends every night to the lowest heaven when one-third of the latter part of the night is left, and says: Who supplicates Me so that I may answer him? Who asks Me so that I may give to him? Who asks Me forgiveness so that I may forgive him?\""
+private let PHONE_JUMUAH_AYAH_AR = "قال الله تعالى: يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوٓا۟ إِذَا نُودِىَ لِلصَّلَوٰةِ مِن يَوْمِ ٱلْجُمُعَةِ فَٱسْعَوْا۟ إِلَىٰ ذِكْرِ ٱللَّهِ وَذَرُوا۟ ٱلْبَيْعَ ۚ ذَٰلِكُمْ خَيْرٌۭ لَّكُمْ إِن كُنتُمْ تَعْلَمُونَ"
+private let PHONE_JUMUAH_AYAH_EN = "Allah, the Exalted, said: \"O believers! When the call to prayer is made on Friday, then proceed (diligently) to the remembrance of Allah and leave off (your) business. That is best for you, if only you knew\" [62:9]"
+private let PHONE_JUMUAH_HADITH_ONE_AR = "عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"الْجُمُعَةُ حَقٌّ وَاجِبٌ عَلَى كُلِّ مُسْلِمٍ فِي جَمَاعَةٍ إِلاَّ أَرْبَعَةً عَبْدٌ مَمْلُوكٌ أَوِ امْرَأَةٌ أَوْ صَبِيٌّ أَوْ مَرِيضٌ‏\""
+private let PHONE_JUMUAH_HADITH_ONE_EN = "The Prophet (ﷺ) said: \"The Friday prayer in congregation is a necessary duty for every Muslim, with four exceptions; a slave, a woman, a boy, and a sick person.\""
+private let PHONE_JUMUAH_HADITH_TWO_AR = "عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"مَنِ اغْتَسَلَ ثُمَّ أَتَى الْجُمُعَةَ فَصَلَّى مَا قُدِّرَ لَهُ ثُمَّ أَنْصَتَ حَتَّى يَفْرُغَ مِنْ خُطْبَتِهِ ثُمَّ يُصَلِّيَ مَعَهُ غُفِرَ لَهُ مَا بَيْنَهُ وَبَيْنَ الْجُمُعَةِ الأُخْرَى وَفَضْلَ ثَلاَثَةِ أَيَّامٍ‏\"‏‏"
+private let PHONE_JUMUAH_HADITH_TWO_EN = "The Prophet (ﷺ) said: \"He who took a bath and then came for Jumu'ah prayer and then prayed what was fixed for him, then kept silence till the Imam finished the sermon, and then prayed along with him, his sins between that time and the next Friday would be forgiven, and even of three days more.\""
+private let PHONE_JUMUAH_HADITH_THREE_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ نَافِعٍ، عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يُصَلِّي قَبْلَ الظُّهْرِ رَكْعَتَيْنِ، وَبَعْدَهَا رَكْعَتَيْنِ، وَبَعْدَ الْمَغْرِبِ رَكْعَتَيْنِ فِي بَيْتِهِ، وَبَعْدَ الْعِشَاءِ رَكْعَتَيْنِ وَكَانَ لاَ يُصَلِّي بَعْدَ الْجُمُعَةِ حَتَّى يَنْصَرِفَ فَيُصَلِّي رَكْعَتَيْنِ‏.‏"
+private let PHONE_JUMUAH_HADITH_THREE_EN = "Narrated `Abdullah bin `Umar: Allah's Messenger (ﷺ) used to pray two rak`at before the Zuhr prayer and two rak`at after it. He also used to pray two rak`at after the Maghrib prayer in his house, and two rak`at after the `Isha' prayer. He never prayed after Jumu'ah prayer till he departed (from the Mosque), and then he would pray two rak`at at home."
 
 private func phoneSelectionHaptic() {
     let generator = UISelectionFeedbackGenerator()
@@ -923,8 +931,8 @@ private struct PhoneDialInsightView: View {
 
     private var ringTop: CGFloat { containerSize.height / 2 - dialSize / 2 }
     private var ringBottom: CGFloat { containerSize.height / 2 + dialSize / 2 }
-    private var ayahTop: CGFloat { containerSize.height * 0.05 }
-    private var monthsTop: CGFloat { ringBottom - containerSize.height * 0.07 }
+    private var ayahTop: CGFloat { containerSize.height * 0.019 }
+    private var monthsTop: CGFloat { ringBottom - containerSize.height * 0.095 }
     private var columnWidth: CGFloat { min((containerSize.width - 44) / 2, 170) }
 
     var body: some View {
@@ -996,6 +1004,10 @@ private struct PhoneSectorTitleSpotlightView: View {
         PHONE_JIBRIL_GROUP_ONE.contains(title)
     }
 
+    private var isJumuah: Bool {
+        title == "Jumu'ah"
+    }
+
     private var isSunDayGroup: Bool {
         PHONE_JIBRIL_GROUP_TWO.contains(title)
     }
@@ -1005,6 +1017,9 @@ private struct PhoneSectorTitleSpotlightView: View {
     }
 
     private var sectorCollectionTitle: String {
+        if isJumuah {
+            return "Jumu'ah"
+        }
         if isPrayerTimingGroup {
             return "Dhuhr, Asr, Maghrib, Isha, Fajr"
         }
@@ -1089,7 +1104,29 @@ private struct PhoneSectorTitleSpotlightView: View {
                 .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
                 .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
             Text("")
-            if isPrayerTimingGroup {
+            if isJumuah {
+                VStack(spacing: 4) {
+                    hadithArabic(PHONE_JUMUAH_AYAH_AR)
+                    Text("")
+                    hadithEnglish(PHONE_JUMUAH_AYAH_EN)
+                    Text("")
+                    hadithArabic(PHONE_JUMUAH_HADITH_ONE_AR)
+                    Text("")
+                    hadithEnglish(PHONE_JUMUAH_HADITH_ONE_EN)
+                    hadithSource("Sunan Abi Dawud 1067")
+                    Text("")
+                    hadithArabic(PHONE_JUMUAH_HADITH_TWO_AR)
+                    Text("")
+                    hadithEnglish(PHONE_JUMUAH_HADITH_TWO_EN)
+                    hadithSource("Sahih Muslim 857")
+                    Text("")
+                    hadithArabic(PHONE_JUMUAH_HADITH_THREE_AR)
+                    Text("")
+                    hadithEnglish(PHONE_JUMUAH_HADITH_THREE_EN)
+                    hadithSource("Sahih al-Bukhari 937")
+                }
+                .frame(maxWidth: min(containerSize.width - 36, 420))
+            } else if isPrayerTimingGroup {
                 VStack(spacing: 4) {
                     hadithArabic(PHONE_JIBRIL_HADITH_AR)
                     Text("")
@@ -1122,7 +1159,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                     hadithArabic(PHONE_LAST_THIRD_HADITH_AR)
                     Text("")
                     hadithEnglish(PHONE_LAST_THIRD_HADITH_EN)
-                    hadithSource("Sahih Muslim, Hadith 758a")
+                    hadithSource("Sahih Muslim, Hadith 758")
                     technicalDetailsLink()
                 }
                 .frame(maxWidth: min(containerSize.width - 36, 420))

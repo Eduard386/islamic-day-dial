@@ -23,6 +23,7 @@ private let footnoteBottomDefs: [PhoneFootnoteDef] = [
     .init(id: "fajr", label: "Fajr", start: \.fajr, end: \.sunrise),
     .init(id: "last_third_start", label: "Last 3rd", start: \.lastThirdStart, end: \.fajr),
 ]
+private let compactBottomClusterIds: Set<String> = ["duha_end", "duha_start", "sunrise"]
 
 private struct VerticalFootnoteItem: Identifiable {
     var id: String { key }
@@ -218,12 +219,33 @@ struct PhoneDialFootnotesView: View {
                 return (def.id, stubAbs.x)
             }
             let fallbackCenters = evenlySpacedCenters(count: defs.count, minX: minCenterX, maxX: maxCenterX)
-            let resolvedCenters = spreadCenters(
+            var resolvedCenters = spreadCenters(
                 refs: targets,
                 minX: minCenterX,
                 maxX: maxCenterX,
                 minGap: labelWidth * 0.94
             )
+
+            if defs.contains(where: { compactBottomClusterIds.contains($0.id) }) {
+                let duhaKey = "duha_start"
+                let middayKey = "duha_end"
+                let sunriseKey = "sunrise"
+                let fajrKey = "fajr"
+                let desiredGap = labelWidth * 0.9
+
+                if
+                    let duhaIndex = defs.firstIndex(where: { $0.id == duhaKey }),
+                    duhaIndex < fallbackCenters.count
+                {
+                    let duhaX = resolvedCenters[duhaKey] ?? fallbackCenters[duhaIndex]
+                    let maxSunrise = min(
+                        maxCenterX,
+                        (resolvedCenters[fajrKey] ?? maxCenterX) - labelWidth * 0.96
+                    )
+                    resolvedCenters[middayKey] = max(minCenterX, duhaX - desiredGap)
+                    resolvedCenters[sunriseKey] = min(maxSunrise, duhaX + desiredGap)
+                }
+            }
 
             return defs.enumerated().compactMap { index, def in
                 let angle = footnoteAngle(def, timeline: timeline)
@@ -232,6 +254,7 @@ struct PhoneDialFootnotesView: View {
                 let stubAbs = toAbs(anchor.stub)
                 let labelCenterX = resolvedCenters[def.id] ?? fallbackCenters[index]
                 let labelJoinY = labelY + (labelY < lineY ? labelFont * 0.18 : -labelFont * 0.18)
+                let itemLabelWidth = compactBottomClusterIds.contains(def.id) ? labelWidth * 0.84 : labelWidth
                 let points = [
                     rimAbs,
                     stubAbs,
@@ -244,7 +267,7 @@ struct PhoneDialFootnotesView: View {
                     label: def.label,
                     points: points,
                     labelPosition: CGPoint(x: labelCenterX, y: labelY),
-                    labelWidth: labelWidth
+                    labelWidth: itemLabelWidth
                 )
             }
         }

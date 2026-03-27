@@ -6,7 +6,8 @@ import UserNotifications
 /// Rescheduling runs on app launch and when app returns from background (handles travel).
 ///
 /// Notification format:
-/// - Title: "PrayerName time has begun"
+/// - Fard prayer titles: observable prompts tied to the Jibril signs
+/// - Special-day titles: current Jumu'ah / Eid labels
 /// - Body: "5 Shawwal 1447"
 enum PrayerNotificationScheduler {
     private static let categoryId = "PRAYER_REMINDER"
@@ -33,6 +34,15 @@ enum PrayerNotificationScheduler {
         let body: String
         let fireDate: Date
     }
+
+    private static let fajrTitle = "The sky is brightening, look to the east."
+    private static let dhuhrTitle = "Is your shadow lengthening again?"
+    private static let asrTitle = "Compare the object and its shadow after the noon minimum."
+    private static let maghribTitle = "Look west. Has the sun gone down?"
+    private static let ishaTitle = "Check the sky to see if the last twilight has disappeared."
+    private static let jumuahTitle = "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutba."
+    private static let eidAlFitrTitle = "Eid al-Fitr prayer time has started."
+    private static let eidAlAdhaTitle = "Eid al-Adha prayer time has started."
 
     private static var authorizationOptions: UNAuthorizationOptions {
         #if os(watchOS)
@@ -131,10 +141,38 @@ enum PrayerNotificationScheduler {
         let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghribForDay)
         return NotificationPlan(
             kind: kind,
-            title: "\(prayerName) time has begun",
+            title: title(for: kind, prayerName: prayerName),
             body: formatHijriTitle(hijri: hijriDate),
             fireDate: fireDate
         )
+    }
+
+    private static func title(for kind: NotificationKind, prayerName: String) -> String {
+        switch kind {
+        case .fajr:
+            return fajrTitle
+        case .dhuhr:
+            return dhuhrTitle
+        case .asr:
+            return asrTitle
+        case .maghrib:
+            return maghribTitle
+        case .isha:
+            return ishaTitle
+        case .jumuah:
+            return jumuahTitle
+        case .eid:
+            switch prayerName {
+            case "EID AL-FITR":
+                return eidAlFitrTitle
+            case "EID AL-ADHA":
+                return eidAlAdhaTitle
+            default:
+                return "\(prayerName) prayer time has started."
+            }
+        case .eidGreeting:
+            return prayerName == eidGreetingTitle ? eidGreetingTitle : prayerName
+        }
     }
 
     private static func noonPlan(
@@ -241,8 +279,8 @@ enum PrayerNotificationScheduler {
     }
 
     /// For unit testing notification naming and timing rules.
-    static func describeNotificationsForTesting(date: Date, location: Location) -> [(name: String, fireDate: Date)] {
-        (buildPlans(for: date, location: location) ?? []).map { ($0.title.replacingOccurrences(of: " time has begun", with: ""), $0.fireDate) }
+    static func describeNotificationsForTesting(date: Date, location: Location) -> [(title: String, fireDate: Date)] {
+        (buildPlans(for: date, location: location) ?? []).map { ($0.title, $0.fireDate) }
     }
 
     /// For unit testing full notification payloads.
@@ -253,7 +291,22 @@ enum PrayerNotificationScheduler {
     /// For unit testing notification content format only.
     static func formatContentForTesting(prayerName: String, fireDate: Date, maghrib: Date) -> (title: String, body: String) {
         let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghrib)
-        let title = "\(prayerName) time has begun"
+        let kind: NotificationKind
+        switch prayerName {
+        case "Fajr":
+            kind = .fajr
+        case "Dhuhr":
+            kind = .dhuhr
+        case "Asr":
+            kind = .asr
+        case "Maghrib":
+            kind = .maghrib
+        case "Isha":
+            kind = .isha
+        default:
+            kind = .dhuhr
+        }
+        let title = title(for: kind, prayerName: prayerName)
         let body = "\(hijriDate.day) \(hijriDate.monthNameEn) \(hijriDate.year)"
         return (title, body)
     }

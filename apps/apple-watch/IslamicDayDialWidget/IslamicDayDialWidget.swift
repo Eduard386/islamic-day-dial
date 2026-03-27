@@ -1,6 +1,60 @@
 import SwiftUI
 import WidgetKit
 
+private struct WidgetHijriEngravedLabelsModifier: ViewModifier {
+    let isEid: Bool
+
+    func body(content: Content) -> some View {
+        let hi = isEid ? Color.white.opacity(0.32) : Color.white.opacity(0.24)
+        let lo = isEid ? Color.black.opacity(0.42) : Color.black.opacity(0.52)
+        content
+            .shadow(color: hi, radius: 0, x: 0, y: -0.5)
+            .shadow(color: lo, radius: 0, x: 0, y: 0.9)
+            .shadow(color: lo.opacity(0.38), radius: 1.2, x: 0, y: 1.3)
+    }
+}
+
+private struct WidgetHijriDimensionalGoldModifier: ViewModifier {
+    let isEid: Bool
+    let secondary: Bool
+
+    func body(content: Content) -> some View {
+        if isEid {
+            content
+                .foregroundStyle(Color(red: 0.06, green: 0.73, blue: 0.51))
+                .modifier(WidgetHijriEngravedLabelsModifier(isEid: true))
+        } else {
+            let top = secondary
+                ? Color(red: 0.9, green: 0.8, blue: 0.55)
+                : Color(red: 0.95, green: 0.84, blue: 0.58)
+            let mid = secondary
+                ? Color(red: 0.77, green: 0.61, blue: 0.24)
+                : Color(red: 0.83, green: 0.66, blue: 0.24)
+            let bottom = secondary
+                ? Color(red: 0.49, green: 0.36, blue: 0.12)
+                : Color(red: 0.57, green: 0.41, blue: 0.1)
+            let topLight = Color.white.opacity(0.12)
+            let warmLift = Color(red: 1, green: 0.95, blue: 0.78).opacity(0.06)
+            let innerGlow = (secondary ? Colors.secondaryGold : Colors.primaryGold).opacity(0.07)
+            let shade = Color.black.opacity(0.42)
+
+            content
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [top, mid, bottom],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .shadow(color: topLight, radius: 0, x: 0, y: -0.7)
+                .shadow(color: warmLift, radius: 1.0, x: 0, y: -0.2)
+                .shadow(color: innerGlow, radius: 2.8)
+                .shadow(color: shade, radius: 0, x: 0, y: 1.0)
+                .shadow(color: shade.opacity(0.5), radius: 1.6, x: 0, y: 1.4)
+        }
+    }
+}
+
 struct IslamicDayDialEntry: TimelineEntry {
     let date: Date
     let snapshot: ComputedIslamicDay?
@@ -114,11 +168,11 @@ private struct HijriWidgetLabels: View {
                 .font(.system(size: 28, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.4)
-                .foregroundStyle(label.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.primaryGold)
+                .modifier(WidgetHijriDimensionalGoldModifier(isEid: label.isEid, secondary: false))
             Text(label.secondary)
                 .font(.system(size: 14, weight: .semibold))
                 .minimumScaleFactor(0.6)
-                .foregroundStyle(Colors.secondaryGold)
+                .modifier(WidgetHijriDimensionalGoldModifier(isEid: label.isEid, secondary: true))
         }
     }
 }
