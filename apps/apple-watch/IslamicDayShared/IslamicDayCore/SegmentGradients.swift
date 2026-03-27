@@ -142,4 +142,3 @@ func buildAngularGradientStops(
     stops.append(Gradient.Stop(color: colorAtAngle(0, segments: segments, mirrorSegment: mirrorSegment), location: 1.0))
     return stops
 }
-

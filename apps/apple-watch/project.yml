@@ -39,11 +39,7 @@ targets:
       Release: IslamicDayDial/Config.xcconfig
     sources:
       - path: IslamicDayDial
-      - path: IslamicDayDialWatch
-        excludes:
-          - IslamicDayDialWatchApp.swift
-          - ContentView.swift
-          - WatchSnapshotStore.swift
+      - path: IslamicDayShared
     dependencies:
       - target: IslamicDayDialWatch
       - target: IslamicDayDialWidget
@@ -76,13 +72,16 @@ targets:
       Release: IslamicDayDial/Config.xcconfig
     sources:
       - path: IslamicDayDialWatch
+      - path: IslamicDayShared
+        excludes:
+          - IslamicDayCore/DayBounds.swift
+          - IslamicDayCore/WidgetPresentation.swift
+          - IslamicDayCore/Snapshot.swift
+          - IslamicDayCore/HijriCalendar.swift
+          - IslamicDayCore/GeoResolver.swift
+          - IslamicDayCore/PrayerTimes.swift
+          - IslamicDayCore/NightMarkers.swift
       - path: IslamicDayDialWatchAssets
-      - path: IslamicDayDial
-        includes:
-          - VisitTracker.swift
-          - PrayerNotificationScheduler.swift
-    dependencies:
-      - package: Adhan
     settings:
       base:
         DEVELOPMENT_TEAM: FB736M6KFV
@@ -95,9 +94,6 @@ targets:
         SKIP_INSTALL: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Islamic Day Dial
-        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: Islamic Day Dial uses your location to calculate accurate prayer times.
-        INFOPLIST_KEY_SupabaseURL: "$(SUPABASE_URL)"
-        INFOPLIST_KEY_SupabaseAnonKey: "$(SUPABASE_ANON_KEY)"
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.islamicdaydial.ios
   IslamicDayDialWidget:
     type: app-extension
@@ -105,11 +101,7 @@ targets:
     platform: iOS
     sources:
       - path: IslamicDayDialWidget
-      - path: IslamicDayDialWatch
-        excludes:
-          - IslamicDayDialWatchApp.swift
-          - ContentView.swift
-          - WatchSnapshotStore.swift
+      - path: IslamicDayShared
     dependencies:
       - package: Adhan
     settings:
@@ -127,11 +119,7 @@ targets:
     platform: iOS
     sources:
       - path: IslamicDayDialTests
-      - path: IslamicDayDialWatch
-        excludes:
-          - IslamicDayDialWatchApp.swift
-          - ContentView.swift
-          - WatchSnapshotStore.swift
+      - path: IslamicDayShared
       - path: IslamicDayDial
         includes:
           - PrayerNotificationScheduler.swift

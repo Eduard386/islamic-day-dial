@@ -49,34 +49,18 @@ private struct WatchDialMetrics {
 }
 
 struct ContentView: View {
-    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var mirrorStore = WatchSnapshotStore.shared
     @State private var now = Date()
-    @State private var debugSnapshot: ComputedIslamicDay?
-    @State private var location: Location = .mecca
-    @State private var hasTrackedVisit = false
-    @State private var hasResolvedLocation = false
-    #if DEBUG
-    @State private var debugNow: Date?
-    #endif
 
     private var activeSnapshot: ComputedIslamicDay? {
-        mirrorStore.snapshot ?? debugSnapshot
-    }
-
-    private var isUsingMirroredSnapshot: Bool {
-        mirrorStore.snapshot != nil
+        mirrorStore.snapshot
     }
 
     private var effectiveNow: Date {
         if let envelope = mirrorStore.envelope {
             return mirroredWatchRenderNow(envelope: envelope, currentDate: now)
         }
-        #if DEBUG
-        return debugNow ?? now
-        #else
         return now
-        #endif
     }
 
     var body: some View {
@@ -113,26 +97,16 @@ struct ContentView: View {
                     }
                     .offset(y: metrics.dialVerticalOffset)
                     .frame(width: geo.size.width, height: geo.size.height)
-                    #if DEBUG
-                    .overlay(alignment: .topLeading) {
-                        if !isUsingMirroredSnapshot {
-                            WatchDebugControls(
-                                showsReset: debugNow != nil,
-                                onNextMonth: advanceDebugMonth,
-                                onForward15Minutes: advanceDebugQuarterHour,
-                                onRandomNotification: sendRandomDebugNotification,
-                                onReset: resetDebugTime
-                            )
-                            .padding(.top, 10)
-                            .padding(.leading, 8)
-                        }
-                    }
-                    #endif
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
             } else {
-                ProgressView()
+                VStack(spacing: 10) {
+                    ProgressView()
+                    Text("Waiting for iPhone snapshot…")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.76))
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -143,53 +117,6 @@ struct ContentView: View {
                 try? await Task.sleep(for: .seconds(1))
             }
         }
-        #if DEBUG
-        .task(id: isUsingMirroredSnapshot) {
-            guard !isUsingMirroredSnapshot else {
-                debugSnapshot = nil
-                return
-            }
-
-            let geo = await resolveGeoResult()
-            location = geo.location
-            hasResolvedLocation = true
-            await PrayerNotificationScheduler.requestAndSchedule(location: geo.location)
-            if !hasTrackedVisit {
-                hasTrackedVisit = true
-                await trackVisit(geo: geo, platform: "watchos", surface: "watch_app")
-            }
-
-            while !Task.isCancelled {
-                guard !isUsingMirroredSnapshot else { break }
-                let currentNow = Date()
-                now = currentNow
-                let renderNow = debugNow ?? currentNow
-                let updatedSnapshot = computeIslamicDaySnapshot(now: renderNow, location: location)
-                await MainActor.run {
-                    debugSnapshot = updatedSnapshot
-                }
-                try? await Task.sleep(for: .seconds(secondsUntilNextRefresh(from: renderNow, snapshot: updatedSnapshot)))
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            guard !isUsingMirroredSnapshot, phase == .active, hasResolvedLocation else { return }
-            Task {
-                await PrayerNotificationScheduler.requestAndSchedule(location: location)
-            }
-        }
-        #endif
-    }
-
-    private func secondsUntilNextRefresh(from date: Date, snapshot: ComputedIslamicDay?) -> Double {
-        let calendar = Calendar.current
-        let nextMinute = calendar.nextDate(
-            after: date,
-            matching: DateComponents(second: 0),
-            matchingPolicy: .nextTime
-        ) ?? date.addingTimeInterval(60)
-        let nextTransition = snapshot.map { getNextTransition(now: date, timeline: $0.timeline).at } ?? nextMinute
-        let refreshAt = min(nextMinute, nextTransition)
-        return max(1, refreshAt.timeIntervalSince(date) + 0.25)
     }
 
     @ViewBuilder
@@ -225,75 +152,7 @@ struct ContentView: View {
         let phase = currentPhase(snapshot: snap, now: now)
         return "\(phase.rawValue)-\(minuteBucket)-\(Int(dialSize.rounded()))"
     }
-
-    #if DEBUG
-    private func advanceDebugMonth() {
-        let updatedNow = addIslamicMonths(1, to: debugNow ?? now)
-        debugNow = updatedNow
-        debugSnapshot = computeIslamicDaySnapshot(now: updatedNow, location: location)
-    }
-
-    private func advanceDebugQuarterHour() {
-        let updatedNow = (debugNow ?? now).addingTimeInterval(15 * 60)
-        debugNow = updatedNow
-        debugSnapshot = computeIslamicDaySnapshot(now: updatedNow, location: location)
-    }
-
-    private func resetDebugTime() {
-        debugNow = nil
-        debugSnapshot = computeIslamicDaySnapshot(now: now, location: location)
-    }
-
-    private func sendRandomDebugNotification() {
-        Task {
-            await PrayerNotificationScheduler.sendRandomDebugNotification(date: effectiveNow, location: location)
-        }
-    }
-    #endif
 }
-
-#if DEBUG
-private func addIslamicMonths(_ months: Int, to date: Date) -> Date {
-    var calendar = Calendar(identifier: .islamicUmmAlQura)
-    calendar.timeZone = .current
-    return calendar.date(byAdding: .month, value: months, to: date) ?? date
-}
-
-private struct WatchDebugControls: View {
-    let showsReset: Bool
-    let onNextMonth: () -> Void
-    let onForward15Minutes: () -> Void
-    let onRandomNotification: () -> Void
-    let onReset: () -> Void
-
-    var body: some View {
-        HStack(spacing: 4) {
-            debugButton("M+", action: onNextMonth)
-            debugButton("+15", action: onForward15Minutes)
-            debugButton("Push", action: onRandomNotification)
-            if showsReset {
-                debugButton("Now", action: onReset)
-            }
-        }
-    }
-
-    private func debugButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
-                .foregroundStyle(Color.white.opacity(0.92))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
-                .background(Color.black.opacity(0.62), in: Capsule())
-                .overlay(
-                    Capsule().stroke(Color.white.opacity(0.12), lineWidth: 0.6)
-                )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-#endif
 
 private struct IshaShadowModifier: ViewModifier {
     let phase: IslamicPhaseId

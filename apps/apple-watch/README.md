@@ -118,13 +118,13 @@ What it includes:
 
 ### `IslamicDayDialWatch`
 
-The companion watchOS app. It reuses the same dial logic and rendering files that power the iPhone app.
+The companion watchOS app. It is now render-only: iPhone computes the current Islamic-day snapshot, syncs it over `WCSession`, and the watch app renders the cached mirrored state.
 
 ### Prayer notifications (iOS)
 
 `PrayerNotificationScheduler` schedules local notifications for Fajr, Asr, Maghrib, Isha, plus a midday special slot. On normal days that slot is `Dhuhr` at `Dhuhr`. On Fridays it becomes `Jumu'ah` at `Duha`, with no `Dhuhr` notification later. On Eid it becomes the Eid name at `Duha`, with no `Dhuhr` notification later, including when Eid falls on Friday. Eid days also get an extra greeting notification 2 hours after `Duha`: title `Taqabbal Allahu minna wa minkum!`, body `May Allah accept from us and from you!`. Titles use the marker name and bodies use the Hijri date unless the notification is this fixed Eid greeting. Rescheduled on app launch and when returning from background (handles travel).
 
-Apple Watch app presence does not replace prayer notifications. Phase 1 keeps notification scheduling on iPhone and relies on normal iPhone-to-Watch mirroring behavior when system settings allow it.
+Apple Watch app presence does not replace prayer notifications. Notification scheduling stays on iPhone and relies on normal iPhone-to-Watch mirroring behavior when system settings allow it.
 
 ### `IslamicDayDialWidget`
 
@@ -134,10 +134,10 @@ The iPhone widget extension. It uses the same snapshot and ring logic to show th
 
 The following Swift files are compiled into multiple targets through `project.yml`:
 
-- `IslamicDayDialWatch/IslamicDayCore/` — Swift port of `packages/core`
-- `IslamicDayDialWatch/RingView.swift`
-- `IslamicDayDialWatch/Geometry.swift`
-- `IslamicDayDialWatch/Colors.swift`
+- `IslamicDayShared/IslamicDayCore/` — Swift port of `packages/core`
+- `IslamicDayShared/RingView.swift`
+- `IslamicDayShared/Geometry.swift`
+- `IslamicDayShared/Colors.swift`
 
 This keeps the ring math and display behavior aligned across iPhone, iPhone widget, and watch app without duplicating algorithms.
 
