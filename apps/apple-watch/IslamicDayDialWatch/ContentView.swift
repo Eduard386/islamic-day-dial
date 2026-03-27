@@ -1,18 +1,58 @@
 import SwiftUI
 
 private let WATCH_RING_OUTER_DIAMETER_RATIO: CGFloat = 0.6645
-private let WATCH_DIAL_EDGE_FIT: CGFloat = 0.98
-private let WATCH_DIAL_VERTICAL_OFFSET_RATIO: CGFloat = 8 / 420
 private let WATCH_CURRENT_PERIOD_FONT_RATIO: CGFloat = 20 / 420
 private let WATCH_HIJRI_COMPACT_FONT_RATIO: CGFloat = 25 / 420
 private let WATCH_HIJRI_COMPACT_EMPHASIZED_FONT_RATIO: CGFloat = 26.5 / 420
 private let WATCH_HIJRI_REGULAR_FONT_RATIO: CGFloat = 22 / 420
 private let WATCH_HIJRI_YEAR_FONT_RATIO: CGFloat = 19 / 420
+private let WATCH_METRICS_COMPACT_MIN_SIDE: CGFloat = 176
+private let WATCH_METRICS_REGULAR_MIN_SIDE: CGFloat = 208
+
+private struct WatchDialMetrics {
+    let dialSize: CGFloat
+    let sectorTop: CGFloat
+    let dateTop: CGFloat
+    let yearTop: CGFloat
+    let centerOffsetY: CGFloat
+    let dialVerticalOffset: CGFloat
+    let maxTextWidth: CGFloat
+
+    init(containerSize: CGSize) {
+        let minSide = min(containerSize.width, containerSize.height)
+        let compactness = Self.compactnessFactor(for: minSide)
+        let glowPadding = minSide * Self.lerp(0.017, 0.032, compactness)
+        let ringOuterDiameter = max(0, minSide - glowPadding * 2)
+
+        dialSize = ringOuterDiameter / WATCH_RING_OUTER_DIAMETER_RATIO
+
+        let holeTop = dialSize * (0.5 - 0.25125)
+        let holeHeight = dialSize * 0.5025
+        sectorTop = holeTop + 55 * (holeHeight / 212)
+        dateTop = holeTop + 100 * (holeHeight / 212)
+        yearTop = dateTop + (dateTop - sectorTop)
+        centerOffsetY = dialSize * Self.lerp(-10 / 420, -8 / 420, compactness)
+        dialVerticalOffset = dialSize * Self.lerp(8 / 420, 10 / 420, compactness)
+        maxTextWidth = holeHeight * Self.lerp(0.72, 0.77, compactness)
+    }
+
+    private static func compactnessFactor(for minSide: CGFloat) -> CGFloat {
+        let clamped = max(WATCH_METRICS_COMPACT_MIN_SIDE, min(WATCH_METRICS_REGULAR_MIN_SIDE, minSide))
+        let span = WATCH_METRICS_REGULAR_MIN_SIDE - WATCH_METRICS_COMPACT_MIN_SIDE
+        guard span > 0 else { return 0 }
+        return 1 - ((clamped - WATCH_METRICS_COMPACT_MIN_SIDE) / span)
+    }
+
+    private static func lerp(_ regular: CGFloat, _ compact: CGFloat, _ compactness: CGFloat) -> CGFloat {
+        regular + (compact - regular) * compactness
+    }
+}
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @State private var snapshot: ComputedIslamicDay?
+    @StateObject private var mirrorStore = WatchSnapshotStore.shared
     @State private var now = Date()
+    @State private var debugSnapshot: ComputedIslamicDay?
     @State private var location: Location = .mecca
     @State private var hasTrackedVisit = false
     @State private var hasResolvedLocation = false
@@ -20,7 +60,18 @@ struct ContentView: View {
     @State private var debugNow: Date?
     #endif
 
+    private var activeSnapshot: ComputedIslamicDay? {
+        mirrorStore.snapshot ?? debugSnapshot
+    }
+
+    private var isUsingMirroredSnapshot: Bool {
+        mirrorStore.snapshot != nil
+    }
+
     private var effectiveNow: Date {
+        if let envelope = mirrorStore.envelope {
+            return mirroredWatchRenderNow(envelope: envelope, currentDate: now)
+        }
         #if DEBUG
         return debugNow ?? now
         #else
@@ -30,59 +81,51 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if let snap = snapshot {
+            if let snap = activeSnapshot {
                 GeometryReader { geo in
-                    // Solve from the actual ring geometry so the outer edge of the ring reaches the watch edges.
-                    let dialOuterDiameter = min(geo.size.width, geo.size.height) * WATCH_DIAL_EDGE_FIT
-                    let dialSize = dialOuterDiameter / WATCH_RING_OUTER_DIAMETER_RATIO
-                    // Web: center-info height 212px = hole diameter; positions 55, 100, 165 from hole top
-                    let holeTop = dialSize * (0.5 - 0.25125)
-                    let holeHeight = dialSize * 0.5025
-                    let sectorTop = holeTop + 55 * (holeHeight / 212)
-                    let dateTop = holeTop + 100 * (holeHeight / 212)
-                    let yearTop = dateTop + (dateTop - sectorTop)
-                    let centerOffsetY = dialSize * (-10 / 420)  // Web: -10px nudge
-                    let dialVerticalOffset = dialSize * WATCH_DIAL_VERTICAL_OFFSET_RATIO
+                    let metrics = WatchDialMetrics(containerSize: geo.size)
                     ZStack {
                         RingView(snapshot: snap, now: effectiveNow, renderVariant: .phone)
-                            .frame(width: dialSize, height: dialSize)
-                            .id(ringRenderIdentity(snapshot: snap, now: effectiveNow, dialSize: dialSize))
+                            .frame(width: metrics.dialSize, height: metrics.dialSize)
+                            .id(ringRenderIdentity(snapshot: snap, now: effectiveNow, dialSize: metrics.dialSize))
                         ZStack(alignment: .top) {
                             Color.clear
-                            currentPeriodView(snapshot: snap, now: effectiveNow, dialSize: dialSize)
+                            currentPeriodView(snapshot: snap, now: effectiveNow, dialSize: metrics.dialSize)
                                 .frame(maxWidth: .infinity)
-                                .offset(y: sectorTop)
+                                .offset(y: metrics.sectorTop)
                             HijriDayMonthLabel(
                                 hijriDate: snap.hijriDate,
-                                dialSize: dialSize,
-                                maxTextWidth: holeHeight * 0.72
+                                dialSize: metrics.dialSize,
+                                maxTextWidth: metrics.maxTextWidth
                             )
                                 .frame(maxWidth: .infinity)
-                                .offset(y: dateTop)
+                                .offset(y: metrics.dateTop)
                             HijriYearLabel(
                                 hijriDate: snap.hijriDate,
-                                dialSize: dialSize,
-                                maxTextWidth: holeHeight * 0.72
+                                dialSize: metrics.dialSize,
+                                maxTextWidth: metrics.maxTextWidth
                             )
                                 .frame(maxWidth: .infinity)
-                                .offset(y: yearTop)
+                                .offset(y: metrics.yearTop)
                         }
-                        .frame(width: dialSize, height: dialSize)
-                        .offset(y: centerOffsetY)
+                        .frame(width: metrics.dialSize, height: metrics.dialSize)
+                        .offset(y: metrics.centerOffsetY)
                     }
-                    .offset(y: dialVerticalOffset)
+                    .offset(y: metrics.dialVerticalOffset)
                     .frame(width: geo.size.width, height: geo.size.height)
                     #if DEBUG
                     .overlay(alignment: .topLeading) {
-                        WatchDebugControls(
-                            showsReset: debugNow != nil,
-                            onNextMonth: advanceDebugMonth,
-                            onForward15Minutes: advanceDebugQuarterHour,
-                            onRandomNotification: sendRandomDebugNotification,
-                            onReset: resetDebugTime
-                        )
-                        .padding(.top, 10)
-                        .padding(.leading, 8)
+                        if !isUsingMirroredSnapshot {
+                            WatchDebugControls(
+                                showsReset: debugNow != nil,
+                                onNextMonth: advanceDebugMonth,
+                                onForward15Minutes: advanceDebugQuarterHour,
+                                onRandomNotification: sendRandomDebugNotification,
+                                onReset: resetDebugTime
+                            )
+                            .padding(.top, 10)
+                            .padding(.leading, 8)
+                        }
                     }
                     #endif
                 }
@@ -95,6 +138,18 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black.ignoresSafeArea())
         .task {
+            while !Task.isCancelled {
+                now = Date()
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+        #if DEBUG
+        .task(id: isUsingMirroredSnapshot) {
+            guard !isUsingMirroredSnapshot else {
+                debugSnapshot = nil
+                return
+            }
+
             let geo = await resolveGeoResult()
             location = geo.location
             hasResolvedLocation = true
@@ -103,21 +158,26 @@ struct ContentView: View {
                 hasTrackedVisit = true
                 await trackVisit(geo: geo, platform: "watchos", surface: "watch_app")
             }
+
             while !Task.isCancelled {
+                guard !isUsingMirroredSnapshot else { break }
                 let currentNow = Date()
                 now = currentNow
                 let renderNow = debugNow ?? currentNow
-                snapshot = computeIslamicDaySnapshot(now: renderNow, location: location)
-                let refreshNow = renderNow
-                try? await Task.sleep(for: .seconds(secondsUntilNextRefresh(from: refreshNow, snapshot: snapshot)))
+                let updatedSnapshot = computeIslamicDaySnapshot(now: renderNow, location: location)
+                await MainActor.run {
+                    debugSnapshot = updatedSnapshot
+                }
+                try? await Task.sleep(for: .seconds(secondsUntilNextRefresh(from: renderNow, snapshot: updatedSnapshot)))
             }
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active, hasResolvedLocation else { return }
+            guard !isUsingMirroredSnapshot, phase == .active, hasResolvedLocation else { return }
             Task {
                 await PrayerNotificationScheduler.requestAndSchedule(location: location)
             }
         }
+        #endif
     }
 
     private func secondsUntilNextRefresh(from date: Date, snapshot: ComputedIslamicDay?) -> Double {
@@ -170,18 +230,18 @@ struct ContentView: View {
     private func advanceDebugMonth() {
         let updatedNow = addIslamicMonths(1, to: debugNow ?? now)
         debugNow = updatedNow
-        snapshot = computeIslamicDaySnapshot(now: updatedNow, location: location)
+        debugSnapshot = computeIslamicDaySnapshot(now: updatedNow, location: location)
     }
 
     private func advanceDebugQuarterHour() {
         let updatedNow = (debugNow ?? now).addingTimeInterval(15 * 60)
         debugNow = updatedNow
-        snapshot = computeIslamicDaySnapshot(now: updatedNow, location: location)
+        debugSnapshot = computeIslamicDaySnapshot(now: updatedNow, location: location)
     }
 
     private func resetDebugTime() {
         debugNow = nil
-        snapshot = computeIslamicDaySnapshot(now: now, location: location)
+        debugSnapshot = computeIslamicDaySnapshot(now: now, location: location)
     }
 
     private func sendRandomDebugNotification() {

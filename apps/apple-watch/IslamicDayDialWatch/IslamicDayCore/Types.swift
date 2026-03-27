@@ -3,7 +3,7 @@ import Foundation
 /// Swift port of @islamic-day-dial/core types.
 /// Keep in sync with packages/core/src/types.ts
 
-public struct Location {
+public struct Location: Codable, Equatable {
     public let latitude: Double
     public let longitude: Double
     
@@ -16,14 +16,14 @@ public struct Location {
     public static let mecca = Location(latitude: 21.4225, longitude: 39.8262)
 }
 
-public struct HijriDate {
+public struct HijriDate: Codable, Equatable {
     public let day: Int
     public let monthNumber: Int
     public let monthNameEn: String
     public let year: Int
 }
 
-public struct PrayerTimesData {
+public struct PrayerTimesData: Codable, Equatable {
     public let fajr: Date
     public let sunrise: Date
     public let dhuhr: Date
@@ -32,7 +32,7 @@ public struct PrayerTimesData {
     public let isha: Date
 }
 
-public struct ComputedTimeline {
+public struct ComputedTimeline: Codable, Equatable {
     public let lastMaghrib: Date
     public let isha: Date
     public let lastThirdStart: Date
@@ -45,7 +45,7 @@ public struct ComputedTimeline {
     public let nextMaghrib: Date
 }
 
-public enum IslamicPhaseId: String, CaseIterable {
+public enum IslamicPhaseId: String, CaseIterable, Codable {
     case maghrib_to_isha
     case isha_to_last_third
     case last_third_to_fajr
@@ -55,19 +55,19 @@ public enum IslamicPhaseId: String, CaseIterable {
     case asr_to_maghrib
 }
 
-public enum RingMarkerKind: String {
+public enum RingMarkerKind: String, Codable {
     case primary
     case secondary
 }
 
-public struct RingMarker {
+public struct RingMarker: Codable, Equatable {
     public let id: String
     public let timestamp: Date
     public let angleDeg: Double
     public let kind: RingMarkerKind
 }
 
-public struct RingSegment {
+public struct RingSegment: Codable, Equatable {
     public let id: IslamicPhaseId
     public let start: Date
     public let end: Date
@@ -75,7 +75,7 @@ public struct RingSegment {
     public let endAngleDeg: Double
 }
 
-public struct ComputedIslamicDay {
+public struct ComputedIslamicDay: Codable, Equatable {
     public let hijriDate: HijriDate
     public let prayerTimes: PrayerTimesData
     public let timeline: ComputedTimeline

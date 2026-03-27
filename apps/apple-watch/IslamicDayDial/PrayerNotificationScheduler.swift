@@ -11,6 +11,7 @@ import UserNotifications
 enum PrayerNotificationScheduler {
     private static let categoryId = "PRAYER_REMINDER"
     private static let identifierPrefix = "prayer_"
+    private static let debugSequenceKeyPrefix = "prayer_debug_sequence"
     private static let eidGreetingDelay: TimeInterval = 2 * 60 * 60
     private static let eidGreetingTitle = "Taqabbal Allahu minna wa minkum!"
     private static let eidGreetingBody = "May Allah accept from us and from you!"
@@ -203,6 +204,40 @@ enum PrayerNotificationScheduler {
         )
 
         try? await center.add(request)
+    }
+
+    static func sendSequentialDebugNotification(date: Date, location: Location, surface: String) async {
+        let center = UNUserNotificationCenter.current()
+        guard (try? await center.requestAuthorization(options: authorizationOptions)) == true else { return }
+
+        let sourcePlans = buildPlans(for: date, location: location) ?? []
+        guard !sourcePlans.isEmpty else { return }
+
+        let defaults = UserDefaults.standard
+        let key = debugSequenceKey(for: date, surface: surface)
+        let nextIndex = defaults.integer(forKey: key) % sourcePlans.count
+        let selected = sourcePlans[nextIndex]
+        defaults.set((nextIndex + 1) % sourcePlans.count, forKey: key)
+
+        let content = UNMutableNotificationContent()
+        content.title = selected.title
+        content.body = selected.body
+        content.sound = .default
+        content.categoryIdentifier = Self.categoryId
+
+        let request = UNNotificationRequest(
+            identifier: "\(Self.identifierPrefix)debug_seq_\(surface)_\(UUID().uuidString)",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+
+        try? await center.add(request)
+    }
+
+    private static func debugSequenceKey(for date: Date, surface: String) -> String {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let stamp = Int(startOfDay.timeIntervalSince1970)
+        return "\(debugSequenceKeyPrefix)_\(surface)_\(stamp)"
     }
 
     /// For unit testing notification naming and timing rules.

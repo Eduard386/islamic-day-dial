@@ -22,6 +22,7 @@ private final class WatchNotificationCenterDelegate: NSObject, UNUserNotificatio
 struct IslamicDayDialWatchApp: App {
     init() {
         UNUserNotificationCenter.current().delegate = WatchNotificationCenterDelegate.shared
+        WatchSnapshotStore.shared.start()
         #if DEBUG
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"

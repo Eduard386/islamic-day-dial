@@ -243,6 +243,14 @@ struct ContentView: View {
         if timeOffsetMs == 0 { return now }
         return now.addingTimeInterval(Double(timeOffsetMs) / 1000)
     }
+
+    private var debugPushHandler: (() -> Void)? {
+        #if DEBUG
+        return sendNextDebugNotification
+        #else
+        return nil
+        #endif
+    }
     
     var body: some View {
         NavigationStack {
@@ -364,7 +372,8 @@ struct ContentView: View {
                 dayOffset: $dayOffset,
                 hourOffset: $hourOffset,
                 timeOffsetMs: $timeOffsetMs,
-                currentHijriDay: snapshot?.hijriDate.day ?? 1
+                currentHijriDay: snapshot?.hijriDate.day ?? 1,
+                onDebugPush: debugPushHandler
             )
         }
         .onDisappear {
@@ -373,7 +382,13 @@ struct ContentView: View {
     }
     
     private func recalcSnapshot() {
-        snapshot = computeIslamicDaySnapshot(now: effectiveNow, location: automaticLocation)
+        let updatedSnapshot = computeIslamicDaySnapshot(now: effectiveNow, location: automaticLocation)
+        snapshot = updatedSnapshot
+        WatchMirrorSyncService.shared.push(
+            snapshot: updatedSnapshot,
+            location: automaticLocation,
+            renderNow: effectiveNow
+        )
     }
 
     private func secondsUntilNextRefresh(from date: Date, snapshot: ComputedIslamicDay?) -> Double {
@@ -548,8 +563,27 @@ struct ContentView: View {
         let currentNow = Date()
         now = currentNow
         let displayNow = currentNow.addingTimeInterval(Double(timeOffsetMs) / 1000)
-        snapshot = computeIslamicDaySnapshot(now: displayNow, location: automaticLocation)
+        let updatedSnapshot = computeIslamicDaySnapshot(now: displayNow, location: automaticLocation)
+        snapshot = updatedSnapshot
+        WatchMirrorSyncService.shared.push(
+            snapshot: updatedSnapshot,
+            location: automaticLocation,
+            renderNow: displayNow,
+            generatedAt: currentNow
+        )
     }
+
+    #if DEBUG
+    private func sendNextDebugNotification() {
+        Task {
+            await PrayerNotificationScheduler.sendSequentialDebugNotification(
+                date: effectiveNow,
+                location: automaticLocation,
+                surface: "ios"
+            )
+        }
+    }
+    #endif
 }
 
 private struct PhoneDialView: View {
@@ -1304,6 +1338,7 @@ private struct TimeTravelSheet: View {
     @Binding var hourOffset: Double
     @Binding var timeOffsetMs: Int64
     let currentHijriDay: Int
+    let onDebugPush: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
     
     private func applyOffset() {
@@ -1357,6 +1392,13 @@ private struct TimeTravelSheet: View {
                         Text("Day \(currentHijriDay)")
                             .fontWeight(.medium)
                         Spacer()
+                        if let onDebugPush {
+                            Button("Push") {
+                                onDebugPush()
+                            }
+                            .fontWeight(.semibold)
+                            .foregroundColor(Colors.neutralHeadingWhite)
+                        }
                         Button("Now") {
                             monthOffset = 0
                             dayOffset = 0
