@@ -1,6 +1,6 @@
 import XCTest
 
-/// Notification content format: body = "day month year", with prayer-specific observable titles.
+/// Notification content format: prayer-day reminders use observable titles with empty bodies.
 final class PrayerNotificationTests: XCTestCase {
     private let mecca = Location.mecca
 
@@ -28,7 +28,7 @@ final class PrayerNotificationTests: XCTestCase {
         XCTAssertEqual(title, "The sky is brightening, look to the east.")
     }
 
-    func testFormatContent_BodyContainsHijriDate() {
+    func testFormatContent_UsesEmptyBodyForPrayerReminders() {
         let fireDate = dateFromISO("2026-03-20T04:30:00")
         let maghrib = dateFromISO("2026-03-20T18:00:00")
         let (_, body) = PrayerNotificationScheduler.formatContentForTesting(
@@ -36,11 +36,7 @@ final class PrayerNotificationTests: XCTestCase {
             fireDate: fireDate,
             maghrib: maghrib
         )
-        XCTAssertTrue(body.contains("1447") || body.contains("1448"))
-        XCTAssertTrue(
-            body.contains("Ramadan") || body.contains("Shaban") ||
-            body.contains("Rabi") || body.contains("Shawwal")
-        )
+        XCTAssertEqual(body, "")
     }
 
     func testFormatContent_AllFivePrayers() {
@@ -60,7 +56,7 @@ final class PrayerNotificationTests: XCTestCase {
                 maghrib: maghrib
             )
             XCTAssertEqual(title, expectedTitle)
-            XCTAssertFalse(body.isEmpty)
+            XCTAssertEqual(body, "")
         }
     }
 
@@ -121,6 +117,15 @@ final class PrayerNotificationTests: XCTestCase {
             Int(eidNotification?.fireDate.timeIntervalSince1970 ?? -1),
             Int(prayerTimes?.dhuhr.timeIntervalSince1970 ?? -1)
         )
+    }
+
+    func testDescribeNotificationPayloads_PrayerRemindersUseEmptyBodies() {
+        let regularDay = dateFromISO("2026-03-23T12:00:00")
+        let payloads = PrayerNotificationScheduler.describeNotificationPayloadsForTesting(date: regularDay, location: mecca)
+        let prayerPayloads = payloads.filter { $0.title != "Taqabbal Allahu minna wa minkum!" }
+
+        XCTAssertFalse(prayerPayloads.isEmpty)
+        XCTAssertTrue(prayerPayloads.allSatisfy { $0.body.isEmpty })
     }
 
     func testDescribeNotificationPayloads_AddsEidGreetingTwoHoursAfterDuha() {

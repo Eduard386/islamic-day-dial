@@ -36,55 +36,80 @@ final class GlowWindowTests: XCTestCase {
         )
     }
 
+    private var eidTimeline: ComputedTimeline {
+        let sunrise = Date(timeIntervalSince1970: 1_742_450_400)
+        let dhuhr = Date(timeIntervalSince1970: 1_742_472_900)
+        return ComputedTimeline(
+            lastMaghrib: Date(timeIntervalSince1970: 1_742_421_600),
+            isha: Date(timeIntervalSince1970: 1_742_457_600),
+            lastThirdStart: Date(timeIntervalSince1970: 1_742_583_600),
+            fajr: Date(timeIntervalSince1970: 1_742_673_600),
+            sunrise: sunrise,
+            duhaStart: sunrise.addingTimeInterval(20 * 60),
+            duhaEnd: dhuhr.addingTimeInterval(-5 * 60),
+            dhuhr: dhuhr,
+            asr: Date(timeIntervalSince1970: 1_742_496_900),
+            nextMaghrib: Date(timeIntervalSince1970: 1_742_530_800)
+        )
+    }
+
+    private let regularHijriDate = HijriDate(day: 8, monthNumber: 10, monthNameEn: "Shawwal", year: 1446)
+    private let eidAlFitrHijriDate = HijriDate(day: 1, monthNumber: 10, monthNameEn: "Shawwal", year: 1446)
+
     // MARK: - Jumu'ah glow
 
     func testJumuahGlow_ReturnsFalseWhenNotFriday() {
         let thursday = Date(timeIntervalSince1970: 1_742_446_800) // Thu 2025-03-20 12:00 UTC
-        XCTAssertFalse(isJumuahGlowWindow(now: thursday, timeline: timeline, currentPhase: .dhuhr_to_asr))
+        XCTAssertFalse(isJumuahGlowWindow(now: thursday, timeline: timeline, currentPhase: .dhuhr_to_asr, hijriDate: regularHijriDate))
     }
 
     func testJumuahGlow_ReturnsTrueOnFridayInDhuhrToAsr() {
         // 2025-03-21 12:30 UTC = Friday, in dhuhr
         let friday = Date(timeIntervalSince1970: 1_742_560_200)
-        XCTAssertTrue(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .dhuhr_to_asr))
+        XCTAssertTrue(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .dhuhr_to_asr, hijriDate: regularHijriDate))
     }
 
     func testJumuahGlow_ReturnsTrueOnFridayInDuha() {
         // 2025-03-21 07:00 UTC = Friday, 20+ min after sunrise (06:00)
         let friday = Date(timeIntervalSince1970: 1_742_540_400)
-        XCTAssertTrue(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .sunrise_to_dhuhr))
+        XCTAssertTrue(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .sunrise_to_dhuhr, hijriDate: regularHijriDate))
     }
 
     func testJumuahGlow_ReturnsTrueOnFridayInMidday() {
         // 2025-03-21 12:12 UTC = Friday, last 5 min before dhuhr (12:15)
         let friday = Date(timeIntervalSince1970: 1_742_559_120)
-        XCTAssertTrue(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .sunrise_to_dhuhr))
+        XCTAssertTrue(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .sunrise_to_dhuhr, hijriDate: regularHijriDate))
     }
 
     func testJumuahGlow_ReturnsFalseOnFridayInSunriseSubPeriod() {
         // 2025-03-21 06:10 UTC = Friday, first 20 min after sunrise (06:00)
         let friday = Date(timeIntervalSince1970: 1_742_536_600)
-        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .sunrise_to_dhuhr))
+        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .sunrise_to_dhuhr, hijriDate: regularHijriDate))
     }
 
     func testJumuahGlow_ReturnsFalseOnFridayInNightPhases() {
         // 2025-03-21 08:16 UTC = Friday, in isha_to_last_third
         let friday = Date(timeIntervalSince1970: 1_742_545_000)
-        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .isha_to_last_third))
-        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .last_third_to_fajr))
-        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .maghrib_to_isha))
+        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .isha_to_last_third, hijriDate: regularHijriDate))
+        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .last_third_to_fajr, hijriDate: regularHijriDate))
+        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .maghrib_to_isha, hijriDate: regularHijriDate))
     }
 
     func testJumuahGlow_ReturnsFalseOnFridayInAsrToMaghrib() {
         let friday = Date(timeIntervalSince1970: 1_742_585_000)
-        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .asr_to_maghrib))
+        XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .asr_to_maghrib, hijriDate: regularHijriDate))
+    }
+
+    func testJumuahGlow_ReturnsTrueOnEidWhenNotFriday() {
+        let thursday = Date(timeIntervalSince1970: 1_742_464_800) // Thu 2025-03-20 10:00 UTC
+        XCTAssertTrue(isJumuahGlowWindow(now: thursday, timeline: eidTimeline, currentPhase: .dhuhr_to_asr, hijriDate: eidAlFitrHijriDate))
     }
 
     func testJumuahGlowStrength_StartsWeakAtDuhaAndReachesFullByEndOfDhuhr() {
         let startOfDuha = timeline.duhaStart.addingTimeInterval(1)
         let endOfDhuhr = timeline.asr.addingTimeInterval(-1)
-        let startStrength = getJumuahGlowStrength(now: startOfDuha, timeline: timeline, currentPhase: .sunrise_to_dhuhr)
-        let endStrength = getJumuahGlowStrength(now: endOfDhuhr, timeline: timeline, currentPhase: .dhuhr_to_asr)
+        let startStrength = getJumuahGlowStrength(now: startOfDuha, timeline: timeline, currentPhase: .sunrise_to_dhuhr, hijriDate: regularHijriDate)
+        let endStrength = getJumuahGlowStrength(now: endOfDhuhr, timeline: timeline, currentPhase: .dhuhr_to_asr, hijriDate: regularHijriDate)
 
         XCTAssertGreaterThan(startStrength, 0)
         XCTAssertLessThan(startStrength, 0.5)
@@ -99,7 +124,8 @@ final class GlowWindowTests: XCTestCase {
             currentPhase: .sunrise_to_dhuhr,
             duhaStartAngleDeg: 100,
             dhuhrAngleDeg: 200,
-            asrAngleDeg: 300
+            asrAngleDeg: 300,
+            hijriDate: regularHijriDate
         )
 
         XCTAssertEqual(sweep.duhaToDhuhrEndAngleDeg ?? 0, 150, accuracy: 0.001)
@@ -114,7 +140,8 @@ final class GlowWindowTests: XCTestCase {
             currentPhase: .dhuhr_to_asr,
             duhaStartAngleDeg: 100,
             dhuhrAngleDeg: 200,
-            asrAngleDeg: 300
+            asrAngleDeg: 300,
+            hijriDate: regularHijriDate
         )
 
         XCTAssertEqual(sweep.duhaToDhuhrEndAngleDeg ?? 0, 200, accuracy: 0.001)

@@ -226,6 +226,7 @@ private func isPhoneUpwardDismissSwipe(_ value: DragGesture.Value) -> Bool {
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var notificationOverlay: PhoneNotificationOverlayStore
     @State private var automaticLocation: Location = .mecca
     @State private var snapshot: ComputedIslamicDay?
     @State private var now = Date()
@@ -292,6 +293,17 @@ struct ContentView: View {
                         .allowsHitTesting(false)
                     }
                 }
+                .overlay(alignment: .top) {
+                    if let notificationMessage = notificationOverlay.currentMessage {
+                        PhoneNotificationOverlayView(
+                            text: notificationMessage,
+                            containerSize: geo.size
+                        )
+                        .opacity(notificationOverlay.isVisible ? 1 : 0)
+                        .animation(.easeOut(duration: 1), value: notificationOverlay.isVisible)
+                        .allowsHitTesting(false)
+                    }
+                }
                 .overlay {
                     Color.clear
                         .contentShape(Rectangle())
@@ -346,7 +358,7 @@ struct ContentView: View {
                             onTap: dismissSectorSpotlight
                         )
                         .opacity(sectorSpotlightOpacity)
-                        .allowsHitTesting(true)
+                        .allowsHitTesting(!isInteractionLocked && sectorSpotlightOpacity > 0.001)
                     }
                 }
             }
@@ -386,6 +398,15 @@ struct ContentView: View {
         }
         .onDisappear {
             interactionLockTask?.cancel()
+        }
+        .onAppear {
+            if notificationOverlay.currentMessage != nil {
+                returnToMainScreenForNotification()
+            }
+        }
+        .onChange(of: notificationOverlay.presentationID) { _, _ in
+            guard notificationOverlay.currentMessage != nil else { return }
+            returnToMainScreenForNotification()
         }
     }
     
@@ -440,6 +461,7 @@ struct ContentView: View {
 
     private func openInfoMode() {
         lockInteractions()
+        notificationOverlay.dismissIfVisible()
         phoneSelectionHaptic()
         showFootnotes = true
         insightOpacity = 0
@@ -471,6 +493,7 @@ struct ContentView: View {
             sectorSpotlightOpacity < 0.001
         else { return }
         lockInteractions()
+        notificationOverlay.dismissIfVisible()
         phoneSelectionHaptic()
         if showFootnotes {
             showFootnotes = false
@@ -520,6 +543,7 @@ struct ContentView: View {
             (insightOpacity < 0.001 || source == .months)
         else { return }
         lockInteractions()
+        notificationOverlay.dismissIfVisible()
         phoneSelectionHaptic()
         sectorSpotlightTitle = title
         sectorSpotlightSource = source
@@ -554,6 +578,51 @@ struct ContentView: View {
                 if sectorSpotlightOpacity < 0.001 {
                     sectorSpotlightTitle = ""
                 }
+            }
+        }
+    }
+
+    private func returnToMainScreenForNotification() {
+        interactionLockTask?.cancel()
+        showTimeTravel = false
+        let needsAnimatedReturn =
+            showFootnotes ||
+            infoPresentationProgress > 0.001 ||
+            footnoteOpacity > 0.001 ||
+            insightOpacity > 0.001 ||
+            sectorSpotlightOpacity > 0.001 ||
+            baseScreenOpacity < 0.999
+
+        guard needsAnimatedReturn else {
+            isInteractionLocked = false
+            showFootnotes = false
+            infoPresentationProgress = 0
+            footnoteOpacity = 0
+            baseScreenOpacity = 1
+            insightOpacity = 0
+            sectorSpotlightOpacity = 0
+            sectorSpotlightTitle = ""
+            sectorSpotlightSource = .main
+            return
+        }
+
+        isInteractionLocked = true
+        showFootnotes = false
+        sectorSpotlightSource = .main
+        withAnimation(.easeInOut(duration: INFO_EXPANSION_DURATION)) {
+            infoPresentationProgress = 0
+            footnoteOpacity = 0
+            baseScreenOpacity = 1
+            insightOpacity = 0
+            sectorSpotlightOpacity = 0
+        }
+
+        interactionLockTask = Task {
+            try? await Task.sleep(for: .seconds(INFO_EXPANSION_DURATION))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                isInteractionLocked = false
+                sectorSpotlightTitle = ""
             }
         }
     }
@@ -990,6 +1059,33 @@ private struct PhoneDialInsightView: View {
             }
         }
         .frame(width: columnWidth, alignment: .leading)
+    }
+}
+
+private struct PhoneNotificationOverlayView: View {
+    let text: String
+    let containerSize: CGSize
+
+    private var translationFontSize: CGFloat {
+        min(containerSize.width * 0.04, 17)
+    }
+
+    private var translationTop: CGFloat {
+        let ayahTop = containerSize.height * 0.019
+        let ayahFontSize = min(containerSize.width * 0.052, 22)
+        return ayahTop + ayahFontSize * 2.75 + containerSize.height * 0.018
+    }
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: translationFontSize, weight: .regular, design: .serif))
+            .foregroundColor(PHONE_READING_TINT)
+            .multilineTextAlignment(.center)
+            .lineSpacing(containerSize.height * 0.003)
+            .frame(maxWidth: min(containerSize.width - 56, 360))
+            .padding(.top, translationTop)
+            .padding(.horizontal, 18)
+            .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 

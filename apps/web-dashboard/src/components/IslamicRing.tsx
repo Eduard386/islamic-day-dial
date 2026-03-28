@@ -109,8 +109,8 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
     return { startAngleDeg: fajrAngle, spanDeg: asrToIshaSpanDeg };
   })();
 
-  const jumuahGlowStrength = getJumuahGlowStrength(now, snapshot.timeline, currentPhase);
-  const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase);
+  const jumuahGlowStrength = getJumuahGlowStrength(now, snapshot.timeline, currentPhase, snapshot.hijriDate);
+  const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase, snapshot.hijriDate);
   const duhaStartMarker = ring.markers.find((m) => m.id === 'duha_start');
   const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
   const asrMarker = ring.markers.find((m) => m.id === 'asr');

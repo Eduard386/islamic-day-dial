@@ -8,7 +8,7 @@ import UserNotifications
 /// Notification format:
 /// - Fard prayer titles: observable prompts tied to the Jibril signs
 /// - Special-day titles: current Jumu'ah / Eid labels
-/// - Body: "5 Shawwal 1447"
+/// - Body: empty for prayer-day reminders; retained only for the Eid greeting
 enum PrayerNotificationScheduler {
     private static let categoryId = "PRAYER_REMINDER"
     private static let identifierPrefix = "prayer_"
@@ -90,10 +90,6 @@ enum PrayerNotificationScheduler {
         }
     }
 
-    private static func formatHijriTitle(hijri: HijriDate) -> String {
-        "\(hijri.day) \(hijri.monthNameEn) \(hijri.year)"
-    }
-
     private static func buildPlans(for date: Date, location: Location) -> [NotificationPlan]? {
         guard let prayerTimes = getPrayerTimesForDate(date: date, location: location),
               let midday = localMidday(for: date),
@@ -106,16 +102,16 @@ enum PrayerNotificationScheduler {
         let isFriday = Calendar.current.component(.weekday, from: prayerTimes.dhuhr) == 6
 
         var plans = [
-            prayerPlan(kind: .fajr, prayerName: "Fajr", fireDate: prayerTimes.fajr, maghribForDay: prayerTimes.maghrib),
+            prayerPlan(kind: .fajr, prayerName: "Fajr", fireDate: prayerTimes.fajr),
             noonPlan(
                 prayerTimes: prayerTimes,
                 duhaStart: snapshot.timeline.duhaStart,
                 isFriday: isFriday,
                 hijriParts: hijriParts
             ),
-            prayerPlan(kind: .asr, prayerName: "Asr", fireDate: prayerTimes.asr, maghribForDay: prayerTimes.maghrib),
-            prayerPlan(kind: .maghrib, prayerName: "Maghrib", fireDate: prayerTimes.maghrib, maghribForDay: prayerTimes.maghrib),
-            prayerPlan(kind: .isha, prayerName: "Isha", fireDate: prayerTimes.isha, maghribForDay: prayerTimes.maghrib),
+            prayerPlan(kind: .asr, prayerName: "Asr", fireDate: prayerTimes.asr),
+            prayerPlan(kind: .maghrib, prayerName: "Maghrib", fireDate: prayerTimes.maghrib),
+            prayerPlan(kind: .isha, prayerName: "Isha", fireDate: prayerTimes.isha),
         ]
 
         if hijriParts.isEid {
@@ -135,14 +131,12 @@ enum PrayerNotificationScheduler {
     private static func prayerPlan(
         kind: NotificationKind,
         prayerName: String,
-        fireDate: Date,
-        maghribForDay: Date
+        fireDate: Date
     ) -> NotificationPlan {
-        let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghribForDay)
         return NotificationPlan(
             kind: kind,
             title: title(for: kind, prayerName: prayerName),
-            body: formatHijriTitle(hijri: hijriDate),
+            body: "",
             fireDate: fireDate
         )
     }
@@ -185,23 +179,20 @@ enum PrayerNotificationScheduler {
             return prayerPlan(
                 kind: .eid,
                 prayerName: hijriParts.dayMonth,
-                fireDate: duhaStart,
-                maghribForDay: prayerTimes.maghrib
+                fireDate: duhaStart
             )
         }
         if isFriday {
             return prayerPlan(
                 kind: .jumuah,
                 prayerName: "Jumu'ah",
-                fireDate: duhaStart,
-                maghribForDay: prayerTimes.maghrib
+                fireDate: duhaStart
             )
         }
         return prayerPlan(
             kind: .dhuhr,
             prayerName: "Dhuhr",
-            fireDate: prayerTimes.dhuhr,
-            maghribForDay: prayerTimes.maghrib
+            fireDate: prayerTimes.dhuhr
         )
     }
 
@@ -290,7 +281,8 @@ enum PrayerNotificationScheduler {
 
     /// For unit testing notification content format only.
     static func formatContentForTesting(prayerName: String, fireDate: Date, maghrib: Date) -> (title: String, body: String) {
-        let hijriDate = getIslamicDayHijriDate(now: fireDate, todayMaghrib: maghrib)
+        _ = fireDate
+        _ = maghrib
         let kind: NotificationKind
         switch prayerName {
         case "Fajr":
@@ -307,7 +299,6 @@ enum PrayerNotificationScheduler {
             kind = .dhuhr
         }
         let title = title(for: kind, prayerName: prayerName)
-        let body = "\(hijriDate.day) \(hijriDate.monthNameEn) \(hijriDate.year)"
-        return (title, body)
+        return (title, "")
     }
 }

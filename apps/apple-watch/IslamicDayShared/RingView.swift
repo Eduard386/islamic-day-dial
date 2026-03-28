@@ -721,7 +721,12 @@ private struct PhoneNightGlowOverlay: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             let (base, phase) = glowPulsePhase(timeline.date)
-            let jumuStrength = getJumuahGlowStrength(now: now, timeline: snapshot.timeline, currentPhase: currentPhase)
+            let jumuStrength = getJumuahGlowStrength(
+                now: now,
+                timeline: snapshot.timeline,
+                currentPhase: currentPhase,
+                hijriDate: snapshot.hijriDate
+            )
             let jumuBaseOpacity = min(1, 0.12 + 0.28 * jumuStrength + 0.16 * base)
             let jumuPeakOpacity = min(1, 0.16 + 0.42 * jumuStrength + 0.28 * phase)
             let lastThirdBase = base

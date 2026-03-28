@@ -13,49 +13,61 @@ describe('isJumuahGlowWindow', () => {
     dhuhr: new Date('2025-03-21T09:15:00.000Z'),
     asr: new Date('2025-03-21T12:30:00.000Z'),
   };
+  const eidTimeline = {
+    duhaStart: new Date('2025-03-20T04:38:00.000Z'),
+    dhuhr: new Date('2025-03-20T09:15:00.000Z'),
+    asr: new Date('2025-03-20T12:30:00.000Z'),
+  };
+  const eidAlFitr = { day: 1, monthNumber: 10, monthNameEn: 'Shawwal', year: 1446 };
+  const regularDay = { day: 8, monthNumber: 10, monthNameEn: 'Shawwal', year: 1446 };
 
   it('returns false when not Friday', () => {
     const thursday = new Date('2025-03-20T10:00:00.000Z');
-    expect(isJumuahGlowWindow(thursday, timeline, 'dhuhr_to_asr')).toBe(false);
+    expect(isJumuahGlowWindow(thursday, timeline, 'dhuhr_to_asr', regularDay)).toBe(false);
   });
 
   it('returns true on Friday when in dhuhr_to_asr', () => {
     const friday = new Date('2025-03-21T10:00:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'dhuhr_to_asr')).toBe(true);
+    expect(isJumuahGlowWindow(friday, timeline, 'dhuhr_to_asr', regularDay)).toBe(true);
   });
 
   it('returns true on Friday when in duha sub-period', () => {
     const friday = new Date('2025-03-21T06:00:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr')).toBe(true);
+    expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr', regularDay)).toBe(true);
   });
 
   it('returns true on Friday when in midday sub-period', () => {
     const friday = new Date('2025-03-21T09:12:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr')).toBe(true);
+    expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr', regularDay)).toBe(true);
   });
 
   it('returns false on Friday when in sunrise sub-period', () => {
     const friday = new Date('2025-03-21T04:20:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr')).toBe(false);
+    expect(isJumuahGlowWindow(friday, timeline, 'sunrise_to_dhuhr', regularDay)).toBe(false);
   });
 
   it('returns false on Friday when in night phases', () => {
     const friday = new Date('2025-03-21T03:00:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'isha_to_last_third')).toBe(false);
-    expect(isJumuahGlowWindow(friday, timeline, 'last_third_to_fajr')).toBe(false);
-    expect(isJumuahGlowWindow(friday, timeline, 'maghrib_to_isha')).toBe(false);
+    expect(isJumuahGlowWindow(friday, timeline, 'isha_to_last_third', regularDay)).toBe(false);
+    expect(isJumuahGlowWindow(friday, timeline, 'last_third_to_fajr', regularDay)).toBe(false);
+    expect(isJumuahGlowWindow(friday, timeline, 'maghrib_to_isha', regularDay)).toBe(false);
   });
 
   it('returns false on Friday when in asr_to_maghrib', () => {
     const friday = new Date('2025-03-21T14:00:00.000Z');
-    expect(isJumuahGlowWindow(friday, timeline, 'asr_to_maghrib')).toBe(false);
+    expect(isJumuahGlowWindow(friday, timeline, 'asr_to_maghrib', regularDay)).toBe(false);
+  });
+
+  it('returns true on Eid when not Friday', () => {
+    const thursday = new Date('2025-03-20T10:00:00.000Z');
+    expect(isJumuahGlowWindow(thursday, eidTimeline, 'dhuhr_to_asr', eidAlFitr)).toBe(true);
   });
 
   it('starts weak at the beginning of duha and reaches full strength by end of dhuhr', () => {
     const startOfDuha = timeline.duhaStart;
     const endOfDhuhr = new Date(timeline.asr.getTime() - 1000);
-    const startStrength = getJumuahGlowStrength(startOfDuha, timeline, 'sunrise_to_dhuhr');
-    const endStrength = getJumuahGlowStrength(endOfDhuhr, timeline, 'dhuhr_to_asr');
+    const startStrength = getJumuahGlowStrength(startOfDuha, timeline, 'sunrise_to_dhuhr', regularDay);
+    const endStrength = getJumuahGlowStrength(endOfDhuhr, timeline, 'dhuhr_to_asr', regularDay);
 
     expect(startStrength).toBeGreaterThan(0);
     expect(startStrength).toBeLessThan(0.5);

@@ -2,8 +2,10 @@ import SwiftUI
 
 private let WATCH_RING_OUTER_DIAMETER_RATIO: CGFloat = 0.6645
 private let WATCH_CURRENT_PERIOD_FONT_RATIO: CGFloat = 20 / 420
+private let WATCH_HIJRI_DAY_NUMBER_FONT_RATIO: CGFloat = 28 / 420
 private let WATCH_HIJRI_COMPACT_FONT_RATIO: CGFloat = 25 / 420
 private let WATCH_HIJRI_COMPACT_EMPHASIZED_FONT_RATIO: CGFloat = 26.5 / 420
+private let WATCH_HIJRI_COMPACT_EXTRA_EMPHASIZED_FONT_RATIO: CGFloat = 27.5 / 420
 private let WATCH_HIJRI_REGULAR_FONT_RATIO: CGFloat = 22 / 420
 private let WATCH_HIJRI_YEAR_FONT_RATIO: CGFloat = 19 / 420
 private let WATCH_METRICS_COMPACT_MIN_SIDE: CGFloat = 176
@@ -171,20 +173,31 @@ private let EMPHASIZED_COMPACT_MONTH_NAMES: Set<String> = [
 
 private struct WatchHijriLabelParts {
     let dayMonth: String
+    let dayText: String
+    let monthText: String
     let year: String
     let isEid: Bool
     let useCompactDayMonth: Bool
     let emphasizedCompactMonth: Bool
+    let extraEmphasizedCompactMonth: Bool
 }
 
 private func getWatchHijriLabelParts(_ hijriDate: HijriDate) -> WatchHijriLabelParts {
     let parts = formatHijriDateParts(hijriDate)
+    let monthName = hijriDate.monthNameEn
+    let isEid = parts.isEid
+    let dayText = isEid ? parts.dayMonth : String(hijriDate.day)
+    let monthText = isEid ? "" : monthName
+    let lowerMonthName = monthName.lowercased()
     return WatchHijriLabelParts(
         dayMonth: parts.dayMonth,
+        dayText: dayText,
+        monthText: monthText,
         year: parts.year,
-        isEid: parts.isEid,
-        useCompactDayMonth: COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased()),
-        emphasizedCompactMonth: EMPHASIZED_COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased())
+        isEid: isEid,
+        useCompactDayMonth: COMPACT_MONTH_NAMES.contains(lowerMonthName),
+        emphasizedCompactMonth: EMPHASIZED_COMPACT_MONTH_NAMES.contains(lowerMonthName),
+        extraEmphasizedCompactMonth: lowerMonthName == "jumada al-thani"
     )
 }
 
@@ -215,14 +228,29 @@ private struct HijriDayMonthLabel: View {
     @State private var pulseBright = false
 
     var body: some View {
-        let dayMonthFontRatio: CGFloat = {
+        let monthFontRatio: CGFloat = {
+            if parts.extraEmphasizedCompactMonth { return WATCH_HIJRI_COMPACT_EXTRA_EMPHASIZED_FONT_RATIO }
             if parts.emphasizedCompactMonth { return WATCH_HIJRI_COMPACT_EMPHASIZED_FONT_RATIO }
             if parts.useCompactDayMonth { return WATCH_HIJRI_COMPACT_FONT_RATIO }
             return WATCH_HIJRI_REGULAR_FONT_RATIO
         }()
 
-        Text(parts.dayMonth.uppercased())
-            .font(.system(size: dialSize * dayMonthFontRatio, weight: .semibold))
+        let content: Text = {
+            if parts.isEid {
+                return Text(parts.dayMonth.uppercased())
+                    .font(.system(size: dialSize * monthFontRatio, weight: .semibold))
+            }
+
+            return
+                Text(parts.dayText)
+                .font(.system(size: dialSize * WATCH_HIJRI_DAY_NUMBER_FONT_RATIO, weight: .semibold))
+                + Text(" ")
+                .font(.system(size: dialSize * monthFontRatio, weight: .semibold))
+                + Text(parts.monthText.uppercased())
+                .font(.system(size: dialSize * monthFontRatio, weight: .semibold))
+        }()
+
+        content
             .lineLimit(1)
             .minimumScaleFactor(0.58)
             .allowsTightening(true)
