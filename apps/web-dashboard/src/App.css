@@ -368,13 +368,11 @@ body {
   flex: 0 0 auto;
   --dial: 420px;
   --footnote-side: 92px;
-  --footnote-pad: 50px;
   width: calc(var(--dial) + 2 * var(--footnote-side));
   max-width: 100%;
-  height: calc(var(--dial) + var(--footnote-pad));
+  height: var(--dial);
   margin-left: auto;
   margin-right: auto;
-  transform: translateY(calc(var(--footnote-pad) * -0.18));
 }
 
 .dial-footnote-leaders {
@@ -389,6 +387,10 @@ body {
   stroke-width: 1;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.dial-footnote-line.is-active {
+  stroke: rgba(242, 238, 227, 0.78);
 }
 
 .footnote-label {
@@ -407,15 +409,11 @@ body {
 }
 
 .footnote-label--left {
-  left: 8px;
   text-align: right;
-  width: calc(var(--footnote-side) - 16px);
 }
 
 .footnote-label--right {
-  right: 8px;
   text-align: left;
-  width: calc(var(--footnote-side) - 16px);
 }
 
 .footnote-label.is-clickable {

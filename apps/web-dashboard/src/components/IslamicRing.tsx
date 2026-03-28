@@ -10,6 +10,7 @@ import {
 import { describeArc, polarToXY } from '../lib/geometry';
 import { getSegmentGradientStops, getConicGradientCss, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
+import { adjustExplodedAngle, getCurrentExplodedArcId, getExplodedRingArcSpecs } from '../lib/explodedRing';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 
 type Props = {
@@ -95,7 +96,26 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
   const { ring, currentPhase } = snapshot;
   const progressAngle = ring.progress * 360;
   const displaySegments = getDisplaySegments(ring.segments, currentPhase);
+  const explodedArcSpecs = getExplodedRingArcSpecs(snapshot);
+  const explodedArcById = new Map(explodedArcSpecs.map((spec) => [spec.id, spec]));
   const inIshaSector = NIGHT_SECTORS_GROUP.has(currentPhase);
+  const sunriseMarker = ring.markers.find((m) => m.id === 'sunrise');
+  const maghribMarker = ring.markers.find((m) => m.id === 'maghrib');
+  const sunriseToDhuhrSubPeriod =
+    currentPhase === 'sunrise_to_dhuhr' && snapshot.timeline
+      ? getSunriseToDhuhrSubPeriod(
+          now ?? new Date(),
+          snapshot.timeline.duhaStart,
+          snapshot.timeline.dhuhr,
+        )
+      : null;
+  const currentExplodedArcId = getCurrentExplodedArcId(snapshot, now);
+  const currentExplodedArc = explodedArcById.get(currentExplodedArcId);
+  const explodedProgressAngle = currentExplodedArc
+    ? adjustExplodedAngle(currentExplodedArc, progressAngle)
+    : progressAngle;
+  const explodedSunriseAngle = explodedArcById.get('sunrise')?.startAngleDeg ?? sunriseMarker?.angleDeg ?? 0;
+  const explodedMaghribAngle = explodedArcById.get('maghrib')?.startAngleDeg ?? maghribMarker?.angleDeg ?? 0;
 
   const mirrorSegment: MirrorSegment | null = (() => {
     const asrMarker = ring.markers.find((m) => m.id === 'asr');
@@ -111,9 +131,6 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
   const jumuahGlowStrength = getJumuahGlowStrength(now, snapshot.timeline, currentPhase, snapshot.hijriDate);
   const showJumuahGlow = isJumuahGlowWindow(now, snapshot.timeline, currentPhase, snapshot.hijriDate);
-  const duhaStartMarker = ring.markers.find((m) => m.id === 'duha_start');
-  const dhuhrMarker = ring.markers.find((m) => m.id === 'dhuhr');
-  const asrMarker = ring.markers.find((m) => m.id === 'asr');
   const sunriseToDhuhrSeg = displaySegments.find((s) => s.id === 'sunrise_to_dhuhr');
   const dhuhrToAsrSeg = displaySegments.find((s) => s.id === 'dhuhr_to_asr');
   const jumuGradSunriseDhuhr =
@@ -132,8 +149,20 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         <CurrentMarkerDefs r={MARKER_R} />
         <mask id="ring-sweep-mask">
           <rect width={size} height={size} fill="black" />
-          <circle cx={cx} cy={cy} r={ringInner + ringStroke} fill="white" />
-          <circle cx={cx} cy={cy} r={ringInner} fill="black" />
+          {explodedArcSpecs.map((spec) => {
+            const path = describeArc(cx, cy, ringR, spec.startAngleDeg, spec.endAngleDeg);
+            if (!path) return null;
+            return (
+              <path
+                key={`mask-${spec.id}`}
+                d={path}
+                fill="none"
+                stroke="white"
+                strokeWidth={ringStroke}
+                strokeLinecap="butt"
+              />
+            );
+          })}
         </mask>
         <filter id="glow-ish" filterUnits="userSpaceOnUse" x="0" y="0" width={size} height={size}>
           <feGaussianBlur stdDeviation={ISHA_GLOW.blur} result="blur" />
@@ -233,9 +262,9 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
       {/* Last third: soft breathing halo when marker is in this sector */}
       {currentPhase === 'last_third_to_fajr' &&
         (() => {
-          const seg = displaySegments.find((s) => s.id === 'last_third_to_fajr');
-          if (!seg) return null;
-          const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
+          const spec = explodedArcById.get('lastThird');
+          if (!spec) return null;
+          const path = describeArc(cx, cy, ringR, spec.startAngleDeg, spec.endAngleDeg);
           if (!path) return null;
           return (
             <g
@@ -257,17 +286,18 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
       {/* Isha glow only: keep ring bright, but add neon halo when marker is inside Isha sectors */}
       {inIshaSector &&
-        displaySegments
-          .filter((seg) => NIGHT_SECTORS_GROUP.has(seg.id))
-          .map((seg) => {
-            const path = describeArc(cx, cy, ringR, seg.startAngleDeg, seg.endAngleDeg);
+        ['isha', 'lastThird']
+          .map((arcId) => explodedArcById.get(arcId as 'isha' | 'lastThird'))
+          .filter(Boolean)
+          .map((spec) => {
+            const path = describeArc(cx, cy, ringR, spec!.startAngleDeg, spec!.endAngleDeg);
             if (!path) return null;
-            const isLastThird = seg.id === 'last_third_to_fajr';
+            const isLastThird = spec!.id === 'lastThird';
             const markerInLastThird = currentPhase === 'last_third_to_fajr';
             if (isLastThird && markerInLastThird) {
               return (
                 <g
-                  key={`glow-ish-${seg.id}`}
+                  key={`glow-ish-${spec!.id}`}
                   className="last-third-glow-pulse"
                   style={{
                     ['--last-third-glow-pulse-duration' as string]: `${LAST_THIRD_GLOW_PULSE_DURATION}s`,
@@ -284,7 +314,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
               );
             }
             return (
-              <g key={`glow-ish-${seg.id}`} filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity}>
+              <g key={`glow-ish-${spec!.id}`} filter="url(#glow-ish)" opacity={ISHA_GLOW.opacity}>
                 <path d={path} fill="none" stroke={ISHA_GLOW.color} strokeWidth={ringStroke + ISHA_GLOW.strokeWidth} strokeLinecap="butt" />
               </g>
             );
@@ -292,19 +322,13 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
       {/* Jumu'ah: три дуги визуально — только пт. и маркер в DUHA / MIDDAY / DHUHR */}
       {showJumuahGlow &&
-        duhaStartMarker &&
-        dhuhrMarker &&
-        asrMarker &&
-        jumuGradSunriseDhuhr &&
-        jumuGradDhuhrAsr &&
+        explodedArcById.get('duha') &&
+        explodedArcById.get('midday') &&
+        explodedArcById.get('dhuhr') &&
         (() => {
-          const s1 = duhaStartMarker.angleDeg;
-          const e1 = dhuhrMarker.angleDeg;
-          const s2 = dhuhrMarker.angleDeg;
-          const e2 = asrMarker.angleDeg;
-          const pathDuhaToDhuhr = describeArc(cx, cy, ringR, s1, e1);
-          const pathDhuhrToAsr = describeArc(cx, cy, ringR, s2, e2);
-          if (!pathDuhaToDhuhr || !pathDhuhrToAsr) return null;
+          const glowArcs = ['duha', 'midday', 'dhuhr']
+            .map((arcId) => explodedArcById.get(arcId as 'duha' | 'midday' | 'dhuhr'))
+            .filter(Boolean);
           const wBase = ringStroke + JUMU_GLOW.baseStrokeExtra;
           const wPeak = ringStroke + JUMU_GLOW.peakStrokeExtra;
           return (
@@ -317,36 +341,36 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
               }}
             >
               <g filter="url(#glow-jumu-base)" opacity={JUMU_GLOW.baseOpacity * jumuahGlowStrength} className="last-third-glow-base">
-                <path
-                  d={pathDuhaToDhuhr}
-                  fill="none"
-                  stroke={`url(#${jumuGradSunriseDhuhr})`}
-                  strokeWidth={wBase}
-                  strokeLinecap="butt"
-                />
-                <path
-                  d={pathDhuhrToAsr}
-                  fill="none"
-                  stroke={`url(#${jumuGradDhuhrAsr})`}
-                  strokeWidth={wBase}
-                  strokeLinecap="butt"
-                />
+                {glowArcs.map((spec) => {
+                  const path = describeArc(cx, cy, ringR, spec!.startAngleDeg, spec!.endAngleDeg);
+                  if (!path) return null;
+                  return (
+                    <path
+                      key={`jumu-base-${spec!.id}`}
+                      d={path}
+                      fill="none"
+                      stroke={`url(#${spec!.id === 'dhuhr' ? jumuGradDhuhrAsr : jumuGradSunriseDhuhr})`}
+                      strokeWidth={wBase}
+                      strokeLinecap="butt"
+                    />
+                  );
+                })}
               </g>
               <g filter="url(#glow-jumu-peak)" className="last-third-glow-peak">
-                <path
-                  d={pathDuhaToDhuhr}
-                  fill="none"
-                  stroke={`url(#${jumuGradSunriseDhuhr})`}
-                  strokeWidth={wPeak}
-                  strokeLinecap="butt"
-                />
-                <path
-                  d={pathDhuhrToAsr}
-                  fill="none"
-                  stroke={`url(#${jumuGradDhuhrAsr})`}
-                  strokeWidth={wPeak}
-                  strokeLinecap="butt"
-                />
+                {glowArcs.map((spec) => {
+                  const path = describeArc(cx, cy, ringR, spec!.startAngleDeg, spec!.endAngleDeg);
+                  if (!path) return null;
+                  return (
+                    <path
+                      key={`jumu-peak-${spec!.id}`}
+                      d={path}
+                      fill="none"
+                      stroke={`url(#${spec!.id === 'dhuhr' ? jumuGradDhuhrAsr : jumuGradSunriseDhuhr})`}
+                      strokeWidth={wPeak}
+                      strokeLinecap="butt"
+                    />
+                  );
+                })}
               </g>
             </g>
           );
@@ -401,27 +425,17 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
       {/* Current position — minimal disk, moon phase at night */}
       {(() => {
-        const pos = polarToXY(cx, cy, ringR, progressAngle);
+        const pos = polarToXY(cx, cy, ringR, explodedProgressAngle);
         const markerState = getCurrentMarkerVisualState(
           currentPhase,
           snapshot.hijriDate,
         );
-        const sunriseMarker = ring.markers.find((m) => m.id === 'sunrise');
-        const maghribMarker = ring.markers.find((m) => m.id === 'maghrib');
         const sunriseBoundary = sunriseMarker
-          ? polarToXY(cx, cy, ringR, sunriseMarker.angleDeg)
+          ? polarToXY(cx, cy, ringR, explodedSunriseAngle)
           : null;
         const maghribBoundary = maghribMarker
-          ? polarToXY(cx, cy, ringR, maghribMarker.angleDeg)
+          ? polarToXY(cx, cy, ringR, explodedMaghribAngle)
           : null;
-        const sunriseToDhuhrSubPeriod =
-          currentPhase === 'sunrise_to_dhuhr' && snapshot.timeline
-            ? getSunriseToDhuhrSubPeriod(
-                now ?? new Date(),
-                snapshot.timeline.duhaStart,
-                snapshot.timeline.dhuhr,
-              )
-            : null;
         const isInSunriseSubPeriod = sunriseToDhuhrSubPeriod === 'sunrise';
         const isInMiddaySubPeriod = sunriseToDhuhrSubPeriod === 'midday';
         return (
@@ -432,9 +446,9 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             size={size}
             state={markerState}
             currentPhase={currentPhase}
-            progressAngle={progressAngle}
-            sunriseAngleDeg={sunriseMarker ? sunriseMarker.angleDeg : 0}
-            maghribAngleDeg={maghribMarker ? maghribMarker.angleDeg : 0}
+            progressAngle={explodedProgressAngle}
+            sunriseAngleDeg={explodedSunriseAngle}
+            maghribAngleDeg={explodedMaghribAngle}
             centerX={cx}
             centerY={cy}
             sunriseBoundary={sunriseBoundary}

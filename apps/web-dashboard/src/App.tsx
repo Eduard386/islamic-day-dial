@@ -145,7 +145,7 @@ export default function App() {
               <h1 className="desktop-shell-title">Islamic Day Dial</h1>
               <p className="subtitle desktop-stage-subtitle">Maghrib to Maghrib</p>
               <div className="desktop-stage-ring">
-                {renderDial(420, 92, true)}
+                {renderDial(420, 132, true)}
               </div>
             </section>
 
