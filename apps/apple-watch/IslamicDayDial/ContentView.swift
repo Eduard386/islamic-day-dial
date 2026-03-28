@@ -8,10 +8,18 @@ private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 private let INFO_EXPANSION_DURATION = 1.0
 private let PHONE_DATE_INFO_SCALE: CGFloat = 1.25
 private let PHONE_TEXT_GLOW_PULSE_DURATION = 3.0
-let PHONE_READING_TINT = Color(red: 0.9, green: 0.88, blue: 0.8)
-let PHONE_READING_GLOW = Color(red: 0.99, green: 0.88, blue: 0.38)
-private let PHONE_INSIGHT_AYAH_AR = "قال الله تعالى: ﴿إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
-private let PHONE_INSIGHT_AYAH_EN = "Allah, the Exalted, said: \"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
+let PHONE_READING_TINT = Color(red: 0.87, green: 0.84, blue: 0.79)
+private let PHONE_SACRED_WHITE = Color(red: 0.949, green: 0.933, blue: 0.894)
+private let PHONE_SOFT_WHITE = Color(red: 0.867, green: 0.839, blue: 0.792)
+private let PHONE_MUTED_META = Color(red: 0.718, green: 0.725, blue: 0.784)
+private let PHONE_ANTIQUE_GOLD = Color(red: 0.78, green: 0.608, blue: 0.231)
+private let PHONE_SCREEN_TITLE = Color(red: 0.902, green: 0.875, blue: 0.824)
+private let PHONE_INSIGHT_AYAH_AR = "قال الله تعالى: إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
+private let PHONE_INSIGHT_AYAH_EN = "Allah, the Exalted, said:\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
+private let PHONE_LOADING_STILL_FADE_DURATION = 1.0
+private let PHONE_LOADING_STILL_ZOOM_MIN: CGFloat = 1.012
+private let PHONE_LOADING_STILL_ZOOM_MAX: CGFloat = 1.032
+private let PHONE_LOADING_STILL_ZOOM_DURATION = 9.0
 private let PHONE_HIJRI_MONTH_NAMES = [
     "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
     "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Shaban",
@@ -44,6 +52,77 @@ private let PHONE_JUMUAH_HADITH_TWO_EN = "The Prophet (ﷺ) said: \"He who took 
 private let PHONE_JUMUAH_HADITH_THREE_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ نَافِعٍ، عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يُصَلِّي قَبْلَ الظُّهْرِ رَكْعَتَيْنِ، وَبَعْدَهَا رَكْعَتَيْنِ، وَبَعْدَ الْمَغْرِبِ رَكْعَتَيْنِ فِي بَيْتِهِ، وَبَعْدَ الْعِشَاءِ رَكْعَتَيْنِ وَكَانَ لاَ يُصَلِّي بَعْدَ الْجُمُعَةِ حَتَّى يَنْصَرِفَ فَيُصَلِّي رَكْعَتَيْنِ‏.‏"
 private let PHONE_JUMUAH_HADITH_THREE_EN = "Narrated `Abdullah bin `Umar: Allah's Messenger (ﷺ) used to pray two rak`at before the Zuhr prayer and two rak`at after it. He also used to pray two rak`at after the Maghrib prayer in his house, and two rak`at after the `Isha' prayer. He never prayed after Jumu'ah prayer till he departed (from the Mosque), and then he would pray two rak`at at home."
 
+private enum PhoneLoadingStillKey: String {
+    case fajr
+    case sunrise
+    case duha
+    case midday
+    case dhuhr
+    case asr
+    case maghrib
+    case isha
+    case lastThird
+    case jumuah
+    case eidAlFitr
+    case eidAlAdha
+
+    var assetName: String {
+        switch self {
+        case .fajr: return "LoadingFajr"
+        case .sunrise: return "LoadingSunrise"
+        case .duha: return "LoadingDuha"
+        case .midday: return "LoadingMidday"
+        case .dhuhr: return "LoadingDhuhr"
+        case .asr: return "LoadingAsr"
+        case .maghrib: return "LoadingMaghrib"
+        case .isha: return "LoadingIsha"
+        case .lastThird: return "LoadingLastThird"
+        case .jumuah: return "LoadingJumuah"
+        case .eidAlFitr: return "LoadingEidAlFitr"
+        case .eidAlAdha: return "LoadingEidAlAdha"
+        }
+    }
+}
+
+private func phoneLoadingStillKey(for snapshot: ComputedIslamicDay, now: Date) -> PhoneLoadingStillKey {
+    if snapshot.hijriDate.monthNumber == 10 && snapshot.hijriDate.day == 1 {
+        return .eidAlFitr
+    }
+    if snapshot.hijriDate.monthNumber == 12 && snapshot.hijriDate.day == 10 {
+        return .eidAlAdha
+    }
+
+    let sectorTitle = getSectorDisplayName(
+        now: now,
+        currentPhase: snapshot.currentPhase,
+        timeline: (duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr)
+    )
+    if sectorTitle == "Jumu'ah" {
+        return .jumuah
+    }
+
+    switch snapshot.currentPhase {
+    case .maghrib_to_isha:
+        return .maghrib
+    case .isha_to_last_third:
+        return .isha
+    case .last_third_to_fajr:
+        return .lastThird
+    case .fajr_to_sunrise:
+        return .fajr
+    case .sunrise_to_dhuhr:
+        switch getSunriseToDhuhrSubPeriod(now: now, duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr) {
+        case .sunrise: return .sunrise
+        case .duha: return .duha
+        case .midday: return .midday
+        }
+    case .dhuhr_to_asr:
+        return .dhuhr
+    case .asr_to_maghrib:
+        return .asr
+    }
+}
+
 private func phoneSelectionHaptic() {
     let generator = UISelectionFeedbackGenerator()
     generator.prepare()
@@ -62,6 +141,33 @@ private func phoneSentenceCaseMonth(_ value: String) -> String {
     let lower = value.lowercased()
     guard let first = lower.first else { return value }
     return String(first).uppercased() + String(lower.dropFirst())
+}
+
+private func phoneDisplayFont(size: CGFloat, weight: Font.Weight = .medium) -> Font {
+    .system(size: size, weight: weight, design: .default)
+}
+
+private func phoneTextFont(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+    .system(size: size, weight: weight, design: .default)
+}
+
+private func phoneArabicUIFont(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
+    let preferredNames: [String] = [
+        "NotoNaskhArabic-Medium",
+        "NotoNaskhArabic-Regular",
+        "Noto Naskh Arabic",
+        "SFArabic-Regular"
+    ]
+    for name in preferredNames {
+        if let font = UIFont(name: name, size: size) {
+            return font
+        }
+    }
+    return UIFont.systemFont(ofSize: size, weight: weight)
+}
+
+private func phoneArabicFont(size: CGFloat, weight: UIFont.Weight = .regular) -> Font {
+    Font(phoneArabicUIFont(size: size, weight: weight))
 }
 
 private enum PhoneSectorSpotlightSource {
@@ -227,6 +333,7 @@ private func isPhoneUpwardDismissSwipe(_ value: DragGesture.Value) -> Bool {
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var notificationOverlay: PhoneNotificationOverlayStore
+    @AppStorage("phone.lastLoadingStillKey") private var persistedLoadingStillKeyRaw = PhoneLoadingStillKey.fajr.rawValue
     @State private var automaticLocation: Location = .mecca
     @State private var snapshot: ComputedIslamicDay?
     @State private var now = Date()
@@ -247,6 +354,11 @@ struct ContentView: View {
     @State private var sectorSpotlightSource: PhoneSectorSpotlightSource = .main
     @State private var isInteractionLocked = false
     @State private var interactionLockTask: Task<Void, Never>?
+    @State private var showsStartupLoadingStill = true
+    @State private var currentLoadingStillKey = PhoneLoadingStillKey.fajr
+    @State private var startupMainBlackoutOpacity = 1.0
+    @State private var startupStillBlackoutOpacity = 0.0
+    @State private var startupDialOpacity = 0.0
 
     private var effectiveNow: Date {
         if timeOffsetMs == 0 { return now }
@@ -264,102 +376,127 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geo in
-                VStack(spacing: 0) {
-                    Spacer(minLength: 0)
-                    dialSection
-                    Spacer(minLength: 0)
-                }
-                .opacity(baseScreenOpacity)
-                .allowsHitTesting(
-                    !isInteractionLocked &&
-                    insightOpacity < 0.001 &&
-                    sectorSpotlightOpacity < 0.001
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.horizontal, 20)
-                .background(Color.black.ignoresSafeArea())
-                .overlay {
-                    ShakeDetectorView { showTimeTravel = true }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .allowsHitTesting(false)
-                }
-                .overlay {
-                    if let snapshot {
-                        PhoneDialInsightView(
-                            snapshot: snapshot,
-                            containerSize: geo.size
-                        )
-                        .opacity(insightOpacity)
-                        .allowsHitTesting(false)
+                ZStack {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        dialSection
+                        Spacer(minLength: 0)
                     }
-                }
-                .overlay(alignment: .top) {
-                    if let notificationMessage = notificationOverlay.currentMessage {
-                        PhoneNotificationOverlayView(
-                            text: notificationMessage,
-                            containerSize: geo.size
-                        )
-                        .opacity(notificationOverlay.isVisible ? 1 : 0)
-                        .animation(.easeOut(duration: 1), value: notificationOverlay.isVisible)
-                        .allowsHitTesting(false)
+                    .opacity(baseScreenOpacity)
+                    .allowsHitTesting(
+                        !showsStartupLoadingStill &&
+                        !isInteractionLocked &&
+                        insightOpacity < 0.001 &&
+                        sectorSpotlightOpacity < 0.001
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal, 20)
+                    .background(Color.black.ignoresSafeArea())
+                    .overlay {
+                        Color.black
+                            .opacity(startupMainBlackoutOpacity)
+                            .ignoresSafeArea()
+                            .allowsHitTesting(false)
                     }
-                }
-                .overlay {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .allowsHitTesting(
-                            !isInteractionLocked &&
-                            (insightOpacity > 0.001 || sectorSpotlightOpacity > 0.001)
-                        )
-                        .gesture(
-                            SpatialTapGesture()
-                                .onEnded { value in
-                                    if sectorSpotlightOpacity > 0.001 {
-                                        dismissSectorSpotlight()
-                                    } else if insightOpacity > 0.001 {
-                                        if let snapshot,
-                                           isPhoneCurrentSectorTitleTap(location: value.location, containerSize: geo.size) {
-                                            beginSectorSpotlight(
-                                                title: getSectorDisplayName(
-                                                    now: effectiveNow,
-                                                    currentPhase: getCurrentPhase(now: effectiveNow, timeline: snapshot.timeline),
-                                                    timeline: (duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr)
-                                                ),
-                                                source: .months
-                                            )
-                                        } else if isPhoneHijriDateTap(location: value.location, containerSize: geo.size) {
-                                            dismissInsightPresentation(triggerHaptic: true)
-                                        } else if isPhoneMainRingTap(location: value.location, containerSize: geo.size) {
-                                            beginInfoModeFromInsight()
-                                        } else {
-                                            dismissInsightPresentation(triggerHaptic: false)
+                    .overlay {
+                        ShakeDetectorView { showTimeTravel = true }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .allowsHitTesting(false)
+                    }
+                    .overlay {
+                        if let snapshot {
+                            PhoneDialInsightView(
+                                snapshot: snapshot,
+                                containerSize: geo.size
+                            )
+                            .opacity(insightOpacity)
+                            .allowsHitTesting(false)
+                        }
+                    }
+                    .overlay(alignment: .top) {
+                        if let notificationMessage = notificationOverlay.currentMessage {
+                            PhoneNotificationOverlayView(
+                                text: notificationMessage,
+                                containerSize: geo.size
+                            )
+                            .opacity(notificationOverlay.isVisible ? 1 : 0)
+                            .animation(.easeOut(duration: 1), value: notificationOverlay.isVisible)
+                            .allowsHitTesting(false)
+                        }
+                    }
+                    .overlay {
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(
+                                !isInteractionLocked &&
+                                (insightOpacity > 0.001 || sectorSpotlightOpacity > 0.001)
+                            )
+                            .gesture(
+                                SpatialTapGesture()
+                                    .onEnded { value in
+                                        if sectorSpotlightOpacity > 0.001 {
+                                            dismissSectorSpotlight()
+                                        } else if insightOpacity > 0.001 {
+                                            if let snapshot,
+                                               isPhoneCurrentSectorTitleTap(location: value.location, containerSize: geo.size) {
+                                                beginSectorSpotlight(
+                                                    title: getSectorDisplayName(
+                                                        now: effectiveNow,
+                                                        currentPhase: getCurrentPhase(now: effectiveNow, timeline: snapshot.timeline),
+                                                        timeline: (duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr)
+                                                    ),
+                                                    source: .months
+                                                )
+                                            } else if isPhoneHijriDateTap(location: value.location, containerSize: geo.size) {
+                                                dismissInsightPresentation(triggerHaptic: true)
+                                            } else if isPhoneMainRingTap(location: value.location, containerSize: geo.size) {
+                                                beginInfoModeFromInsight()
+                                            } else {
+                                                dismissInsightPresentation(triggerHaptic: false)
+                                            }
                                         }
                                     }
-                                }
-                        )
-                        .simultaneousGesture(
-                            DragGesture(minimumDistance: 22)
-                                .onEnded { value in
-                                    guard
-                                        sectorSpotlightOpacity < 0.001,
-                                        insightOpacity > 0.001,
-                                        isPhoneUpwardDismissSwipe(value)
-                                    else { return }
-                                    dismissInsightPresentation(triggerHaptic: true)
-                                }
-                        )
-                }
-                .overlay {
-                    if !sectorSpotlightTitle.isEmpty {
-                        PhoneSectorTitleSpotlightView(
-                            title: sectorSpotlightTitle,
-                            source: sectorSpotlightSource,
-                            containerSize: geo.size,
-                            onTap: dismissSectorSpotlight
-                        )
-                        .opacity(sectorSpotlightOpacity)
-                        .allowsHitTesting(!isInteractionLocked && sectorSpotlightOpacity > 0.001)
+                            )
+                            .simultaneousGesture(
+                                DragGesture(minimumDistance: 22)
+                                    .onEnded { value in
+                                        guard
+                                            sectorSpotlightOpacity < 0.001,
+                                            insightOpacity > 0.001,
+                                            isPhoneUpwardDismissSwipe(value)
+                                        else { return }
+                                        dismissInsightPresentation(triggerHaptic: true)
+                                    }
+                            )
                     }
+                    .overlay {
+                        if !sectorSpotlightTitle.isEmpty {
+                            PhoneSectorTitleSpotlightView(
+                                title: sectorSpotlightTitle,
+                                source: sectorSpotlightSource,
+                                containerSize: geo.size,
+                                onTap: dismissSectorSpotlight
+                            )
+                            .opacity(sectorSpotlightOpacity)
+                            .allowsHitTesting(!isInteractionLocked && sectorSpotlightOpacity > 0.001)
+                        }
+                    }
+
+                    if showsStartupLoadingStill {
+                        PhoneLoadingStillView(key: currentLoadingStillKey)
+                            .frame(
+                                width: geo.size.width + geo.safeAreaInsets.leading + geo.safeAreaInsets.trailing,
+                                height: geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom
+                            )
+                            .ignoresSafeArea()
+                            .overlay {
+                                Color.black
+                                    .opacity(startupStillBlackoutOpacity)
+                                    .ignoresSafeArea()
+                            }
+                            .allowsHitTesting(false)
+                    }
+
                 }
             }
         }
@@ -381,6 +518,23 @@ struct ContentView: View {
             }
         }
         .onChange(of: timeOffsetMs) { _, _ in recalcSnapshot() }
+        .onChange(of: snapshot != nil) { _, hasSnapshot in
+            guard hasSnapshot, showsStartupLoadingStill else { return }
+            Task {
+                try? await Task.sleep(for: .milliseconds(120))
+                await MainActor.run {
+                    withAnimation(.easeInOut(duration: PHONE_LOADING_STILL_FADE_DURATION)) {
+                        startupStillBlackoutOpacity = 1
+                        startupMainBlackoutOpacity = 0
+                        startupDialOpacity = 1
+                    }
+                }
+                try? await Task.sleep(for: .seconds(PHONE_LOADING_STILL_FADE_DURATION))
+                await MainActor.run {
+                    showsStartupLoadingStill = false
+                }
+            }
+        }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if oldPhase == .background && newPhase == .active {
                 Task { await refreshSnapshot(forceResolveLocation: true) }
@@ -400,6 +554,10 @@ struct ContentView: View {
             interactionLockTask?.cancel()
         }
         .onAppear {
+            currentLoadingStillKey = PhoneLoadingStillKey(rawValue: persistedLoadingStillKeyRaw) ?? .fajr
+            startupMainBlackoutOpacity = showsStartupLoadingStill ? 1 : 0
+            startupStillBlackoutOpacity = 0
+            startupDialOpacity = showsStartupLoadingStill ? 0 : 1
             if notificationOverlay.currentMessage != nil {
                 returnToMainScreenForNotification()
             }
@@ -413,11 +571,14 @@ struct ContentView: View {
     private func recalcSnapshot() {
         let updatedSnapshot = computeIslamicDaySnapshot(now: effectiveNow, location: automaticLocation)
         snapshot = updatedSnapshot
-        WatchMirrorSyncService.shared.push(
-            snapshot: updatedSnapshot,
-            location: automaticLocation,
-            renderNow: effectiveNow
-        )
+        if let updatedSnapshot {
+            updateLoadingStillKey(with: updatedSnapshot, renderNow: effectiveNow)
+            WatchMirrorSyncService.shared.push(
+                snapshot: updatedSnapshot,
+                location: automaticLocation,
+                renderNow: effectiveNow
+            )
+        }
     }
 
     private func secondsUntilNextRefresh(from date: Date, snapshot: ComputedIslamicDay?) -> Double {
@@ -447,13 +608,13 @@ struct ContentView: View {
                     onSeparatedSectorTap: { _ in closeInfoMode(triggerHaptic: true) },
                     onCurrentSectorTap: { title, source in beginSectorSpotlight(title: title, source: source) },
                     onFootnoteTap: { title in beginSectorSpotlight(title: title, source: .separated) },
-                    onBackgroundTap: { closeInfoMode(triggerHaptic: false) },
                     onSeparatedSwipeUp: { closeInfoMode(triggerHaptic: true) }
                 )
+                    .opacity(startupDialOpacity)
                     .frame(height: DIAL_SECTION_HEIGHT)
             } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, minHeight: 320)
+                Color.clear
+                    .frame(maxWidth: .infinity, minHeight: DIAL_SECTION_HEIGHT, maxHeight: DIAL_SECTION_HEIGHT)
             }
         }
         .padding(.bottom, DIAL_VERTICAL_GAP)
@@ -642,12 +803,21 @@ struct ContentView: View {
         let displayNow = currentNow.addingTimeInterval(Double(timeOffsetMs) / 1000)
         let updatedSnapshot = computeIslamicDaySnapshot(now: displayNow, location: automaticLocation)
         snapshot = updatedSnapshot
-        WatchMirrorSyncService.shared.push(
-            snapshot: updatedSnapshot,
-            location: automaticLocation,
-            renderNow: displayNow,
-            generatedAt: currentNow
-        )
+        if let updatedSnapshot {
+            updateLoadingStillKey(with: updatedSnapshot, renderNow: displayNow)
+            WatchMirrorSyncService.shared.push(
+                snapshot: updatedSnapshot,
+                location: automaticLocation,
+                renderNow: displayNow,
+                generatedAt: currentNow
+            )
+        }
+    }
+
+    private func updateLoadingStillKey(with snapshot: ComputedIslamicDay, renderNow: Date) {
+        let nextKey = phoneLoadingStillKey(for: snapshot, now: renderNow)
+        currentLoadingStillKey = nextKey
+        persistedLoadingStillKeyRaw = nextKey.rawValue
     }
 
     #if DEBUG
@@ -663,6 +833,54 @@ struct ContentView: View {
     #endif
 }
 
+private struct PhoneLoadingStillView: View {
+    let key: PhoneLoadingStillKey
+    @State private var driftsIn = false
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                Image(key.assetName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .scaleEffect(driftsIn ? PHONE_LOADING_STILL_ZOOM_MAX : PHONE_LOADING_STILL_ZOOM_MIN)
+                    .ignoresSafeArea()
+
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.18),
+                        Color.black.opacity(0.08),
+                        Color.black.opacity(0.26)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+
+                RadialGradient(
+                    colors: [
+                        Color.white.opacity(0.065),
+                        Color.clear
+                    ],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: geo.size.height * 0.72
+                )
+                .blendMode(.screen)
+                .ignoresSafeArea()
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .background(Color.black.ignoresSafeArea())
+        .onAppear {
+            withAnimation(.easeInOut(duration: PHONE_LOADING_STILL_ZOOM_DURATION).repeatForever(autoreverses: true)) {
+                driftsIn = true
+            }
+        }
+    }
+}
+
 private struct PhoneDialView: View {
     let snapshot: ComputedIslamicDay
     let now: Date
@@ -675,7 +893,6 @@ private struct PhoneDialView: View {
     let onSeparatedSectorTap: (String) -> Void
     let onCurrentSectorTap: (String, PhoneSectorSpotlightSource) -> Void
     let onFootnoteTap: (String) -> Void
-    let onBackgroundTap: () -> Void
     let onSeparatedSwipeUp: () -> Void
 
     var body: some View {
@@ -718,9 +935,6 @@ private struct PhoneDialView: View {
                 Color.clear
                     .contentShape(Rectangle())
                     .allowsHitTesting(canTapSeparatedBackground)
-                    .onTapGesture {
-                        onBackgroundTap()
-                    }
                     .gesture(
                         DragGesture(minimumDistance: 22)
                             .onEnded { value in
@@ -731,6 +945,7 @@ private struct PhoneDialView: View {
 
                 PhoneDialFootnotesView(
                     snapshot: snapshot,
+                    now: now,
                     dialSize: dialSize,
                     dialCenter: dialCenter,
                     bounds: geo.size,
@@ -799,6 +1014,7 @@ private struct PhoneDialView: View {
                         .zIndex(2)
                         HijriDateLabels(
                             hijriDate: snapshot.hijriDate,
+                            showYear: !isEidJumuahConflict(snapshot: snapshot, now: now),
                             infoProgress: 0,
                             isInteractive: canEnterInsight,
                             onTap: onDateTap
@@ -819,6 +1035,9 @@ private struct PhoneDialView: View {
     
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date) -> some View {
+        if isEidJumuahConflict(snapshot: snap, now: now) {
+            EmptyView()
+        } else {
         let phase = currentPhase(snapshot: snap, now: now)
         let fontSize: CGFloat = 20
         Text(periodLabel(snapshot: snap, now: now).uppercased())
@@ -826,6 +1045,7 @@ private struct PhoneDialView: View {
             .tracking(fontSize * 0.1)
             .foregroundColor(periodColor(snapshot: snap, now: now))
             .modifier(IshaShadowModifier(phase: phase))
+        }
     }
     
     private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
@@ -844,6 +1064,10 @@ private struct PhoneDialView: View {
 
     private func currentPhase(snapshot snap: ComputedIslamicDay, now: Date) -> IslamicPhaseId {
         getCurrentPhase(now: now, timeline: snap.timeline)
+    }
+
+    private func isEidJumuahConflict(snapshot snap: ComputedIslamicDay, now: Date) -> Bool {
+        formatHijriDateParts(snap.hijriDate).isEid && periodLabel(snapshot: snap, now: now) == "Jumu'ah"
     }
 }
 
@@ -934,13 +1158,21 @@ private struct PhoneHijriDimensionalGoldModifier: ViewModifier {
 
 private struct HijriDateLabels: View {
     private let parts: (dayMonth: String, year: String, isEid: Bool)
+    private let showYear: Bool
     private let useCompactDayMonth: Bool
     private let infoProgress: Double
     private let isInteractive: Bool
     private let onTap: (() -> Void)?
 
-    init(hijriDate: HijriDate, infoProgress: Double = 0, isInteractive: Bool = false, onTap: (() -> Void)? = nil) {
+    init(
+        hijriDate: HijriDate,
+        showYear: Bool = true,
+        infoProgress: Double = 0,
+        isInteractive: Bool = false,
+        onTap: (() -> Void)? = nil
+    ) {
         self.parts = formatHijriDateParts(hijriDate)
+        self.showYear = showYear
         self.useCompactDayMonth = COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased())
         self.infoProgress = max(0, min(1, infoProgress))
         self.isInteractive = isInteractive
@@ -964,9 +1196,11 @@ private struct HijriDateLabels: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .modifier(PhoneHijriDimensionalGoldModifier(isEid: parts.isEid, secondary: false))
-                Text(parts.year)
-                    .font(.system(size: 14, weight: .semibold))
-                    .modifier(PhoneHijriDimensionalGoldModifier(isEid: parts.isEid, secondary: true))
+                if showYear {
+                    Text(parts.year)
+                        .font(.system(size: 14, weight: .semibold))
+                        .modifier(PhoneHijriDimensionalGoldModifier(isEid: parts.isEid, secondary: true))
+                }
             }
             .scaleEffect(scale)
             .brightness(-0.01 + phase * 0.04)
@@ -987,11 +1221,15 @@ private struct PhoneDialInsightView: View {
     let containerSize: CGSize
 
     private var translationFontSize: CGFloat {
-        min(containerSize.width * 0.04, 17)
+        min(containerSize.width * 0.041, 17)
     }
 
     private var translationFont: Font {
-        .system(size: translationFontSize, weight: .regular, design: .serif)
+        phoneTextFont(size: translationFontSize, weight: .regular)
+    }
+
+    private var ayahFont: Font {
+        phoneArabicFont(size: min(containerSize.width * 0.058, 24), weight: .medium)
     }
 
     private var dialSize: CGFloat {
@@ -1008,17 +1246,19 @@ private struct PhoneDialInsightView: View {
         ZStack(alignment: .top) {
             VStack(spacing: containerSize.height * 0.012) {
                 Text(PHONE_INSIGHT_AYAH_AR)
-                    .font(.system(size: min(containerSize.width * 0.052, 22), weight: .medium, design: .serif))
-                    .foregroundColor(PHONE_READING_TINT)
+                    .font(ayahFont)
+                    .foregroundColor(PHONE_SACRED_WHITE)
                     .multilineTextAlignment(.center)
                     .lineSpacing(containerSize.height * 0.006)
-                    .frame(maxWidth: min(containerSize.width - 36, 420))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: min(containerSize.width - 28, 440))
 
                 Text(PHONE_INSIGHT_AYAH_EN)
                     .font(translationFont)
-                    .foregroundColor(PHONE_READING_TINT)
+                    .foregroundColor(PHONE_SOFT_WHITE)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(containerSize.height * 0.003)
+                    .lineSpacing(containerSize.height * 0.004)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: min(containerSize.width - 56, 360))
             }
             .frame(maxWidth: .infinity)
@@ -1046,16 +1286,15 @@ private struct PhoneDialInsightView: View {
 
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Text("\(index + 1).")
-                        .font(translationFont)
+                        .font(phoneTextFont(size: translationFontSize, weight: .medium))
                         .lineLimit(1)
                         .frame(width: 34, alignment: .trailing)
                     Text(phoneSentenceCaseMonth(monthName))
-                        .font(translationFont)
+                        .font(phoneTextFont(size: translationFontSize, weight: .regular))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .foregroundColor(isCurrentMonth ? Colors.primaryGold : PHONE_READING_TINT)
-                .modifier(HijriEngravedLabelsModifier(isEid: false))
+                .foregroundColor(isCurrentMonth ? PHONE_ANTIQUE_GOLD : PHONE_SOFT_WHITE)
             }
         }
         .frame(width: columnWidth, alignment: .leading)
@@ -1066,25 +1305,32 @@ private struct PhoneNotificationOverlayView: View {
     let text: String
     let containerSize: CGSize
 
-    private var translationFontSize: CGFloat {
-        min(containerSize.width * 0.04, 17)
+    private var messageFontSize: CGFloat {
+        min(containerSize.width * 0.043, 18)
+    }
+
+    private var messageFont: Font {
+        phoneTextFont(size: messageFontSize, weight: .medium)
     }
 
     private var translationTop: CGFloat {
         let ayahTop = containerSize.height * 0.019
-        let ayahFontSize = min(containerSize.width * 0.052, 22)
-        return ayahTop + ayahFontSize * 2.75 + containerSize.height * 0.018
+        let ayahFontSize = min(containerSize.width * 0.058, 24)
+        return ayahTop + ayahFontSize * 2.45 + containerSize.height * 0.02
     }
 
     var body: some View {
         Text(text)
-            .font(.system(size: translationFontSize, weight: .regular, design: .serif))
-            .foregroundColor(PHONE_READING_TINT)
+            .font(messageFont)
+            .foregroundColor(PHONE_SOFT_WHITE.opacity(0.98))
             .multilineTextAlignment(.center)
-            .lineSpacing(containerSize.height * 0.003)
-            .frame(maxWidth: min(containerSize.width - 56, 360))
+            .lineSpacing(containerSize.height * 0.0045)
+            .tracking(messageFontSize * 0.01)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: min(containerSize.width - 76, 328))
+            .shadow(color: Color.black.opacity(0.22), radius: 2, x: 0, y: 1)
             .padding(.top, translationTop)
-            .padding(.horizontal, 18)
+            .padding(.horizontal, 24)
             .frame(maxWidth: .infinity, alignment: .center)
     }
 }
@@ -1127,8 +1373,8 @@ private struct PhoneSectorTitleSpotlightView: View {
 
     private func calculationHeading(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 15, weight: .medium, design: .serif))
-            .foregroundColor(PHONE_READING_TINT)
+            .font(phoneDisplayFont(size: 21, weight: .semibold))
+            .foregroundColor(PHONE_SACRED_WHITE)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity, alignment: .center)
     }
@@ -1136,13 +1382,12 @@ private struct PhoneSectorTitleSpotlightView: View {
     private func calculationLine(label: String, detail: String) -> some View {
         (
             Text("\(label): ")
-                .font(.system(size: 15, weight: .medium, design: .serif))
-                .foregroundColor(PHONE_READING_TINT)
+                .font(phoneTextFont(size: 17, weight: .semibold))
+                .foregroundColor(PHONE_SACRED_WHITE)
             +
             Text(detail)
-                .font(.system(size: 13, weight: .regular, design: .serif))
-                .italic()
-                .foregroundColor(PHONE_READING_TINT.opacity(0.85))
+                .font(phoneTextFont(size: 17, weight: .regular))
+                .foregroundColor(PHONE_SOFT_WHITE)
         )
         .multilineTextAlignment(.leading)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1150,25 +1395,26 @@ private struct PhoneSectorTitleSpotlightView: View {
 
     private func hadithArabic(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 16, weight: .regular, design: .serif))
-            .foregroundColor(PHONE_READING_TINT)
+            .font(phoneArabicFont(size: 21, weight: .medium))
+            .foregroundColor(PHONE_SACRED_WHITE)
             .multilineTextAlignment(.trailing)
+            .lineSpacing(containerSize.height * 0.006)
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
     private func hadithEnglish(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 15, weight: .medium, design: .serif))
-            .foregroundColor(PHONE_READING_TINT)
+            .font(phoneTextFont(size: 18, weight: .regular))
+            .foregroundColor(PHONE_SOFT_WHITE)
             .multilineTextAlignment(.leading)
+            .lineSpacing(containerSize.height * 0.004)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func hadithSource(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 13, weight: .regular))
-            .italic()
-            .foregroundColor(PHONE_READING_TINT.opacity(0.85))
+            .font(phoneTextFont(size: 15, weight: .medium))
+            .foregroundColor(PHONE_MUTED_META)
             .multilineTextAlignment(.trailing)
             .frame(maxWidth: .infinity, alignment: .trailing)
     }
@@ -1181,8 +1427,8 @@ private struct PhoneSectorTitleSpotlightView: View {
             }
         } label: {
             Text("Technical details")
-                .font(.system(size: 13, weight: .regular, design: .serif))
-                .foregroundColor(PHONE_READING_TINT.opacity(0.7))
+                .font(phoneTextFont(size: 15, weight: .medium))
+                .foregroundColor(PHONE_MUTED_META)
                 .underline()
                 .frame(maxWidth: .infinity, alignment: .center)
         }
@@ -1194,11 +1440,8 @@ private struct PhoneSectorTitleSpotlightView: View {
     private func mainSpotlightContent() -> some View {
         VStack(spacing: 4) {
             Text(sectorCollectionTitle)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(PHONE_READING_TINT)
-                .tracking(1.0)
-                .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
-                .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
+                .font(phoneDisplayFont(size: 23, weight: .medium))
+                .foregroundColor(PHONE_SCREEN_TITLE)
             Text("")
             if isJumuah {
                 VStack(spacing: 4) {
@@ -1271,15 +1514,12 @@ private struct PhoneSectorTitleSpotlightView: View {
     private func technicalDetailsContent() -> some View {
         VStack(spacing: 4) {
             Text(sectorCollectionTitle)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(PHONE_READING_TINT)
-                .tracking(1.0)
-                .shadow(color: PHONE_READING_GLOW.opacity(0.42), radius: 6)
-                .shadow(color: PHONE_READING_GLOW.opacity(0.24), radius: 12)
+                .font(phoneDisplayFont(size: 23, weight: .medium))
+                .foregroundColor(PHONE_SCREEN_TITLE)
             Text("")
             Text("Technical details")
-                .font(.system(size: 15, weight: .regular, design: .serif))
-                .foregroundColor(PHONE_READING_TINT.opacity(0.76))
+                .font(phoneTextFont(size: 15, weight: .medium))
+                .foregroundColor(PHONE_MUTED_META)
                 .frame(maxWidth: .infinity, alignment: .center)
             Text("")
             if isPrayerTimingGroup {

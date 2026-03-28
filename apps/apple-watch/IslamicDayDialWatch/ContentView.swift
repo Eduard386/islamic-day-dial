@@ -88,6 +88,7 @@ struct ContentView: View {
                                 .offset(y: metrics.dateTop)
                             HijriYearLabel(
                                 hijriDate: snap.hijriDate,
+                                isVisible: !isEidJumuahConflict(snapshot: snap, now: effectiveNow),
                                 dialSize: metrics.dialSize,
                                 maxTextWidth: metrics.maxTextWidth
                             )
@@ -123,11 +124,15 @@ struct ContentView: View {
 
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date, dialSize: CGFloat) -> some View {
+        if isEidJumuahConflict(snapshot: snap, now: now) {
+            EmptyView()
+        } else {
         let phase = currentPhase(snapshot: snap, now: now)
         Text(periodLabel(snapshot: snap, now: now).uppercased())
             .font(.system(size: dialSize * WATCH_CURRENT_PERIOD_FONT_RATIO, weight: .regular))
             .foregroundColor(periodColor(snapshot: snap, now: now))
             .modifier(IshaShadowModifier(phase: phase))
+        }
     }
 
     private func periodLabel(snapshot snap: ComputedIslamicDay, now: Date) -> String {
@@ -153,6 +158,10 @@ struct ContentView: View {
         let minuteBucket = Int(now.timeIntervalSince1970 / 60)
         let phase = currentPhase(snapshot: snap, now: now)
         return "\(phase.rawValue)-\(minuteBucket)-\(Int(dialSize.rounded()))"
+    }
+
+    private func isEidJumuahConflict(snapshot snap: ComputedIslamicDay, now: Date) -> Bool {
+        formatHijriDateParts(snap.hijriDate).isEid && periodLabel(snapshot: snap, now: now) == "Jumu'ah"
     }
 }
 
@@ -268,11 +277,13 @@ private struct HijriDayMonthLabel: View {
 
 private struct HijriYearLabel: View {
     private let parts: WatchHijriLabelParts
+    private let isVisible: Bool
     private let dialSize: CGFloat
     private let maxTextWidth: CGFloat
 
-    init(hijriDate: HijriDate, dialSize: CGFloat, maxTextWidth: CGFloat) {
+    init(hijriDate: HijriDate, isVisible: Bool = true, dialSize: CGFloat, maxTextWidth: CGFloat) {
         self.parts = getWatchHijriLabelParts(hijriDate)
+        self.isVisible = isVisible
         self.dialSize = dialSize
         self.maxTextWidth = maxTextWidth
     }
@@ -280,11 +291,15 @@ private struct HijriYearLabel: View {
     @State private var pulseBright = false
 
     var body: some View {
-        Text(parts.year)
-            .font(.system(size: dialSize * WATCH_HIJRI_YEAR_FONT_RATIO, weight: .semibold))
-            .frame(width: maxTextWidth)
-            .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.secondaryGoldBright)
-            .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
+        Group {
+            if isVisible {
+                Text(parts.year)
+                    .font(.system(size: dialSize * WATCH_HIJRI_YEAR_FONT_RATIO, weight: .semibold))
+                    .frame(width: maxTextWidth)
+                    .foregroundColor(parts.isEid ? Color(red: 0.06, green: 0.73, blue: 0.51) : Colors.secondaryGoldBright)
+                    .modifier(HijriEngravedLabelsModifier(isEid: parts.isEid))
+            }
+        }
         .brightness(pulseBright ? 0.05 : -0.025)
         .onAppear {
             withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {

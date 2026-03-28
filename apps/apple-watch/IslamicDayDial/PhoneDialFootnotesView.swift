@@ -1,6 +1,9 @@
 import SwiftUI
 
 private let footnoteStubBaseRatio: CGFloat = 0.048
+private let phoneDiagramLabelColor = Color(red: 0.812, green: 0.79, blue: 0.748)
+private let phoneDiagramActiveLabelColor = Color(red: 0.902, green: 0.875, blue: 0.824)
+private let phoneDiagramLineColor = Color(red: 0.545, green: 0.518, blue: 0.467).opacity(0.6)
 
 private struct PhoneFootnoteDef {
     let id: String
@@ -23,7 +26,6 @@ private let footnoteBottomDefs: [PhoneFootnoteDef] = [
     .init(id: "fajr", label: "Fajr", start: \.fajr, end: \.sunrise),
     .init(id: "last_third_start", label: "Last 3rd", start: \.lastThirdStart, end: \.fajr),
 ]
-private let compactBottomClusterIds: Set<String> = ["duha_end", "duha_start", "sunrise"]
 
 private struct VerticalFootnoteItem: Identifiable {
     var id: String { key }
@@ -32,29 +34,12 @@ private struct VerticalFootnoteItem: Identifiable {
     let points: [CGPoint]
     let labelPosition: CGPoint
     let labelWidth: CGFloat
+    let lineColor: Color
+    let labelColor: Color
 }
 
-private func phoneFootnoteLabelColor(_ label: String) -> Color {
-    switch label {
-    case "Isha", "Last 3rd":
-        return Color(red: 0.72, green: 0.82, blue: 0.97)
-    case "Fajr":
-        return Color(red: 0.86, green: 0.84, blue: 0.66)
-    case "Sunrise":
-        return Color(red: 0.95, green: 0.64, blue: 0.39)
-    case "Duha":
-        return Color(red: 0.91, green: 0.77, blue: 0.43)
-    case "Midday":
-        return Color(red: 0.97, green: 0.9, blue: 0.62)
-    case "Dhuhr":
-        return Color(red: 0.93, green: 0.8, blue: 0.48)
-    case "Asr":
-        return Color(red: 0.89, green: 0.75, blue: 0.47)
-    case "Maghrib":
-        return Color(red: 0.9, green: 0.53, blue: 0.4)
-    default:
-        return PHONE_READING_TINT
-    }
+private func phoneFootnoteLabelColor(_ label: String, currentLabel: String?) -> Color {
+    label == currentLabel ? phoneDiagramActiveLabelColor : phoneDiagramLabelColor.opacity(0.82)
 }
 
 private func ringOuterR(dialSize: CGFloat) -> CGFloat {
@@ -81,13 +66,6 @@ private func anchorOnRing(dialSize: CGFloat, angleDeg: Double, markerId: String)
     return (CGPoint(x: rim.x, y: rim.y), CGPoint(x: stubPt.x, y: stubPt.y))
 }
 
-private func evenlySpacedCenters(count: Int, minX: CGFloat, maxX: CGFloat) -> [CGFloat] {
-    guard count > 0 else { return [] }
-    guard count > 1 else { return [(minX + maxX) / 2] }
-    let step = (maxX - minX) / CGFloat(count - 1)
-    return (0..<count).map { minX + CGFloat($0) * step }
-}
-
 private func midpoint(_ start: Date, _ end: Date) -> Date {
     Date(timeIntervalSince1970: start.timeIntervalSince1970 + (end.timeIntervalSince1970 - start.timeIntervalSince1970) / 2)
 }
@@ -102,42 +80,9 @@ private func footnoteAngle(_ def: PhoneFootnoteDef, timeline: ComputedTimeline) 
     return max(0, min(360, elapsed / total * 360))
 }
 
-private func spreadCenters(
-    refs: [(key: String, targetX: CGFloat)],
-    minX: CGFloat,
-    maxX: CGFloat,
-    minGap: CGFloat
-) -> [String: CGFloat] {
-    guard !refs.isEmpty else { return [:] }
-    let sorted = refs.sorted { $0.targetX < $1.targetX }
-    let clampedTargets = sorted.map { min(max($0.targetX, minX), maxX) }
-    var positions = clampedTargets
-
-    for index in 1..<positions.count {
-        positions[index] = max(positions[index], positions[index - 1] + minGap)
-    }
-    if let overflow = positions.last.map({ $0 - maxX }), overflow > 0 {
-        positions = positions.map { $0 - overflow }
-    }
-    if let underflow = positions.first.map({ minX - $0 }), underflow > 0 {
-        positions = positions.map { $0 + underflow }
-    }
-    for index in stride(from: positions.count - 2, through: 0, by: -1) {
-        positions[index] = min(positions[index], positions[index + 1] - minGap)
-    }
-    if let underflow = positions.first.map({ minX - $0 }), underflow > 0 {
-        positions = positions.map { $0 + underflow }
-    }
-
-    var resolved: [String: CGFloat] = [:]
-    for (index, item) in sorted.enumerated() {
-        resolved[item.key] = positions[index]
-    }
-    return resolved
-}
-
 struct PhoneDialFootnotesView: View {
     let snapshot: ComputedIslamicDay
+    let now: Date
     let dialSize: CGFloat
     let dialCenter: CGPoint
     let bounds: CGSize
@@ -148,15 +93,42 @@ struct PhoneDialFootnotesView: View {
         CGPoint(x: dialCenter.x - dialSize / 2, y: dialCenter.y - dialSize / 2)
     }
 
-    private var labelFont: CGFloat { max(9, dialSize * (10.9 / 420)) }
-    private var labelWidth: CGFloat { max(56, dialSize * 0.17) }
+    private var labelFont: CGFloat { max(8.8, dialSize * (9.7 / 420)) }
+    private var labelWidth: CGFloat { max(50, dialSize * 0.148) }
     private var labelHeight: CGFloat { max(28, labelFont * 2.4) }
-    private var lineColor: Color { Color(red: 0.984, green: 0.925, blue: 0.796).opacity(0.45) }
+    private var lineColor: Color { phoneDiagramLineColor }
 
-    private var topLineY: CGFloat { dialOrigin.y - dialSize * 0.07 }
-    private var topLabelY: CGFloat { dialOrigin.y - dialSize * 0.145 }
-    private var bottomLineY: CGFloat { dialOrigin.y + dialSize + dialSize * 0.07 }
-    private var bottomLabelY: CGFloat { dialOrigin.y + dialSize + dialSize * 0.145 }
+    private var topLineY: CGFloat { dialOrigin.y - dialSize * 0.032 }
+    private var topLabelY: CGFloat { dialOrigin.y - dialSize * 0.079 }
+    private var bottomLineY: CGFloat { dialOrigin.y + dialSize + dialSize * 0.03 }
+    private var bottomLabelY: CGFloat { dialOrigin.y + dialSize + dialSize * 0.074 }
+
+    private var currentLabel: String? {
+        let phase = getCurrentPhase(now: now, timeline: snapshot.timeline)
+        switch phase {
+        case .maghrib_to_isha:
+            return "Maghrib"
+        case .isha_to_last_third:
+            return "Isha"
+        case .last_third_to_fajr:
+            return "Last 3rd"
+        case .fajr_to_sunrise:
+            return "Fajr"
+        case .sunrise_to_dhuhr:
+            switch getSunriseToDhuhrSubPeriod(now: now, duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr) {
+            case .sunrise:
+                return "Sunrise"
+            case .duha:
+                return "Duha"
+            case .midday:
+                return "Midday"
+            }
+        case .dhuhr_to_asr:
+            return "Dhuhr"
+        case .asr_to_maghrib:
+            return "Asr"
+        }
+    }
 
     var body: some View {
         let items = buildItems()
@@ -169,21 +141,18 @@ struct PhoneDialFootnotesView: View {
                     for point in item.points.dropFirst() {
                         path.addLine(to: point)
                     }
-                    context.stroke(path, with: .color(lineColor), lineWidth: max(0.8, dialSize / 420))
+                    context.stroke(path, with: .color(item.lineColor), lineWidth: max(0.8, dialSize / 420))
                 }
             }
             .allowsHitTesting(false)
 
             ForEach(items) { item in
-                let labelColor = phoneFootnoteLabelColor(item.label)
                 Text(item.label)
-                    .font(.system(size: labelFont, weight: .medium))
-                    .foregroundStyle(labelColor)
+                    .font(.system(size: labelFont, weight: .semibold, design: .default))
+                    .foregroundStyle(item.labelColor)
                     .textCase(.uppercase)
-                    .tracking(1.0)
+                    .tracking(labelFont * 0.1)
                     .multilineTextAlignment(.center)
-                    .shadow(color: labelColor.opacity(0.24), radius: 6)
-                    .shadow(color: labelColor.opacity(0.12), radius: 12)
                     .frame(width: item.labelWidth, height: labelHeight)
                     .contentShape(Rectangle())
                     .onTapGesture {
@@ -200,61 +169,45 @@ struct PhoneDialFootnotesView: View {
     private func buildItems() -> [VerticalFootnoteItem] {
         let timeline = snapshot.timeline
         let origin = dialOrigin
-        let minCenterX = origin.x + 28 + labelWidth / 2
-        let maxCenterX = origin.x + dialSize - 28 - labelWidth / 2
 
         func toAbs(_ point: CGPoint) -> CGPoint {
             CGPoint(x: origin.x + point.x, y: origin.y + point.y)
         }
+
+        let clusterCenters: [String: CGFloat] = [
+            "dhuhr": origin.x + dialSize * 0.145,
+            "asr": origin.x + dialSize * 0.33,
+            "maghrib": origin.x + dialSize * 0.55,
+            "isha": origin.x + dialSize * 0.83,
+            "duha_end": origin.x + dialSize * 0.135,
+            "duha_start": origin.x + dialSize * 0.27,
+            "sunrise": origin.x + dialSize * 0.405,
+            "fajr": origin.x + dialSize * 0.72,
+            "last_third_start": origin.x + dialSize * 0.89,
+        ]
+
+        let clusterWidths: [String: CGFloat] = [
+            "maghrib": labelWidth * 1.14,
+            "duha_end": labelWidth * 0.92,
+            "duha_start": labelWidth * 0.9,
+            "sunrise": labelWidth * 0.94,
+            "last_third_start": labelWidth * 1.18,
+        ]
 
         func buildRow(
             defs: [PhoneFootnoteDef],
             lineY: CGFloat,
             labelY: CGFloat
         ) -> [VerticalFootnoteItem] {
-            let targets = defs.map { def -> (String, CGFloat) in
-                let angle = footnoteAngle(def, timeline: timeline)
-                let anchor = anchorOnRing(dialSize: dialSize, angleDeg: angle, markerId: def.id)
-                let stubAbs = toAbs(anchor.stub)
-                return (def.id, stubAbs.x)
-            }
-            let fallbackCenters = evenlySpacedCenters(count: defs.count, minX: minCenterX, maxX: maxCenterX)
-            var resolvedCenters = spreadCenters(
-                refs: targets,
-                minX: minCenterX,
-                maxX: maxCenterX,
-                minGap: labelWidth * 0.94
-            )
-
-            if defs.contains(where: { compactBottomClusterIds.contains($0.id) }) {
-                let duhaKey = "duha_start"
-                let middayKey = "duha_end"
-                let sunriseKey = "sunrise"
-                let fajrKey = "fajr"
-                let desiredGap = labelWidth * 0.9
-
-                if
-                    let duhaIndex = defs.firstIndex(where: { $0.id == duhaKey }),
-                    duhaIndex < fallbackCenters.count
-                {
-                    let duhaX = resolvedCenters[duhaKey] ?? fallbackCenters[duhaIndex]
-                    let maxSunrise = min(
-                        maxCenterX,
-                        (resolvedCenters[fajrKey] ?? maxCenterX) - labelWidth * 0.96
-                    )
-                    resolvedCenters[middayKey] = max(minCenterX, duhaX - desiredGap)
-                    resolvedCenters[sunriseKey] = min(maxSunrise, duhaX + desiredGap)
-                }
-            }
-
-            return defs.enumerated().compactMap { index, def in
+            defs.compactMap { def in
                 let angle = footnoteAngle(def, timeline: timeline)
                 let anchor = anchorOnRing(dialSize: dialSize, angleDeg: angle, markerId: def.id)
                 let rimAbs = toAbs(anchor.rim)
                 let stubAbs = toAbs(anchor.stub)
-                let labelCenterX = resolvedCenters[def.id] ?? fallbackCenters[index]
+                let labelCenterX = clusterCenters[def.id] ?? stubAbs.x
                 let labelJoinY = labelY + (labelY < lineY ? labelFont * 0.18 : -labelFont * 0.18)
-                let itemLabelWidth = compactBottomClusterIds.contains(def.id) ? labelWidth * 0.84 : labelWidth
+                let itemLabelWidth = clusterWidths[def.id] ?? labelWidth
+                let isCurrent = def.label == currentLabel
                 let points = [
                     rimAbs,
                     stubAbs,
@@ -267,7 +220,9 @@ struct PhoneDialFootnotesView: View {
                     label: def.label,
                     points: points,
                     labelPosition: CGPoint(x: labelCenterX, y: labelY),
-                    labelWidth: itemLabelWidth
+                    labelWidth: itemLabelWidth,
+                    lineColor: isCurrent ? lineColor.opacity(0.88) : lineColor.opacity(0.7),
+                    labelColor: phoneFootnoteLabelColor(def.label, currentLabel: currentLabel)
                 )
             }
         }

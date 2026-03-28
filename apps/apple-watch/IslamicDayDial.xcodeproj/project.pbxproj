@@ -19,7 +19,6 @@
 		2BF82D345F5DCD3A8C0B30DB /* WidgetPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104FF42BB05556065331C6FD /* WidgetPresentation.swift */; };
 		2C3711A0994237BAA6C29522 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 97B7F54DCBC457A3C0362B68 /* Adhan */; };
 		2EC71E7FAAB19DDE42BEE65A /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F224900F9D839207C2427 /* Snapshot.swift */; };
-		33CF69558C9C089365771950 /* WatchInstallDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = E584BDFFBE091FB788332E35 /* WatchInstallDiagnostics.swift */; };
 		33E18E8F7774DC57F89B1529 /* PrayerNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */; };
 		3ADDAC1596B8EC3DA9FCADAE /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A616ADCAF43A68D76AB049 /* Geometry.swift */; };
 		3AE17F8B794803535213C8EA /* WatchRenderSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687447C6CC7C0318D1414504 /* WatchRenderSnapshotTests.swift */; };
@@ -191,7 +190,6 @@
 		D3715B31AE84BE3336BA0F3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DD29CDA7D639629AC0DDFBBD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E227165691AC83CDEE71442D /* IslamicDayDial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IslamicDayDial.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E584BDFFBE091FB788332E35 /* WatchInstallDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchInstallDiagnostics.swift; sourceTree = "<group>"; };
 		E62613E106128F27FFA2118A /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
 		F5FC7B4E3A74A600017506DB /* IslamicDayDialWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWatchApp.swift; sourceTree = "<group>"; };
 		F618B8CDAF9F87887992E08F /* DuhaStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuhaStartTests.swift; sourceTree = "<group>"; };
@@ -290,7 +288,6 @@
 				5BA3BD2D8965B9AE4F23EAFC /* PhoneNotificationOverlayStore.swift */,
 				B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */,
 				915B3BBEE071FE6FED33633D /* VisitTracker.swift */,
-				E584BDFFBE091FB788332E35 /* WatchInstallDiagnostics.swift */,
 				4067560A35492BC7F967A38F /* WatchMirrorSyncService.swift */,
 			);
 			path = IslamicDayDial;
@@ -568,7 +565,6 @@
 				DBD43CBF7F5AEAE671F74DFE /* Snapshot.swift in Sources */,
 				B0893462365C411CB1B5CCF7 /* Types.swift in Sources */,
 				7398FB63978F1BB6AC70AA86 /* VisitTracker.swift in Sources */,
-				33CF69558C9C089365771950 /* WatchInstallDiagnostics.swift in Sources */,
 				AE377C0EB35AD30DF2AE5134 /* WatchMirrorSyncService.swift in Sources */,
 				B3FAB805CBF0AD96BE7909A7 /* WatchRenderSnapshot.swift in Sources */,
 				2BF82D345F5DCD3A8C0B30DB /* WidgetPresentation.swift in Sources */,
