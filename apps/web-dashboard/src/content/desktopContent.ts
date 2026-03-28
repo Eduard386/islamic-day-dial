@@ -8,6 +8,17 @@ export type ReadingBlock =
 export type ReadingPanelContent = {
   title: string;
   blocks: ReadingBlock[];
+  technicalSections?: TechnicalSection[];
+};
+
+export type TechnicalLine = {
+  label: string;
+  detail: string;
+};
+
+export type TechnicalSection = {
+  heading: string;
+  lines: TechnicalLine[];
 };
 
 export const WEB_INSIGHT_AYAH_AR = 'إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا';
@@ -81,6 +92,43 @@ const READING_CONTENT: Record<ReadingKey, ReadingPanelContent> = {
       { kind: 'english', text: PHONE_JIBRIL_HADITH_EN },
       { kind: 'source', text: 'Sunan Abi Dawud, Hadith 393' },
     ],
+    technicalSections: [
+      {
+        heading: 'Dhuhr calculation',
+        lines: [
+          { label: 'Start', detail: 'calculated according to Umm al-Qura, 18.5° (at the user’s coordinates).' },
+          { label: 'End', detail: 'at the start of Asr.' },
+        ],
+      },
+      {
+        heading: 'Asr calculation',
+        lines: [
+          { label: 'Start', detail: 'when shadow length = object height + noon shadow (at the user’s coordinates).' },
+          { label: 'End', detail: 'at the start of Maghrib.' },
+        ],
+      },
+      {
+        heading: 'Maghrib calculation',
+        lines: [
+          { label: 'Start', detail: 'at sunset, when the sun disappears below the horizon (at the user’s coordinates).' },
+          { label: 'End', detail: 'at the start of Isha.' },
+        ],
+      },
+      {
+        heading: 'Isha calculation',
+        lines: [
+          { label: 'Start', detail: 'when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates).' },
+          { label: 'End', detail: 'at the start of Fajr.' },
+        ],
+      },
+      {
+        heading: 'Fajr calculation',
+        lines: [
+          { label: 'Start', detail: 'calculated according to Umm al-Qura, 18.5° (at the user’s coordinates).' },
+          { label: 'End', detail: 'at the start of Sunrise.' },
+        ],
+      },
+    ],
   },
   sunDay: {
     title: 'Sunrise, Duha, Midday',
@@ -95,6 +143,29 @@ const READING_CONTENT: Record<ReadingKey, ReadingPanelContent> = {
       { kind: 'english', text: PHONE_DUHA_HADITH_THREE_EN },
       { kind: 'source', text: 'Sahih Muslim, Hadith 832' },
     ],
+    technicalSections: [
+      {
+        heading: 'Sunrise calculation',
+        lines: [
+          { label: 'Start', detail: 'calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°).' },
+          { label: 'End', detail: 'at the start of Duha.' },
+        ],
+      },
+      {
+        heading: 'Duha calculation',
+        lines: [
+          { label: 'Start', detail: 'when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise.' },
+          { label: 'End', detail: 'at the start of Midday.' },
+        ],
+      },
+      {
+        heading: 'Midday calculation',
+        lines: [
+          { label: 'Start', detail: '5 minutes before Dhuhr.' },
+          { label: 'End', detail: 'at Dhuhr.' },
+        ],
+      },
+    ],
   },
   lastThird: {
     title: 'Last 3rd',
@@ -102,6 +173,15 @@ const READING_CONTENT: Record<ReadingKey, ReadingPanelContent> = {
       { kind: 'arabic', text: PHONE_LAST_THIRD_HADITH_AR },
       { kind: 'english', text: PHONE_LAST_THIRD_HADITH_EN },
       { kind: 'source', text: 'Sahih Muslim, Hadith 758' },
+    ],
+    technicalSections: [
+      {
+        heading: 'Last 3rd calculation',
+        lines: [
+          { label: 'Start', detail: 'time between last Maghrib and Fajr divided by 3.' },
+          { label: 'End', detail: 'at the start of Fajr.' },
+        ],
+      },
     ],
   },
   jumuah: {

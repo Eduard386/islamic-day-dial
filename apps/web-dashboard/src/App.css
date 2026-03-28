@@ -885,6 +885,12 @@ body {
   margin-bottom: 18px;
 }
 
+.desktop-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .desktop-panel-kicker {
   color: var(--cool-muted-subtitle);
   font-size: 0.76rem;
@@ -952,6 +958,61 @@ body {
   font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 0.88rem;
   line-height: 1.4;
+}
+
+.desktop-technical-link {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--cool-muted-subtitle);
+  font: inherit;
+  font-size: 0.94rem;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+  align-self: center;
+  padding: 4px 0 0;
+}
+
+.desktop-technical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.desktop-technical-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.desktop-technical-heading {
+  color: var(--warm-sacred-white);
+  font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.desktop-technical-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.desktop-technical-line {
+  color: var(--soft-quote-white);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.desktop-technical-label {
+  color: var(--warm-sacred-white);
+  font-weight: 600;
+}
+
+.desktop-technical-detail {
+  color: var(--soft-quote-white);
 }
 
 .desktop-reading-panel--empty {
