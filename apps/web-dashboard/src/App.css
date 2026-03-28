@@ -106,18 +106,23 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   min-height: 100vh;
 }
 
 .app {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 24px 20px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.app--desktop {
+  max-width: 1560px;
+  padding-top: 28px;
 }
 
 .app-header {
@@ -161,9 +166,136 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 32px;
+  align-items: stretch;
+  gap: 36px;
   min-height: 0;
+}
+
+.desktop-shell {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(240px, 290px) minmax(420px, 1fr) minmax(320px, 390px);
+  gap: 34px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.desktop-months-rail,
+.desktop-reading-panel {
+  min-height: 720px;
+  border: 1px solid rgba(139, 132, 119, 0.28);
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.025), transparent 52%),
+    linear-gradient(180deg, rgba(18, 18, 18, 0.96), rgba(5, 5, 5, 0.96));
+  border-radius: 28px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.desktop-months-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px 24px 24px;
+}
+
+.desktop-shell-subtitle {
+  color: var(--cool-muted-subtitle);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.desktop-shell-title {
+  color: var(--neutral-heading-white);
+  font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.desktop-months-ayah-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.desktop-months-ayah {
+  color: var(--warm-sacred-white);
+  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  font-size: 1.85rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.desktop-months-translation {
+  color: var(--soft-quote-white);
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.desktop-months-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.desktop-month-item {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 12px;
+  color: rgba(221, 214, 202, 0.76);
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  padding: 6px 10px;
+  border-radius: 12px;
+  transition: background 0.24s ease, color 0.24s ease, transform 0.24s ease;
+}
+
+.desktop-month-item.is-active {
+  background: rgba(199, 155, 59, 0.1);
+  color: var(--warm-sacred-white);
+  transform: translateX(4px);
+}
+
+.desktop-month-index {
+  color: var(--cool-muted-subtitle);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+.desktop-month-item.is-active .desktop-month-index {
+  color: var(--primary-gold);
+}
+
+.desktop-stage {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.desktop-stage-subtitle {
+  color: var(--cool-muted-subtitle);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.desktop-stage-ring {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 720px;
 }
 
 /* ---------- Dial ---------- */
@@ -263,14 +395,15 @@ body {
   position: absolute;
   z-index: 3;
   transform: translateY(-50%);
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.09em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--cool-label);
+  color: rgba(221, 214, 202, 0.72);
   pointer-events: none;
   line-height: 1.15;
   max-width: calc(var(--footnote-side) - 12px);
+  transition: color 0.28s ease, opacity 0.28s ease;
 }
 
 .footnote-label--left {
@@ -283,6 +416,29 @@ body {
   right: 8px;
   text-align: left;
   width: calc(var(--footnote-side) - 16px);
+}
+
+.footnote-label.is-clickable {
+  pointer-events: auto;
+}
+
+.footnote-label.is-active {
+  color: var(--warm-sacred-white);
+}
+
+.footnote-label-button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  width: 100%;
+  text-align: inherit;
+  padding: 0;
 }
 
 .dial-core {
@@ -317,6 +473,10 @@ body {
   height: var(--dial, 420px);
 }
 
+.dial-wrapper--interactive {
+  cursor: default;
+}
+
 .center-overlay {
   position: absolute;
   top: 50%;
@@ -324,6 +484,10 @@ body {
   transform: translate(-50%, calc(-50% - 10px));
   text-align: center;
   pointer-events: none;
+}
+
+.center-overlay--interactive {
+  pointer-events: auto;
 }
 
 /* ---------- Center Info ---------- */
@@ -452,6 +616,18 @@ body {
   margin-top: 0;
 }
 
+.current-period-clickable {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.current-period-clickable.is-selected,
+.current-period-clickable:hover {
+  color: var(--warm-sacred-white);
+}
+
 .current-period-main {
   font-weight: 600;
   font-size: inherit;
@@ -563,6 +739,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.app--desktop .controls-section {
+  max-width: none;
 }
 
 /* ---------- Controls ---------- */
@@ -685,3 +865,154 @@ body {
   min-width: 4em;
 }
 
+.desktop-reading-panel {
+  overflow: hidden;
+  position: relative;
+}
+
+.desktop-reading-panel--content {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 22px 18px;
+  height: 720px;
+}
+
+.desktop-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.desktop-panel-kicker {
+  color: var(--cool-muted-subtitle);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.desktop-panel-title {
+  color: var(--screen-title, var(--neutral-heading-white));
+  font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.desktop-panel-close {
+  appearance: none;
+  border: 1px solid rgba(139, 132, 119, 0.35);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--cool-muted-subtitle);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.24s ease, color 0.24s ease, background 0.24s ease;
+}
+
+.desktop-panel-close:hover {
+  border-color: rgba(242, 238, 227, 0.24);
+  color: var(--warm-sacred-white);
+}
+
+.desktop-panel-scroll {
+  overflow: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.desktop-reading-block {
+  margin: 0;
+}
+
+.desktop-reading-block--arabic {
+  color: var(--warm-sacred-white);
+  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  font-size: 1.55rem;
+  line-height: 1.58;
+  text-align: right;
+}
+
+.desktop-reading-block--english {
+  color: var(--soft-white, #ddd6ca);
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.02rem;
+  line-height: 1.58;
+}
+
+.desktop-reading-block--source {
+  color: var(--cool-muted-subtitle);
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.desktop-reading-panel--empty {
+  padding: 0;
+}
+
+.desktop-still-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 720px;
+  overflow: hidden;
+}
+
+.desktop-still-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  transform: scale(1.028);
+  filter: saturate(0.96) contrast(1.02);
+}
+
+.desktop-still-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.18) 72%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.56));
+}
+
+.desktop-still-caption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 24px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.74));
+}
+
+.desktop-panel-empty-copy {
+  color: rgba(221, 214, 202, 0.82);
+  font-size: 0.96rem;
+  line-height: 1.45;
+  max-width: 24rem;
+}
+
+.panel-animate-in {
+  animation: desktop-panel-fade-in 0.9s ease both;
+}
+
+@keyframes desktop-panel-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

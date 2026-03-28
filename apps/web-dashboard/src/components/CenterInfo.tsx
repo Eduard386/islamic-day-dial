@@ -8,9 +8,11 @@ type Props = {
   snapshot: ComputedIslamicDay;
   now: Date;
   timezone: string;
+  onPeriodSelect?: () => void;
+  isPeriodSelected?: boolean;
 };
 
-export function CenterInfo({ snapshot, now, timezone }: Props) {
+export function CenterInfo({ snapshot, now, timezone, onPeriodSelect, isPeriodSelected = false }: Props) {
   const periodLabel = getSectorDisplayName(
     now,
     snapshot.currentPhase,
@@ -26,12 +28,26 @@ export function CenterInfo({ snapshot, now, timezone }: Props) {
   const dayMonthDisplay = dateParts.dayMonth.toUpperCase();
   const compactMonthNames = new Set(['rabi al-awwal', 'rabi al-thani', 'jumada al-ula', 'jumada al-thani']);
   const useCompactDayMonthSize = compactMonthNames.has(snapshot.hijriDate.monthNameEn.toLowerCase());
+  const periodClassName = `current-period center-info-first sector-block${!periodLabel ? ' current-period-empty' : ''}${onPeriodSelect ? ' current-period-clickable' : ''}${isPeriodSelected ? ' is-selected' : ''}`;
 
   return (
     <div className="center-info center-info-abs">
-      <div className={`current-period center-info-first sector-block ${!periodLabel ? 'current-period-empty' : ''}`}>
-        {periodContent || '\u00A0'}
-      </div>
+      {onPeriodSelect ? (
+        <button
+          type="button"
+          className={periodClassName}
+          onClick={(event) => {
+            event.stopPropagation();
+            onPeriodSelect();
+          }}
+        >
+          {periodContent || '\u00A0'}
+        </button>
+      ) : (
+        <div className={periodClassName}>
+          {periodContent || '\u00A0'}
+        </div>
+      )}
 
       <div className="center-date date-block hijri-date-pair">
         <div

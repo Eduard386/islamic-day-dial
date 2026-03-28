@@ -1,0 +1,39 @@
+import type { ComputedIslamicDay } from '@islamic-day-dial/core';
+import {
+  WEB_HIJRI_MONTH_NAMES,
+  WEB_INSIGHT_AYAH_AR,
+  WEB_INSIGHT_AYAH_EN,
+} from '../content/desktopContent';
+
+type Props = {
+  snapshot: ComputedIslamicDay;
+};
+
+export function DesktopMonthsRail({ snapshot }: Props) {
+  const currentMonthIndex = Math.max(0, snapshot.hijriDate.monthNumber - 1);
+
+  return (
+    <aside className="desktop-months-rail">
+      <div className="desktop-months-ayah-block">
+        <p className="desktop-months-ayah" dir="rtl" lang="ar">
+          {WEB_INSIGHT_AYAH_AR}
+        </p>
+        <p className="desktop-months-translation" lang="en">
+          {WEB_INSIGHT_AYAH_EN}
+        </p>
+      </div>
+
+      <ol className="desktop-months-list">
+        {WEB_HIJRI_MONTH_NAMES.map((month, index) => (
+          <li
+            key={month}
+            className={`desktop-month-item${index === currentMonthIndex ? ' is-active' : ''}`}
+          >
+            <span className="desktop-month-index">{index + 1}</span>
+            <span className="desktop-month-name">{month}</span>
+          </li>
+        ))}
+      </ol>
+    </aside>
+  );
+}

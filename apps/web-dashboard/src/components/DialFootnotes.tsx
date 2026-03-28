@@ -7,6 +7,8 @@ type Props = {
   dialSize?: number;
   /** Horizontal margin for labels + leader lines */
   sidePad?: number;
+  activeLabelId?: string | null;
+  onSelect?: (id: string) => void;
 };
 
 /** Same ring metrics as `IslamicRing`. */
@@ -103,7 +105,7 @@ type FootItem = {
 /** Запас под разведённые подписи ниже кольца (синхронно с `--footnote-pad` в App.css) */
 const FOOTNOTE_VERTICAL_PAD = 120;
 
-export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92 }: Props) {
+export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92, activeLabelId = null, onSelect }: Props) {
   const markers = snapshot.ring.markers;
   const totalW = dialSize + 2 * sidePad;
   const h = dialSize + FOOTNOTE_VERTICAL_PAD;
@@ -180,19 +182,31 @@ export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92 }: Props)
       {leftItems.map((it) => (
         <div
           key={`LL-${it.key}`}
-          className="footnote-label footnote-label--left"
+          className={`footnote-label footnote-label--left${activeLabelId === it.key ? ' is-active' : ''}${onSelect ? ' is-clickable' : ''}`}
           style={{ top: it.yLabel }}
         >
-          {it.label}
+          {onSelect ? (
+            <button type="button" className="footnote-label-button" onClick={() => onSelect(it.key)}>
+              {it.label}
+            </button>
+          ) : (
+            it.label
+          )}
         </div>
       ))}
       {rightItems.map((it) => (
         <div
           key={`LR-${it.key}`}
-          className="footnote-label footnote-label--right"
+          className={`footnote-label footnote-label--right${activeLabelId === it.key ? ' is-active' : ''}${onSelect ? ' is-clickable' : ''}`}
           style={{ top: it.yLabel }}
         >
-          {it.label}
+          {onSelect ? (
+            <button type="button" className="footnote-label-button" onClick={() => onSelect(it.key)}>
+              {it.label}
+            </button>
+          ) : (
+            it.label
+          )}
         </div>
       ))}
     </>
