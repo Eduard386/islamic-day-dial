@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		04C3AF609FF91BE919D40D7C /* GlowWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33EA8F92F7D8C05232ABA035 /* GlowWindow.swift */; };
+		0515463CD896F287EDC9C269 /* PhoneHomePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E5CDD64C5094219F566110 /* PhoneHomePresentationTests.swift */; };
 		06A3B52CDFBD43BC5BD44120 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62613E106128F27FFA2118A /* Formatting.swift */; };
 		0727A480F1322F612E42193D /* PhoneDialFootnotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5319685E2FDF59B9E5301677 /* PhoneDialFootnotesView.swift */; };
 		0A5C68E957869DEBCFD6FFEA /* PrayerTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCC72BFCA4E1CCF8FA27ED55 /* PrayerTimes.swift */; };
+		1497A01FDD63FEB787E5FFC0 /* PhoneHomePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466CE54DF39550277030A5D7 /* PhoneHomePresentation.swift */; };
 		154B4D5A9F732E3895D186E9 /* WatchRenderSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683150B920EA725579156BCD /* WatchRenderSnapshot.swift */; };
 		226BD32919DCFF48367F3577 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05BB742B7F16B0D76D011D /* Types.swift */; };
 		26205D6F1579B3756668FFBB /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2417ABA45050636237AA85E5 /* Colors.swift */; };
@@ -18,6 +20,7 @@
 		2A278CB3259D8350579FFD4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DD29CDA7D639629AC0DDFBBD /* Assets.xcassets */; };
 		2BF82D345F5DCD3A8C0B30DB /* WidgetPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104FF42BB05556065331C6FD /* WidgetPresentation.swift */; };
 		2C3711A0994237BAA6C29522 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 97B7F54DCBC457A3C0362B68 /* Adhan */; };
+		2E7986631C46918535086169 /* PhoneHomePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466CE54DF39550277030A5D7 /* PhoneHomePresentation.swift */; };
 		2EC71E7FAAB19DDE42BEE65A /* Snapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 063F224900F9D839207C2427 /* Snapshot.swift */; };
 		33E18E8F7774DC57F89B1529 /* PrayerNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */; };
 		3ADDAC1596B8EC3DA9FCADAE /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A616ADCAF43A68D76AB049 /* Geometry.swift */; };
@@ -153,6 +156,7 @@
 		104FF42BB05556065331C6FD /* WidgetPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPresentation.swift; sourceTree = "<group>"; };
 		198C5249B9FCCCFE7493AC60 /* IslamicDayDialWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = IslamicDayDialWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		20A616ADCAF43A68D76AB049 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		20E5CDD64C5094219F566110 /* PhoneHomePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneHomePresentationTests.swift; sourceTree = "<group>"; };
 		2291BF8B68D8440214262E1A /* NightMarkers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightMarkers.swift; sourceTree = "<group>"; };
 		2417ABA45050636237AA85E5 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		2730D4B1BE1EE2C49777CA1D /* IslamicDayDialApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialApp.swift; sourceTree = "<group>"; };
@@ -162,6 +166,7 @@
 		388E2C9F52BF2B1B0CF87B22 /* IslamicDayDialTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = IslamicDayDialTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE8FFC8BD4ED0CB041267D3 /* WidgetPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPresentationTests.swift; sourceTree = "<group>"; };
 		4067560A35492BC7F967A38F /* WatchMirrorSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMirrorSyncService.swift; sourceTree = "<group>"; };
+		466CE54DF39550277030A5D7 /* PhoneHomePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneHomePresentation.swift; sourceTree = "<group>"; };
 		51C6817D41E8725809AC8530 /* HijriCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HijriCalendar.swift; sourceTree = "<group>"; };
 		5319685E2FDF59B9E5301677 /* PhoneDialFootnotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneDialFootnotesView.swift; sourceTree = "<group>"; };
 		5A05BB742B7F16B0D76D011D /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
@@ -285,6 +290,7 @@
 				D3715B31AE84BE3336BA0F3D /* ContentView.swift */,
 				2730D4B1BE1EE2C49777CA1D /* IslamicDayDialApp.swift */,
 				5319685E2FDF59B9E5301677 /* PhoneDialFootnotesView.swift */,
+				466CE54DF39550277030A5D7 /* PhoneHomePresentation.swift */,
 				5BA3BD2D8965B9AE4F23EAFC /* PhoneNotificationOverlayStore.swift */,
 				B4CB3EBE34CFD5D8C0C10190 /* PrayerNotificationScheduler.swift */,
 				915B3BBEE071FE6FED33633D /* VisitTracker.swift */,
@@ -323,6 +329,7 @@
 				A6AFD71C2DB37C124D06B287 /* GeometryTests.swift */,
 				31CDE66D7D65BB546EBCE261 /* GeoResolverTests.swift */,
 				AE978CCE5827A9F804A61F80 /* GlowWindowTests.swift */,
+				20E5CDD64C5094219F566110 /* PhoneHomePresentationTests.swift */,
 				6B8ED73ED962032E2BDD3BEA /* PrayerNotificationTests.swift */,
 				687447C6CC7C0318D1414504 /* WatchRenderSnapshotTests.swift */,
 				3AE8FFC8BD4ED0CB041267D3 /* WidgetPresentationTests.swift */,
@@ -556,6 +563,7 @@
 				BF40BB2B59E7A4A2682CDD8A /* NightMarkers.swift in Sources */,
 				C315A4E7AE17923747BC998B /* Phases.swift in Sources */,
 				0727A480F1322F612E42193D /* PhoneDialFootnotesView.swift in Sources */,
+				1497A01FDD63FEB787E5FFC0 /* PhoneHomePresentation.swift in Sources */,
 				613E4BE24C5CF0D3C9B3EA91 /* PhoneNotificationOverlayStore.swift in Sources */,
 				E5ADE40412470A33665E675C /* PrayerNotificationScheduler.swift in Sources */,
 				93A994E39818F4BC737855CD /* PrayerTimes.swift in Sources */,
@@ -589,6 +597,8 @@
 				D70EDAC9BD6C4F9233D0C83E /* HijriCalendar.swift in Sources */,
 				D85601DF6E22B3E742AF32A0 /* NightMarkers.swift in Sources */,
 				75102E77B5A961B875975197 /* Phases.swift in Sources */,
+				2E7986631C46918535086169 /* PhoneHomePresentation.swift in Sources */,
+				0515463CD896F287EDC9C269 /* PhoneHomePresentationTests.swift in Sources */,
 				33E18E8F7774DC57F89B1529 /* PrayerNotificationScheduler.swift in Sources */,
 				BC840421C08A087AA4880A1B /* PrayerNotificationTests.swift in Sources */,
 				0A5C68E957869DEBCFD6FFEA /* PrayerTimes.swift in Sources */,

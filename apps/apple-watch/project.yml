@@ -123,6 +123,7 @@ targets:
       - path: IslamicDayDial
         includes:
           - PrayerNotificationScheduler.swift
+          - PhoneHomePresentation.swift
     dependencies:
       - target: IslamicDayDial
       - package: Adhan

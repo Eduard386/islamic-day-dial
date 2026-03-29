@@ -35,14 +35,14 @@ enum PrayerNotificationScheduler {
         let fireDate: Date
     }
 
-    private static let fajrTitle = "The sky is brightening, look to the east."
-    private static let dhuhrTitle = "Is your shadow lengthening again?"
-    private static let asrTitle = "Compare the object and its shadow after the noon minimum."
-    private static let maghribTitle = "Look west. Has the sun gone down?"
-    private static let ishaTitle = "Check the sky to see if the last twilight has disappeared."
-    private static let jumuahTitle = "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutba."
-    private static let eidAlFitrTitle = "Eid al-Fitr prayer time has started."
-    private static let eidAlAdhaTitle = "Eid al-Adha prayer time has started."
+    private static let fajrTitle = PHONE_CUE_FAJR
+    private static let dhuhrTitle = PHONE_CUE_DHUHR
+    private static let asrTitle = PHONE_CUE_ASR
+    private static let maghribTitle = PHONE_CUE_MAGHRIB
+    private static let ishaTitle = PHONE_CUE_ISHA
+    private static let jumuahTitle = PHONE_CUE_JUMUAH
+    private static let eidAlFitrTitle = PHONE_CUE_EID_AL_FITR
+    private static let eidAlAdhaTitle = PHONE_CUE_EID_AL_ADHA
 
     private static var authorizationOptions: UNAuthorizationOptions {
         #if os(watchOS)
