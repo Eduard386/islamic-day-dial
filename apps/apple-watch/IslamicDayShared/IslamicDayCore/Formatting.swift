@@ -15,7 +15,7 @@ func formatHijriDateParts(_ date: HijriDate) -> (dayMonth: String, year: String,
 let PERIOD_NAMES: [IslamicPhaseId: String] = [
     .maghrib_to_isha: "Maghrib",
     .isha_to_last_third: "Isha",
-    .last_third_to_fajr: "Isha",
+    .last_third_to_fajr: "Last 3rd",
     .fajr_to_sunrise: "Fajr",
     .sunrise_to_dhuhr: "Duha",
     .dhuhr_to_asr: "Dhuhr",

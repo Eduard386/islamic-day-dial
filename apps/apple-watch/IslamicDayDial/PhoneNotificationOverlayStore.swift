@@ -13,6 +13,7 @@ final class PhoneNotificationOverlayStore: ObservableObject {
 
     private var dismissTask: Task<Void, Never>?
     private var activeToken = UUID()
+    private var isSuspended = false
 
     deinit {
         dismissTask?.cancel()
@@ -36,6 +37,28 @@ final class PhoneNotificationOverlayStore: ObservableObject {
         currentMessage = message
         isVisible = false
 
+        guard !isSuspended else { return }
+        startVisibilityCycle(using: token)
+    }
+
+    func suspendPresentation() {
+        guard currentMessage != nil else { return }
+        isSuspended = true
+        dismissTask?.cancel()
+        isVisible = false
+    }
+
+    func resumePresentationIfNeeded() {
+        isSuspended = false
+        guard currentMessage != nil else { return }
+
+        dismissTask?.cancel()
+        let token = UUID()
+        activeToken = token
+        startVisibilityCycle(using: token)
+    }
+
+    private func startVisibilityCycle(using token: UUID) {
         Task { @MainActor [weak self] in
             await Task.yield()
             guard let self, self.activeToken == token else { return }

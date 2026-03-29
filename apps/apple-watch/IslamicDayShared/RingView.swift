@@ -511,6 +511,7 @@ struct RingView: View {
     var thicknessScale: CGFloat = 1
     var renderVariant: RingRenderVariant = .watch
     var phoneInfoProgress: Double = 0
+    var showsCurrentMarker: Bool = true
     
     private var currentPhase: IslamicPhaseId {
         getCurrentPhase(now: now, timeline: snapshot.timeline)
@@ -677,18 +678,20 @@ struct RingView: View {
                 }
                 .opacity(tickOpacity)
 
-                CurrentMarkerOverlay(
-                    snapshot: snapshot,
-                    now: now,
-                    currentPhase: currentPhase,
-                    progressAngle: progressAngle,
-                    markerAngle: markerAngle,
-                    sunMarkerState: sunMarkerState(),
-                    thicknessScale: thicknessScale,
-                    size: cs,
-                    renderVariant: renderVariant,
-                    ringRadius: ringRadius
-                )
+                if showsCurrentMarker {
+                    CurrentMarkerOverlay(
+                        snapshot: snapshot,
+                        now: now,
+                        currentPhase: currentPhase,
+                        progressAngle: progressAngle,
+                        markerAngle: markerAngle,
+                        sunMarkerState: sunMarkerState(),
+                        thicknessScale: thicknessScale,
+                        size: cs,
+                        renderVariant: renderVariant,
+                        ringRadius: ringRadius
+                    )
+                }
             }
             .frame(width: cs, height: cs)
         }
