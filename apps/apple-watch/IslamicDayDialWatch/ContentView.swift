@@ -2,7 +2,6 @@ import SwiftUI
 
 private let WATCH_RING_OUTER_DIAMETER_RATIO: CGFloat = 0.6645
 private let WATCH_CURRENT_PERIOD_FONT_RATIO: CGFloat = 20 / 420
-private let WATCH_HIJRI_DAY_NUMBER_FONT_RATIO: CGFloat = 28 / 420
 private let WATCH_HIJRI_COMPACT_FONT_RATIO: CGFloat = 25 / 420
 private let WATCH_HIJRI_COMPACT_EMPHASIZED_FONT_RATIO: CGFloat = 26.5 / 420
 private let WATCH_HIJRI_COMPACT_EXTRA_EMPHASIZED_FONT_RATIO: CGFloat = 27.5 / 420
@@ -80,14 +79,16 @@ struct ContentView: View {
                                 .frame(maxWidth: .infinity)
                                 .offset(y: metrics.sectorTop)
                             HijriDayMonthLabel(
-                                hijriDate: snap.hijriDate,
+                                snapshot: snap,
+                                now: effectiveNow,
                                 dialSize: metrics.dialSize,
                                 maxTextWidth: metrics.maxTextWidth
                             )
                                 .frame(maxWidth: .infinity)
                                 .offset(y: metrics.dateTop)
                             HijriYearLabel(
-                                hijriDate: snap.hijriDate,
+                                snapshot: snap,
+                                now: effectiveNow,
                                 isVisible: !isEidJumuahConflict(snapshot: snap, now: effectiveNow),
                                 dialSize: metrics.dialSize,
                                 maxTextWidth: metrics.maxTextWidth
@@ -186,17 +187,52 @@ private struct WatchHijriLabelParts {
     let monthText: String
     let year: String
     let isEid: Bool
+    let showsEidHeading: Bool
     let useCompactDayMonth: Bool
     let emphasizedCompactMonth: Bool
     let extraEmphasizedCompactMonth: Bool
 }
 
-private func getWatchHijriLabelParts(_ hijriDate: HijriDate) -> WatchHijriLabelParts {
+private func watchEidHeadingTitle(hijriDate: HijriDate) -> String {
+    if hijriDate.monthNumber == 10 && hijriDate.day == 1 {
+        return "EID AL-FITR"
+    }
+    if hijriDate.monthNumber == 12 && hijriDate.day == 10 {
+        return "EID AL-ADHA"
+    }
+    return ""
+}
+
+private func watchShowsEidHeading(snapshot: ComputedIslamicDay, now: Date) -> Bool {
+    let parts = formatHijriDateParts(snapshot.hijriDate)
+    guard parts.isEid else { return false }
+
+    switch getCurrentPhase(now: now, timeline: snapshot.timeline) {
+    case .sunrise_to_dhuhr:
+        let sub = getSunriseToDhuhrSubPeriod(
+            now: now,
+            duhaStart: snapshot.timeline.duhaStart,
+            dhuhr: snapshot.timeline.dhuhr
+        )
+        return sub == .duha || sub == .midday
+    case .dhuhr_to_asr:
+        return true
+    default:
+        return false
+    }
+}
+
+private func getWatchHijriLabelParts(
+    hijriDate: HijriDate,
+    snapshot: ComputedIslamicDay,
+    now: Date
+) -> WatchHijriLabelParts {
     let parts = formatHijriDateParts(hijriDate)
     let monthName = hijriDate.monthNameEn
     let isEid = parts.isEid
-    let dayText = isEid ? parts.dayMonth : String(hijriDate.day)
-    let monthText = isEid ? "" : monthName
+    let showsEidHeading = watchShowsEidHeading(snapshot: snapshot, now: now)
+    let dayText = showsEidHeading ? watchEidHeadingTitle(hijriDate: hijriDate) : String(hijriDate.day)
+    let monthText = showsEidHeading ? "" : monthName
     let lowerMonthName = monthName.lowercased()
     return WatchHijriLabelParts(
         dayMonth: parts.dayMonth,
@@ -204,6 +240,7 @@ private func getWatchHijriLabelParts(_ hijriDate: HijriDate) -> WatchHijriLabelP
         monthText: monthText,
         year: parts.year,
         isEid: isEid,
+        showsEidHeading: showsEidHeading,
         useCompactDayMonth: COMPACT_MONTH_NAMES.contains(lowerMonthName),
         emphasizedCompactMonth: EMPHASIZED_COMPACT_MONTH_NAMES.contains(lowerMonthName),
         extraEmphasizedCompactMonth: lowerMonthName == "jumada al-thani"
@@ -228,8 +265,12 @@ private struct HijriDayMonthLabel: View {
     private let dialSize: CGFloat
     private let maxTextWidth: CGFloat
 
-    init(hijriDate: HijriDate, dialSize: CGFloat, maxTextWidth: CGFloat) {
-        self.parts = getWatchHijriLabelParts(hijriDate)
+    init(snapshot: ComputedIslamicDay, now: Date, dialSize: CGFloat, maxTextWidth: CGFloat) {
+        self.parts = getWatchHijriLabelParts(
+            hijriDate: snapshot.hijriDate,
+            snapshot: snapshot,
+            now: now
+        )
         self.dialSize = dialSize
         self.maxTextWidth = maxTextWidth
     }
@@ -245,14 +286,14 @@ private struct HijriDayMonthLabel: View {
         }()
 
         let content: Text = {
-            if parts.isEid {
-                return Text(parts.dayMonth.uppercased())
+            if parts.showsEidHeading {
+                return Text(parts.dayText)
                     .font(.system(size: dialSize * monthFontRatio, weight: .semibold))
             }
 
             return
                 Text(parts.dayText)
-                .font(.system(size: dialSize * WATCH_HIJRI_DAY_NUMBER_FONT_RATIO, weight: .semibold))
+                .font(.system(size: dialSize * monthFontRatio, weight: .semibold))
                 + Text(" ")
                 .font(.system(size: dialSize * monthFontRatio, weight: .semibold))
                 + Text(parts.monthText.uppercased())
@@ -281,8 +322,12 @@ private struct HijriYearLabel: View {
     private let dialSize: CGFloat
     private let maxTextWidth: CGFloat
 
-    init(hijriDate: HijriDate, isVisible: Bool = true, dialSize: CGFloat, maxTextWidth: CGFloat) {
-        self.parts = getWatchHijriLabelParts(hijriDate)
+    init(snapshot: ComputedIslamicDay, now: Date, isVisible: Bool = true, dialSize: CGFloat, maxTextWidth: CGFloat) {
+        self.parts = getWatchHijriLabelParts(
+            hijriDate: snapshot.hijriDate,
+            snapshot: snapshot,
+            now: now
+        )
         self.isVisible = isVisible
         self.dialSize = dialSize
         self.maxTextWidth = maxTextWidth
