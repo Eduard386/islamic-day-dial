@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   formatHijriDate,
+  formatHijriDateParts,
   formatCountdown,
   formatPhase,
   getSunriseToDhuhrSubPeriod,
@@ -13,19 +14,34 @@ describe('formatHijriDate', () => {
       .toBe('14 Ramadan 1447');
   });
 
-  it('returns EID AL-FITR on 1 Shawwal', () => {
+  it('formats 1 Shawwal with year (Eid day)', () => {
     expect(formatHijriDate({ day: 1, monthNumber: 10, monthNameEn: 'Shawwal', year: 1447 }))
-      .toBe('EID AL-FITR');
+      .toBe('1 Shawwal 1447');
   });
 
-  it('returns EID AL-ADHA on 10 Dhul Hijjah', () => {
+  it('formats 10 Dhul Hijjah with year (Eid day)', () => {
     expect(formatHijriDate({ day: 10, monthNumber: 12, monthNameEn: 'Dhul Hijjah', year: 1447 }))
-      .toBe('EID AL-ADHA');
+      .toBe('10 Dhul Hijjah 1447');
   });
 
   it('formats regular date on 2 Shawwal', () => {
     expect(formatHijriDate({ day: 2, monthNumber: 10, monthNameEn: 'Shawwal', year: 1447 }))
       .toBe('2 Shawwal 1447');
+  });
+});
+
+describe('formatHijriDateParts', () => {
+  it('keeps day and month on Eid al-Fitr with isEid true', () => {
+    const parts = formatHijriDateParts({ day: 1, monthNumber: 10, monthNameEn: 'Shawwal', year: 1447 });
+    expect(parts.dayMonth).toBe('1 Shawwal');
+    expect(parts.year).toBe('1447');
+    expect(parts.isEid).toBe(true);
+  });
+
+  it('keeps day and month on Eid al-Adha with isEid true', () => {
+    const parts = formatHijriDateParts({ day: 10, monthNumber: 12, monthNameEn: 'Dhul Hijjah', year: 1447 });
+    expect(parts.dayMonth).toBe('10 Dhul Hijjah');
+    expect(parts.isEid).toBe(true);
   });
 });
 

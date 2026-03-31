@@ -9,20 +9,25 @@ private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 private let PHONE_PRIMARY_TRANSITION_DURATION = 0.6
 private let PHONE_DATE_INFO_SCALE: CGFloat = 1.25
 private let PHONE_TEXT_GLOW_PULSE_DURATION = 3.0
-let PHONE_READING_TINT = Color(red: 0.87, green: 0.84, blue: 0.79)
-private let PHONE_SACRED_WHITE = Color(red: 0.949, green: 0.933, blue: 0.894)
-private let PHONE_SOFT_WHITE = Color(red: 0.867, green: 0.839, blue: 0.792)
-private let PHONE_MUTED_META = Color(red: 0.718, green: 0.725, blue: 0.784)
-private let PHONE_ANTIQUE_GOLD = Color(red: 0.78, green: 0.608, blue: 0.231)
-private let PHONE_SCREEN_TITLE = Color(red: 0.902, green: 0.875, blue: 0.824)
-private let PHONE_SHEET_FILL = Color.black.opacity(0.78)
-private let PHONE_SHEET_STROKE = Color.white.opacity(0.08)
-private let PHONE_SHEET_HANDLE = Color.white.opacity(0.18)
-private let PHONE_SHEET_SHADOW = Color.black.opacity(0.34)
+let PHONE_READING_TINT = Color(red: 0.84, green: 0.81, blue: 0.75)
+private let PHONE_SACRED_WHITE = Color(red: 0.918, green: 0.898, blue: 0.84)
+private let PHONE_SOFT_WHITE = Color(red: 0.83, green: 0.8, blue: 0.75)
+private let PHONE_MUTED_META = Color(red: 0.62, green: 0.592, blue: 0.556)
+private let PHONE_ANTIQUE_GOLD = Color(red: 0.705, green: 0.552, blue: 0.262)
+private let PHONE_SCREEN_TITLE = PHONE_SACRED_WHITE
+private let PHONE_PANEL_STROKE = Color(red: 0.82, green: 0.76, blue: 0.66).opacity(0.045)
+private let PHONE_PANEL_HIGHLIGHT = Color(red: 0.9, green: 0.84, blue: 0.74).opacity(0.028)
+private let PHONE_PANEL_SHADOW = Color(red: 0.02, green: 0.016, blue: 0.012).opacity(0.18)
+private let PHONE_PANEL_RADIUS: CGFloat = 20
+private let PHONE_PANEL_HORIZONTAL_PADDING: CGFloat = 24
+private let PHONE_PANEL_VERTICAL_PADDING: CGFloat = 22
 private let PHONE_SECTOR_LABEL_COLOR = Color(red: 0.78, green: 0.84, blue: 0.92)
-private let PHONE_SUMMARY_PANEL_FILL = Color.black.opacity(0.24)
-private let PHONE_SUMMARY_PANEL_STROKE = Color.white.opacity(0.08)
-private let PHONE_SUMMARY_PANEL_SHADOW = Color.black.opacity(0.28)
+private let PHONE_ATMOS_TOP_OPACITY = 0.38
+private let PHONE_ATMOS_MID_OPACITY = 0.14
+private let PHONE_ATMOS_BOTTOM_OPACITY = 0.30
+private let PHONE_SECONDARY_SCREEN_OFFSET: CGFloat = 18
+private let PHONE_DUST_TINT = Color(red: 0.23, green: 0.18, blue: 0.13)
+private let PHONE_DRY_SHADE = Color(red: 0.06, green: 0.05, blue: 0.04)
 private let PHONE_INSIGHT_AYAH_AR = "قال الله تعالى: إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
 private let PHONE_INSIGHT_AYAH_EN = "Allah, the Exalted, said:\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
 private let PHONE_LOADING_STILL_ZOOM_MIN: CGFloat = 1.012
@@ -89,8 +94,6 @@ private func phoneHomeBackgroundScrimOpacity(for key: PhonePhaseBackgroundKey) -
     switch key {
     case .sunrise, .duha, .midday, .dhuhr, .asr:
         return 0.42
-    case .jumuah, .eidAlFitr, .eidAlAdha:
-        return 0.34
     case .maghrib:
         return 0.26
     case .fajr:
@@ -100,8 +103,8 @@ private func phoneHomeBackgroundScrimOpacity(for key: PhonePhaseBackgroundKey) -
     }
 }
 
-private func phoneOverlayScrimOpacity(insight: Double, spotlight: Double) -> Double {
-    min(0.3, max(insight * 0.14, spotlight * 0.2))
+private func phoneOverlayScrimOpacity(isSecondaryScreenPresented: Bool) -> Double {
+    isSecondaryScreenPresented ? 0.4 : 0
 }
 
 private func phoneDisplayFont(size: CGFloat, weight: Font.Weight = .medium) -> Font {
@@ -114,6 +117,8 @@ private func phoneTextFont(size: CGFloat, weight: Font.Weight = .regular) -> Fon
 
 private func phoneArabicUIFont(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
     let preferredNames: [String] = [
+        "Amiri-Regular",
+        "Amiri",
         "NotoNaskhArabic-Medium",
         "NotoNaskhArabic-Regular",
         "Noto Naskh Arabic",
@@ -131,6 +136,108 @@ private func phoneArabicFont(size: CGFloat, weight: UIFont.Weight = .regular) ->
     Font(phoneArabicUIFont(size: size, weight: weight))
 }
 
+private func phonePhaseTitleFont(containerSize: CGSize) -> Font {
+    phoneDisplayFont(size: min(44, containerSize.width * 0.112), weight: .semibold)
+}
+
+private func phoneHijriDateFont(containerSize: CGSize) -> Font {
+    phoneDisplayFont(size: min(26, containerSize.width * 0.069), weight: .medium)
+}
+
+private func phoneSectionTitleFont(containerSize: CGSize) -> Font {
+    phoneDisplayFont(size: min(24, containerSize.width * 0.064), weight: .semibold)
+}
+
+private func phoneBodyFont(containerSize: CGSize) -> Font {
+    phoneTextFont(size: min(19, containerSize.width * 0.051), weight: .regular)
+}
+
+private func phoneLabelFont(containerSize: CGSize) -> Font {
+    phoneTextFont(size: min(18, containerSize.width * 0.048), weight: .semibold)
+}
+
+private func phoneTranslationFont(containerSize: CGSize) -> Font {
+    phoneTextFont(size: min(20, containerSize.width * 0.054), weight: .regular)
+}
+
+private func phoneMetadataFont(containerSize: CGSize) -> Font {
+    phoneTextFont(size: min(17, containerSize.width * 0.046), weight: .medium)
+}
+
+private enum PhoneSurfaceTone {
+    case standard
+    case reading
+
+    var fillTop: Color {
+        switch self {
+        case .standard:
+            return Color(red: 0.138, green: 0.108, blue: 0.087).opacity(0.94)
+        case .reading:
+            return Color(red: 0.126, green: 0.098, blue: 0.079).opacity(0.97)
+        }
+    }
+
+    var fillBottom: Color {
+        switch self {
+        case .standard:
+            return Color(red: 0.088, green: 0.071, blue: 0.058).opacity(0.97)
+        case .reading:
+            return Color(red: 0.068, green: 0.055, blue: 0.046).opacity(0.985)
+        }
+    }
+
+    var edgeOpacity: Double {
+        switch self {
+        case .standard:
+            return 0.045
+        case .reading:
+            return 0.035
+        }
+    }
+}
+
+private struct PhoneDebossedTextModifier: ViewModifier {
+    let highlightOpacity: Double
+    let shadowOpacity: Double
+    let ambientOpacity: Double
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(color: Color.white.opacity(highlightOpacity), radius: 0, x: 0, y: -0.55)
+            .shadow(color: PHONE_DRY_SHADE.opacity(shadowOpacity), radius: 0, x: 0, y: 0.85)
+            .shadow(color: Color.black.opacity(ambientOpacity), radius: 2.4, x: 0, y: 1.45)
+    }
+}
+
+private extension View {
+    func phoneDebossedTitle() -> some View {
+        modifier(PhoneDebossedTextModifier(
+            highlightOpacity: 0.1,
+            shadowOpacity: 0.22,
+            ambientOpacity: 0.1
+        ))
+    }
+
+    func phoneDebossedBody() -> some View {
+        modifier(PhoneDebossedTextModifier(
+            highlightOpacity: 0.06,
+            shadowOpacity: 0.16,
+            ambientOpacity: 0.07
+        ))
+    }
+}
+
+private enum PhoneReadingScreenMode {
+    case dalil
+    case technical
+}
+
+private enum PhoneSecondaryScreen: Equatable {
+    case hijri
+    case dalil(String)
+    case technical(String)
+}
+
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var notificationOverlay: PhoneNotificationOverlayStore
@@ -145,9 +252,7 @@ struct ContentView: View {
     @State private var dayOffset = 0
     @State private var hourOffset: Double = 0
     @State private var timeOffsetMs: Int64 = 0
-    @State private var insightOpacity = 0.0
-    @State private var sectorSpotlightTitle = ""
-    @State private var sectorSpotlightOpacity = 0.0
+    @State private var secondaryScreen: PhoneSecondaryScreen?
     @State private var isInteractionLocked = false
     @State private var interactionLockTask: Task<Void, Never>?
     @State private var showsStartupLoadingStill = true
@@ -189,21 +294,24 @@ struct ContentView: View {
                     }
                     .allowsHitTesting(false)
 
-                    Color.black
-                        .opacity(
-                            phoneHomeBackgroundScrimOpacity(for: currentLoadingStillKey) +
-                            phoneOverlayScrimOpacity(insight: insightOpacity, spotlight: sectorSpotlightOpacity)
+                    PhoneAtmosphericOverlay(
+                        baseDim: phoneHomeBackgroundScrimOpacity(for: currentLoadingStillKey),
+                        modalDim: phoneOverlayScrimOpacity(
+                            isSecondaryScreenPresented: secondaryScreen != nil
                         )
-                        .ignoresSafeArea()
-                        .allowsHitTesting(false)
+                    )
+                    .allowsHitTesting(false)
 
                     homeSummarySection(containerSize: geo.size)
-                    .opacity(1)
+                    .opacity(secondaryScreen == nil ? 1 : 0.08)
+                    .animation(
+                        .easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION),
+                        value: secondaryScreen != nil
+                    )
                     .allowsHitTesting(
                         !showsStartupLoadingStill &&
                         !isInteractionLocked &&
-                        insightOpacity < 0.001 &&
-                        sectorSpotlightOpacity < 0.001
+                        secondaryScreen == nil
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.horizontal, 20)
@@ -212,52 +320,60 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .allowsHitTesting(false)
                     }
-                    .overlay(alignment: .top) {
-                        if let notificationMessage = notificationOverlay.currentMessage {
-                            PhoneNotificationOverlayView(
-                                text: notificationMessage,
-                                containerSize: geo.size
-                            )
-                            .opacity(notificationOverlay.isVisible ? 1 : 0)
-                            .animation(.easeOut(duration: PHONE_PRIMARY_TRANSITION_DURATION), value: notificationOverlay.isVisible)
-                            .allowsHitTesting(false)
+                    .overlay {
+                        if secondaryScreen != nil {
+                            ZStack {
+                                Color(red: 0.07, green: 0.055, blue: 0.042)
+                                    .opacity(0.46)
+
+                                LinearGradient(
+                                    colors: [
+                                        Color(red: 0.11, green: 0.085, blue: 0.062).opacity(0.34),
+                                        Color.black.opacity(0.22),
+                                        Color(red: 0.045, green: 0.036, blue: 0.028).opacity(0.44)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+
+                                RadialGradient(
+                                    colors: [
+                                        Color(red: 0.23, green: 0.18, blue: 0.13).opacity(0.05),
+                                        Color.clear
+                                    ],
+                                    center: .top,
+                                    startRadius: 0,
+                                    endRadius: min(geo.size.width * 0.7, 320)
+                                )
+
+                                PHONE_DUST_TINT
+                                    .opacity(0.12)
+                                    .blendMode(.multiply)
+                            }
+                            .ignoresSafeArea()
+                            .allowsHitTesting(!isInteractionLocked)
+                            .onTapGesture {
+                                dismissSecondaryScreen(triggerHaptic: false)
+                            }
                         }
                     }
                     .overlay {
-                        if insightOpacity > 0.001 || sectorSpotlightOpacity > 0.001 {
-                            Color.black
-                                .opacity(max(insightOpacity * 0.1, sectorSpotlightOpacity * 0.14))
-                                .ignoresSafeArea()
-                                .allowsHitTesting(!isInteractionLocked)
-                                .onTapGesture {
-                                    if sectorSpotlightOpacity > 0.001 {
-                                        dismissSectorSpotlight(triggerHaptic: false)
-                                    } else if insightOpacity > 0.001 {
-                                        dismissInsightPresentation(triggerHaptic: false)
-                                    }
-                                }
-                        }
-                    }
-                    .overlay(alignment: .bottom) {
-                        if let snapshot, insightOpacity > 0.001 {
-                            PhoneHijriMonthsSheetView(
+                        if let snapshot, let secondaryScreen {
+                            PhoneSecondaryScreenContainer(
+                                screen: secondaryScreen,
                                 snapshot: snapshot,
-                                containerSize: geo.size
+                                containerSize: geo.size,
+                                onShowDalil: presentDalilScreen,
+                                onShowTechnical: presentTechnicalScreen,
+                                onDismiss: { dismissSecondaryScreen(triggerHaptic: false) }
                             )
-                            .opacity(insightOpacity)
                             .allowsHitTesting(!isInteractionLocked)
-                            .transition(.opacity)
-                        }
-                    }
-                    .overlay(alignment: .bottom) {
-                        if !sectorSpotlightTitle.isEmpty {
-                            PhoneSectorTitleSpotlightView(
-                                title: sectorSpotlightTitle,
-                                containerSize: geo.size
+                            .transition(
+                                .asymmetric(
+                                    insertion: .offset(y: PHONE_SECONDARY_SCREEN_OFFSET).combined(with: .opacity),
+                                    removal: .opacity
+                                )
                             )
-                            .opacity(sectorSpotlightOpacity)
-                            .allowsHitTesting(!isInteractionLocked && sectorSpotlightOpacity > 0.001)
-                            .transition(.opacity)
                         }
                     }
                 }
@@ -389,27 +505,19 @@ struct ContentView: View {
     private func beginInsightPresentation() {
         guard
             !isInteractionLocked,
-            insightOpacity < 0.001,
-            sectorSpotlightOpacity < 0.001
+            secondaryScreen == nil
         else { return }
         lockInteractions()
         notificationOverlay.dismissIfVisible()
         phoneSelectionHaptic()
         withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-            sectorSpotlightOpacity = 0
-            insightOpacity = 1
+            secondaryScreen = .hijri
         }
     }
 
     private func dismissInsightPresentation(triggerHaptic: Bool) {
-        guard insightOpacity > 0.001 else { return }
-        lockInteractions()
-        if triggerHaptic {
-            phoneSelectionHaptic()
-        }
-        withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-            insightOpacity = 0
-        }
+        guard case .hijri? = secondaryScreen else { return }
+        dismissSecondaryScreen(triggerHaptic: triggerHaptic)
     }
 
     private func beginCurrentSectorReading() {
@@ -426,26 +534,36 @@ struct ContentView: View {
     private func beginSectorSpotlight(title: String) {
         guard
             !isInteractionLocked,
-            sectorSpotlightOpacity < 0.001
+            secondaryScreen == nil
         else { return }
+        presentDalilScreen(title)
+    }
+
+    private func presentDalilScreen(_ title: String) {
         lockInteractions()
         notificationOverlay.dismissIfVisible()
         phoneSelectionHaptic()
-        sectorSpotlightTitle = title
         withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-            insightOpacity = 0
-            sectorSpotlightOpacity = 1
+            secondaryScreen = .dalil(title)
         }
     }
 
-    private func dismissSectorSpotlight(triggerHaptic: Bool = true) {
-        guard sectorSpotlightOpacity > 0.001 else { return }
+    private func presentTechnicalScreen(_ title: String) {
+        guard !isInteractionLocked else { return }
+        lockInteractions()
+        withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
+            secondaryScreen = .technical(title)
+        }
+    }
+
+    private func dismissSecondaryScreen(triggerHaptic: Bool = true) {
+        guard secondaryScreen != nil else { return }
         lockInteractions()
         if triggerHaptic {
             phoneSelectionHaptic()
         }
         withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-            sectorSpotlightOpacity = 0
+            secondaryScreen = nil
         }
     }
 
@@ -457,9 +575,6 @@ struct ContentView: View {
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 isInteractionLocked = false
-                if sectorSpotlightOpacity < 0.001 {
-                    sectorSpotlightTitle = ""
-                }
             }
         }
     }
@@ -467,22 +582,17 @@ struct ContentView: View {
     private func returnToMainScreenForNotification() {
         interactionLockTask?.cancel()
         showTimeTravel = false
-        let needsAnimatedReturn =
-            insightOpacity > 0.001 ||
-            sectorSpotlightOpacity > 0.001
+        let needsAnimatedReturn = secondaryScreen != nil
 
         guard needsAnimatedReturn else {
             isInteractionLocked = false
-            insightOpacity = 0
-            sectorSpotlightOpacity = 0
-            sectorSpotlightTitle = ""
+            secondaryScreen = nil
             return
         }
 
         isInteractionLocked = true
         withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-            insightOpacity = 0
-            sectorSpotlightOpacity = 0
+            secondaryScreen = nil
         }
 
         interactionLockTask = Task {
@@ -490,7 +600,6 @@ struct ContentView: View {
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 isInteractionLocked = false
-                sectorSpotlightTitle = ""
             }
         }
     }
@@ -560,6 +669,459 @@ struct ContentView: View {
     #endif
 }
 
+private struct PhoneAtmosphericOverlay: View {
+    let baseDim: Double
+    let modalDim: Double
+
+    var body: some View {
+        ZStack {
+            PHONE_DUST_TINT
+                .opacity(0.05 + baseDim * 0.03)
+                .blendMode(.multiply)
+
+            Color.black.opacity(0.04 + baseDim * 0.04)
+
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(PHONE_ATMOS_TOP_OPACITY + baseDim * 0.12),
+                    Color.clear
+                ],
+                startPoint: .top,
+                endPoint: .center
+            )
+
+            Color.black.opacity(PHONE_ATMOS_MID_OPACITY + baseDim * 0.08)
+
+            LinearGradient(
+                colors: [
+                    Color.clear,
+                    Color.black.opacity(PHONE_ATMOS_BOTTOM_OPACITY + baseDim * 0.12)
+                ],
+                startPoint: .center,
+                endPoint: .bottom
+            )
+
+            LinearGradient(
+                colors: [
+                    Color.clear,
+                    PHONE_DUST_TINT.opacity(0.08 + baseDim * 0.04)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .blendMode(.multiply)
+
+            if modalDim > 0 {
+                Color(red: 0.052, green: 0.041, blue: 0.032)
+                    .opacity(min(0.36, modalDim * 0.7))
+
+                PHONE_DUST_TINT
+                    .opacity(min(0.12, modalDim * 0.22))
+                    .blendMode(.multiply)
+            }
+        }
+        .ignoresSafeArea()
+    }
+}
+
+private struct PhoneObserveSceneStyle {
+    let skyTop: Color
+    let skyBottom: Color
+    let skyOpacity: Double
+    let horizonColor: Color
+    let horizonOpacity: Double
+    let lightColor: Color
+    let lightOpacity: Double
+    let lightCenter: UnitPoint
+    let lightRadiusScale: CGFloat
+    let dustOpacity: Double
+    let poleFillTop: Color
+    let poleFillBottom: Color
+    let poleHighlightOpacity: Double
+    let poleShadowOpacity: Double
+    let shadowAngleDeg: Double
+    let shadowLengthScale: CGFloat
+    let shadowWidth: CGFloat
+    let shadowOpacity: Double
+    let shadowBlur: CGFloat
+}
+
+private func phoneObserveSceneStyle(for key: PhonePhaseBackgroundKey) -> PhoneObserveSceneStyle {
+    switch key {
+    case .fajr:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.12, green: 0.14, blue: 0.21),
+            skyBottom: Color(red: 0.28, green: 0.22, blue: 0.18),
+            skyOpacity: 0.34,
+            horizonColor: Color(red: 0.76, green: 0.63, blue: 0.46),
+            horizonOpacity: 0.22,
+            lightColor: Color(red: 0.66, green: 0.62, blue: 0.54),
+            lightOpacity: 0.12,
+            lightCenter: UnitPoint(x: 0.18, y: 0.24),
+            lightRadiusScale: 0.7,
+            dustOpacity: 0.08,
+            poleFillTop: Color(red: 0.29, green: 0.22, blue: 0.16),
+            poleFillBottom: Color(red: 0.18, green: 0.13, blue: 0.09),
+            poleHighlightOpacity: 0.05,
+            poleShadowOpacity: 0.12,
+            shadowAngleDeg: 132,
+            shadowLengthScale: 0.34,
+            shadowWidth: 26,
+            shadowOpacity: 0.16,
+            shadowBlur: 16
+        )
+    case .sunrise:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.31, green: 0.27, blue: 0.23),
+            skyBottom: Color(red: 0.66, green: 0.45, blue: 0.28),
+            skyOpacity: 0.3,
+            horizonColor: Color(red: 0.85, green: 0.63, blue: 0.34),
+            horizonOpacity: 0.28,
+            lightColor: Color(red: 0.92, green: 0.76, blue: 0.46),
+            lightOpacity: 0.24,
+            lightCenter: UnitPoint(x: 0.18, y: 0.31),
+            lightRadiusScale: 0.58,
+            dustOpacity: 0.1,
+            poleFillTop: Color(red: 0.34, green: 0.25, blue: 0.17),
+            poleFillBottom: Color(red: 0.21, green: 0.15, blue: 0.1),
+            poleHighlightOpacity: 0.07,
+            poleShadowOpacity: 0.16,
+            shadowAngleDeg: 128,
+            shadowLengthScale: 0.4,
+            shadowWidth: 28,
+            shadowOpacity: 0.2,
+            shadowBlur: 16
+        )
+    case .duha:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.46, green: 0.49, blue: 0.48),
+            skyBottom: Color(red: 0.74, green: 0.66, blue: 0.54),
+            skyOpacity: 0.18,
+            horizonColor: Color(red: 0.83, green: 0.74, blue: 0.56),
+            horizonOpacity: 0.16,
+            lightColor: Color(red: 0.93, green: 0.86, blue: 0.64),
+            lightOpacity: 0.16,
+            lightCenter: UnitPoint(x: 0.22, y: 0.19),
+            lightRadiusScale: 0.54,
+            dustOpacity: 0.08,
+            poleFillTop: Color(red: 0.35, green: 0.27, blue: 0.18),
+            poleFillBottom: Color(red: 0.22, green: 0.16, blue: 0.11),
+            poleHighlightOpacity: 0.06,
+            poleShadowOpacity: 0.14,
+            shadowAngleDeg: 120,
+            shadowLengthScale: 0.26,
+            shadowWidth: 24,
+            shadowOpacity: 0.16,
+            shadowBlur: 14
+        )
+    case .midday:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.53, green: 0.56, blue: 0.56),
+            skyBottom: Color(red: 0.73, green: 0.67, blue: 0.58),
+            skyOpacity: 0.14,
+            horizonColor: Color(red: 0.86, green: 0.8, blue: 0.68),
+            horizonOpacity: 0.1,
+            lightColor: Color(red: 0.96, green: 0.9, blue: 0.7),
+            lightOpacity: 0.12,
+            lightCenter: UnitPoint(x: 0.5, y: 0.1),
+            lightRadiusScale: 0.5,
+            dustOpacity: 0.06,
+            poleFillTop: Color(red: 0.33, green: 0.25, blue: 0.17),
+            poleFillBottom: Color(red: 0.21, green: 0.16, blue: 0.11),
+            poleHighlightOpacity: 0.05,
+            poleShadowOpacity: 0.12,
+            shadowAngleDeg: 98,
+            shadowLengthScale: 0.11,
+            shadowWidth: 18,
+            shadowOpacity: 0.12,
+            shadowBlur: 10
+        )
+    case .dhuhr:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.52, green: 0.55, blue: 0.55),
+            skyBottom: Color(red: 0.74, green: 0.67, blue: 0.58),
+            skyOpacity: 0.15,
+            horizonColor: Color(red: 0.84, green: 0.77, blue: 0.64),
+            horizonOpacity: 0.12,
+            lightColor: Color(red: 0.95, green: 0.88, blue: 0.68),
+            lightOpacity: 0.12,
+            lightCenter: UnitPoint(x: 0.54, y: 0.12),
+            lightRadiusScale: 0.52,
+            dustOpacity: 0.06,
+            poleFillTop: Color(red: 0.33, green: 0.25, blue: 0.17),
+            poleFillBottom: Color(red: 0.2, green: 0.15, blue: 0.11),
+            poleHighlightOpacity: 0.05,
+            poleShadowOpacity: 0.12,
+            shadowAngleDeg: 104,
+            shadowLengthScale: 0.16,
+            shadowWidth: 20,
+            shadowOpacity: 0.13,
+            shadowBlur: 11
+        )
+    case .asr:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.44, green: 0.43, blue: 0.39),
+            skyBottom: Color(red: 0.71, green: 0.59, blue: 0.46),
+            skyOpacity: 0.22,
+            horizonColor: Color(red: 0.86, green: 0.69, blue: 0.43),
+            horizonOpacity: 0.17,
+            lightColor: Color(red: 0.89, green: 0.73, blue: 0.44),
+            lightOpacity: 0.2,
+            lightCenter: UnitPoint(x: 0.78, y: 0.2),
+            lightRadiusScale: 0.56,
+            dustOpacity: 0.09,
+            poleFillTop: Color(red: 0.34, green: 0.25, blue: 0.18),
+            poleFillBottom: Color(red: 0.2, green: 0.15, blue: 0.1),
+            poleHighlightOpacity: 0.06,
+            poleShadowOpacity: 0.16,
+            shadowAngleDeg: 58,
+            shadowLengthScale: 0.31,
+            shadowWidth: 24,
+            shadowOpacity: 0.18,
+            shadowBlur: 13
+        )
+    case .maghrib:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.27, green: 0.2, blue: 0.18),
+            skyBottom: Color(red: 0.62, green: 0.36, blue: 0.23),
+            skyOpacity: 0.28,
+            horizonColor: Color(red: 0.88, green: 0.57, blue: 0.3),
+            horizonOpacity: 0.24,
+            lightColor: Color(red: 0.92, green: 0.6, blue: 0.33),
+            lightOpacity: 0.18,
+            lightCenter: UnitPoint(x: 0.83, y: 0.33),
+            lightRadiusScale: 0.5,
+            dustOpacity: 0.11,
+            poleFillTop: Color(red: 0.31, green: 0.23, blue: 0.17),
+            poleFillBottom: Color(red: 0.17, green: 0.12, blue: 0.09),
+            poleHighlightOpacity: 0.05,
+            poleShadowOpacity: 0.18,
+            shadowAngleDeg: 48,
+            shadowLengthScale: 0.4,
+            shadowWidth: 28,
+            shadowOpacity: 0.2,
+            shadowBlur: 15
+        )
+    case .isha:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.08, green: 0.09, blue: 0.14),
+            skyBottom: Color(red: 0.15, green: 0.13, blue: 0.12),
+            skyOpacity: 0.34,
+            horizonColor: Color(red: 0.36, green: 0.31, blue: 0.26),
+            horizonOpacity: 0.12,
+            lightColor: Color(red: 0.56, green: 0.59, blue: 0.68),
+            lightOpacity: 0.08,
+            lightCenter: UnitPoint(x: 0.76, y: 0.18),
+            lightRadiusScale: 0.4,
+            dustOpacity: 0.04,
+            poleFillTop: Color(red: 0.21, green: 0.17, blue: 0.14),
+            poleFillBottom: Color(red: 0.12, green: 0.1, blue: 0.08),
+            poleHighlightOpacity: 0.03,
+            poleShadowOpacity: 0.1,
+            shadowAngleDeg: 90,
+            shadowLengthScale: 0.04,
+            shadowWidth: 14,
+            shadowOpacity: 0.06,
+            shadowBlur: 10
+        )
+    case .lastThird:
+        return PhoneObserveSceneStyle(
+            skyTop: Color(red: 0.06, green: 0.08, blue: 0.12),
+            skyBottom: Color(red: 0.12, green: 0.11, blue: 0.11),
+            skyOpacity: 0.36,
+            horizonColor: Color(red: 0.24, green: 0.24, blue: 0.23),
+            horizonOpacity: 0.08,
+            lightColor: Color(red: 0.56, green: 0.62, blue: 0.74),
+            lightOpacity: 0.1,
+            lightCenter: UnitPoint(x: 0.72, y: 0.16),
+            lightRadiusScale: 0.36,
+            dustOpacity: 0.03,
+            poleFillTop: Color(red: 0.2, green: 0.17, blue: 0.14),
+            poleFillBottom: Color(red: 0.11, green: 0.09, blue: 0.08),
+            poleHighlightOpacity: 0.03,
+            poleShadowOpacity: 0.08,
+            shadowAngleDeg: 90,
+            shadowLengthScale: 0.03,
+            shadowWidth: 14,
+            shadowOpacity: 0.05,
+            shadowBlur: 10
+        )
+    }
+}
+
+private struct PhoneObserveSceneOverlay: View {
+    let key: PhonePhaseBackgroundKey
+    let containerSize: CGSize
+
+    private var style: PhoneObserveSceneStyle {
+        phoneObserveSceneStyle(for: key)
+    }
+
+    var body: some View {
+        let width = containerSize.width
+        let height = containerSize.height
+
+        ZStack {
+            LinearGradient(
+                colors: [
+                    style.skyTop.opacity(style.skyOpacity),
+                    Color.clear,
+                    style.skyBottom.opacity(style.skyOpacity * 0.72)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            RadialGradient(
+                colors: [
+                    style.lightColor.opacity(style.lightOpacity),
+                    Color.clear
+                ],
+                center: style.lightCenter,
+                startRadius: 0,
+                endRadius: max(width, height) * style.lightRadiusScale
+            )
+            .blendMode(.screen)
+
+            Ellipse()
+                .fill(style.horizonColor.opacity(style.horizonOpacity))
+                .frame(width: width * 0.92, height: height * 0.17)
+                .blur(radius: 22)
+                .offset(y: height * 0.01)
+                .blendMode(.screen)
+
+            LinearGradient(
+                colors: [
+                    Color.clear,
+                    PHONE_DUST_TINT.opacity(style.dustOpacity),
+                    PHONE_DUST_TINT.opacity(style.dustOpacity * 0.5)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: height * 0.4)
+            .offset(y: height * 0.08)
+            .blendMode(.multiply)
+        }
+        .frame(width: width, height: height)
+        .allowsHitTesting(false)
+    }
+}
+
+private struct PhonePanelBackground: View {
+    let cornerRadius: CGFloat
+    let tone: PhoneSurfaceTone
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        tone.fillTop,
+                        tone.fillBottom
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                PHONE_PANEL_HIGHLIGHT,
+                                Color(red: 0.22, green: 0.17, blue: 0.13).opacity(0.05),
+                                Color.black.opacity(0.03)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.18, green: 0.14, blue: 0.11).opacity(0.08),
+                                Color.clear,
+                                Color(red: 0.04, green: 0.03, blue: 0.024).opacity(0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .blendMode(.multiply)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(
+                        PHONE_PANEL_STROKE.opacity(tone.edgeOpacity / 0.045),
+                        lineWidth: 0.7
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                PHONE_PANEL_HIGHLIGHT,
+                                Color.clear
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 0.45
+                    )
+                    .padding(0.75)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color(red: 0.34, green: 0.27, blue: 0.21).opacity(0.03),
+                                Color.clear
+                            ],
+                            center: .topLeading,
+                            startRadius: 0,
+                            endRadius: 260
+                        )
+                    )
+            )
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color(red: 0.03, green: 0.025, blue: 0.02).opacity(0.16))
+                    .blur(radius: 24)
+                    .offset(y: 3)
+            )
+            .shadow(color: PHONE_PANEL_SHADOW, radius: 24, x: 0, y: 4)
+    }
+}
+
+private struct PhonePanel<Content: View>: View {
+    let cornerRadius: CGFloat
+    let tone: PhoneSurfaceTone
+    private let content: Content
+
+    init(
+        cornerRadius: CGFloat = PHONE_PANEL_RADIUS,
+        tone: PhoneSurfaceTone = .standard,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.cornerRadius = cornerRadius
+        self.tone = tone
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding(.horizontal, PHONE_PANEL_HORIZONTAL_PADDING)
+            .padding(.vertical, PHONE_PANEL_VERTICAL_PADDING)
+            .background(PhonePanelBackground(cornerRadius: cornerRadius, tone: tone))
+    }
+}
+
 private struct PhoneLoadingStillView: View {
     let key: PhonePhaseBackgroundKey
     @State private var driftsIn = false
@@ -572,42 +1134,26 @@ private struct PhoneLoadingStillView: View {
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
                     .scaleEffect(driftsIn ? PHONE_LOADING_STILL_ZOOM_MAX : PHONE_LOADING_STILL_ZOOM_MIN)
+                    .saturation(0.78)
+                    .brightness(-0.06)
+                    .contrast(0.97)
                     .ignoresSafeArea()
 
                 LinearGradient(
                     colors: [
-                        Color.black.opacity(0.18),
-                        Color.black.opacity(0.08),
-                        Color.black.opacity(0.26)
+                        Color.black.opacity(0.14),
+                        Color.clear,
+                        Color.black.opacity(0.16)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
 
-                RadialGradient(
-                    colors: [
-                        Color.white.opacity(0.065),
-                        Color.clear
-                    ],
-                    center: .top,
-                    startRadius: 0,
-                    endRadius: geo.size.height * 0.72
-                )
-                .blendMode(.screen)
-                .ignoresSafeArea()
-
-                RadialGradient(
-                    colors: [
-                        Color.clear,
-                        Color.black.opacity(0.12),
-                        Color.black.opacity(0.26)
-                    ],
-                    center: .center,
-                    startRadius: geo.size.width * 0.16,
-                    endRadius: max(geo.size.width, geo.size.height) * 0.84
-                )
-                .ignoresSafeArea()
+                PHONE_DUST_TINT
+                    .opacity(0.08)
+                    .blendMode(.multiply)
+                    .ignoresSafeArea()
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
@@ -1456,54 +2002,157 @@ private func phoneSummaryDateLine(hijriDate: HijriDate) -> String {
     return "\(parts.dayMonth.uppercased()) \(parts.year)"
 }
 
+private struct PhoneSummaryCardContent: Identifiable {
+    let id: String
+    let text: String
+}
+
+private let PHONE_EID_TAQABBAL_BETWEEN =
+    "Taqabbal Allahu minna wa minkum!\nMay Allah accept from us and from you!"
+
+private func phoneSummaryShowsEidTaqabbalInBetween(
+    snapshot: ComputedIslamicDay,
+    now: Date,
+    isEidDay: Bool
+) -> Bool {
+    guard isEidDay else { return false }
+    switch snapshot.currentPhase {
+    case .sunrise_to_dhuhr:
+        let sub = getSunriseToDhuhrSubPeriod(
+            now: now,
+            duhaStart: snapshot.timeline.duhaStart,
+            dhuhr: snapshot.timeline.dhuhr
+        )
+        return sub == .duha || sub == .midday
+    case .dhuhr_to_asr:
+        return true
+    default:
+        return false
+    }
+}
+
+private func phoneBaseSummaryCardContents(for rawSectorTitle: String) -> [PhoneSummaryCardContent] {
+    switch rawSectorTitle {
+    case "Fajr":
+        return [
+            PhoneSummaryCardContent(
+                id: "fajr",
+                text: "Between true dawn and sunrise."
+            )
+        ]
+    case "Sunrise":
+        return [
+            PhoneSummaryCardContent(
+                id: "sunrise",
+                text: "Between sunrise and when the morning light has clearly spread."
+            )
+        ]
+    case "Duha":
+        return [
+            PhoneSummaryCardContent(
+                id: "duha",
+                text: "Between when the morning light has clearly spread and when the shadow is shortest."
+            )
+        ]
+    case "Midday":
+        return [
+            PhoneSummaryCardContent(
+                id: "midday",
+                text: "Between when the shadow is shortest and when it begins to lengthen again."
+            )
+        ]
+    case "Dhuhr":
+        return [
+            PhoneSummaryCardContent(
+                id: "dhuhr",
+                text: "Between when the shadow begins to lengthen again and when the shadow equals the object's height plus the noon shadow."
+            )
+        ]
+    case "Asr":
+        return [
+            PhoneSummaryCardContent(
+                id: "asr",
+                text: "Between when the shadow equals the object's height plus the noon shadow and sunset, when the sun disappears below the horizon."
+            )
+        ]
+    case "Maghrib":
+        return [
+            PhoneSummaryCardContent(
+                id: "maghrib",
+                text: "Between sunset, when the sun disappears below the horizon, and when the evening twilight disappears."
+            )
+        ]
+    case "Isha":
+        return [
+            PhoneSummaryCardContent(
+                id: "isha",
+                text: "Between when the evening twilight disappears and when true dawn begins."
+            )
+        ]
+    case "Last 3rd":
+        return [
+            PhoneSummaryCardContent(
+                id: "last_third",
+                text: "Between the start of the last third of the night, measured from Maghrib to true dawn, and true dawn."
+            )
+        ]
+    case "Jumu'ah":
+        return [
+            PhoneSummaryCardContent(
+                id: "jumuah",
+                text: "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutbah."
+            )
+        ]
+    case "EID AL-FITR", "EID AL-ADHA":
+        return []
+    default:
+        return []
+    }
+}
+
+private func phoneSummaryCardContents(
+    presentation: PhoneHomePresentation,
+    snapshot: ComputedIslamicDay,
+    now: Date
+) -> [PhoneSummaryCardContent] {
+    let taqabbalWindow = phoneSummaryShowsEidTaqabbalInBetween(
+        snapshot: snapshot,
+        now: now,
+        isEidDay: presentation.isEidDay
+    )
+    var cards: [PhoneSummaryCardContent]
+    if presentation.isEidDay,
+       presentation.rawSectorTitle == "Jumu'ah",
+       taqabbalWindow {
+        cards = []
+    } else {
+        cards = phoneBaseSummaryCardContents(for: presentation.rawSectorTitle)
+    }
+    if taqabbalWindow {
+        cards.append(
+            PhoneSummaryCardContent(id: "eid_taqabbal_between", text: PHONE_EID_TAQABBAL_BETWEEN)
+        )
+    }
+    return cards
+}
+
 private struct PhoneBoundaryCard: View {
-    let label: String
-    let event: PhoneBoundaryEvent
-    let tint: Color
+    let text: String
     let containerSize: CGSize
 
-    private var metaFont: Font {
-        phoneTextFont(size: min(containerSize.width * 0.03, 12), weight: .semibold)
-    }
-
-    private var cueFont: Font {
-        phoneTextFont(size: min(containerSize.width * 0.041, 16), weight: .regular)
+    private var bodyFont: Font {
+        phoneTextFont(size: min(18, containerSize.width * 0.048), weight: .regular)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("\(label.uppercased()):")
-                .font(metaFont)
-                .foregroundColor(tint)
-                .tracking(1.4)
-
-            Text(event.cueText)
-                .font(cueFont)
-                .foregroundColor(PHONE_SOFT_WHITE)
-                .lineSpacing(containerSize.height * 0.004)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            PHONE_SUMMARY_PANEL_FILL.opacity(0.98),
-                            PHONE_SUMMARY_PANEL_FILL.opacity(0.84)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(PHONE_SUMMARY_PANEL_STROKE, lineWidth: 1)
-                )
-                .shadow(color: PHONE_SUMMARY_PANEL_SHADOW, radius: 20, x: 0, y: 12)
-        )
+        Text(text)
+            .font(bodyFont)
+            .foregroundColor(PHONE_SOFT_WHITE.opacity(0.84))
+            .lineSpacing(min(containerSize.width * 0.019, 7))
+            .multilineTextAlignment(.center)
+            .phoneDebossedBody()
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
@@ -1516,76 +2165,85 @@ private struct PhoneHomeSummaryView: View {
     let onDateTap: () -> Void
     let onCurrentSectorTap: () -> Void
 
-    private var boundaryWindow: PhoneBoundaryWindow {
-        phoneBoundaryWindow(snapshot: snapshot, now: now)
-    }
-
-    private var headerFont: Font {
-        phoneDisplayFont(size: min(containerSize.width * 0.058, 22), weight: .semibold)
+    private var summaryCardContents: [PhoneSummaryCardContent] {
+        phoneSummaryCardContents(presentation: presentation, snapshot: snapshot, now: now)
     }
 
     private var sectorFont: Font {
-        phoneDisplayFont(size: min(containerSize.width * 0.108, 42), weight: .semibold)
+        phonePhaseTitleFont(containerSize: containerSize)
+    }
+
+    private var headerFont: Font {
+        phoneDisplayFont(size: min(containerSize.width * 0.054, 20), weight: .regular)
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 14) {
+            VStack(spacing: 20) {
                 Button(action: onCurrentSectorTap) {
                     Text(presentation.displayTitle.uppercased())
                         .font(sectorFont)
-                        .foregroundColor(PHONE_SCREEN_TITLE)
-                        .tracking(2.2)
+                        .foregroundColor(PHONE_SCREEN_TITLE.opacity(0.92))
+                        .tracking(min(containerSize.width * 0.007, 2.8))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .minimumScaleFactor(0.72)
-                        .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 1)
+                        .phoneDebossedTitle()
                 }
                 .buttonStyle(.plain)
                 .allowsHitTesting(isInteractive)
 
-                VStack(spacing: 12) {
-                    PhoneBoundaryCard(
-                        label: "Start",
-                        event: boundaryWindow.start,
-                        tint: Colors.primaryGoldBright,
-                        containerSize: containerSize
-                    )
-                    PhoneBoundaryCard(
-                        label: "End",
-                        event: boundaryWindow.end,
-                        tint: PHONE_SECTOR_LABEL_COLOR,
-                        containerSize: containerSize
-                    )
+                if !summaryCardContents.isEmpty {
+                    VStack(spacing: 12) {
+                        ForEach(summaryCardContents) { item in
+                            PhoneBoundaryCard(
+                                text: item.text,
+                                containerSize: containerSize
+                            )
+                        }
+                    }
                 }
             }
             .frame(maxWidth: min(containerSize.width - 32, 430))
-            .padding(.top, max(containerSize.height * 0.12, 96))
+            .background {
+                RadialGradient(
+                    colors: [
+                        Color.black.opacity(0.12),
+                        Color.black.opacity(0.06),
+                        Color.clear
+                    ],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: min(containerSize.width * 0.55, 240)
+                )
+                .frame(width: min(containerSize.width - 28, 400), height: 184)
+                .blur(radius: 26)
+                .offset(y: 14)
+            }
+            .padding(.top, max(containerSize.height * 0.018, 14))
 
             Spacer(minLength: 0)
 
             Button(action: onDateTap) {
                 Text(phoneSummaryDateLine(hijriDate: snapshot.hijriDate))
                     .font(headerFont)
-                    .foregroundColor(Colors.warmSacredWhite)
-                    .tracking(1.2)
+                    .foregroundColor(PHONE_SCREEN_TITLE.opacity(0.88))
+                    .tracking(0.45)
                     .multilineTextAlignment(.center)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 10)
-                    .background(
-                        Capsule()
-                            .fill(PHONE_SUMMARY_PANEL_FILL)
-                            .overlay(
-                                Capsule()
-                                    .stroke(PHONE_SUMMARY_PANEL_STROKE, lineWidth: 1)
-                            )
-                    )
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
             }
             .buttonStyle(.plain)
             .allowsHitTesting(isInteractive)
-            .padding(.bottom, max(containerSize.height * 0.05, 34))
+            .background {
+                Ellipse()
+                    .fill(Color.black.opacity(0.08))
+                    .frame(width: min(containerSize.width - 70, 240), height: 30)
+                    .blur(radius: 14)
+            }
+            .padding(.bottom, max(containerSize.height * 0.044, 30))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.horizontal, 16)
@@ -1612,134 +2270,191 @@ private struct PhoneCenterHijriLabelModifier: ViewModifier {
     }
 }
 
+private enum PhoneOverlaySheetStyle {
+    case panel
+    case fullScreen
+}
+
 private struct PhoneOverlaySheet<Content: View>: View {
     let containerSize: CGSize
     let maxHeightRatio: CGFloat
+    let isCentered: Bool
+    let tone: PhoneSurfaceTone
+    let style: PhoneOverlaySheetStyle
+    let onTapDismiss: (() -> Void)?
     private let content: Content
 
     init(
         containerSize: CGSize,
         maxHeightRatio: CGFloat,
+        isCentered: Bool = false,
+        tone: PhoneSurfaceTone = .standard,
+        style: PhoneOverlaySheetStyle = .panel,
+        onTapDismiss: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.containerSize = containerSize
         self.maxHeightRatio = maxHeightRatio
+        self.isCentered = isCentered
+        self.tone = tone
+        self.style = style
+        self.onTapDismiss = onTapDismiss
         self.content = content()
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            Capsule()
-                .fill(PHONE_SHEET_HANDLE)
-                .frame(width: 42, height: 5)
-                .padding(.top, 12)
-                .padding(.bottom, 18)
+        Group {
+            switch style {
+            case .panel:
+                content
+                    .frame(
+                        maxWidth: min(containerSize.width - 20, 460),
+                        maxHeight: min(containerSize.height * maxHeightRatio, isCentered ? 680 : 720),
+                        alignment: .top
+                    )
+                    .background(PhonePanelBackground(cornerRadius: PHONE_PANEL_RADIUS, tone: tone))
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                        alignment: isCentered ? .center : .bottom
+                    )
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, isCentered ? 18 : max(12, containerSize.height * 0.022))
 
-            content
-                .frame(maxWidth: .infinity, alignment: .top)
-        }
-        .frame(
-            maxWidth: min(containerSize.width - 20, 460),
-            maxHeight: min(containerSize.height * maxHeightRatio, 640),
-            alignment: .top
-        )
-        .background(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(
+            case .fullScreen:
+                ZStack {
                     LinearGradient(
                         colors: [
-                            PHONE_SHEET_FILL.opacity(0.98),
-                            PHONE_SHEET_FILL.opacity(0.94)
+                            tone.fillTop.opacity(0.99),
+                            tone.fillBottom.opacity(1)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
+                    .ignoresSafeArea()
+
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.16),
+                            Color.clear,
+                            PHONE_DUST_TINT.opacity(0.08)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .blendMode(.multiply)
+                    .ignoresSafeArea()
+
+                    content
+                        .frame(
+                            maxWidth: min(containerSize.width - 36, 420),
+                            maxHeight: .infinity,
+                            alignment: .top
+                        )
+                        .padding(.horizontal, 18)
+                        .padding(.top, max(28, containerSize.height * 0.058))
+                        .padding(.bottom, max(26, containerSize.height * 0.05))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        onTapDismiss?()
+                    }
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 30, style: .continuous)
-                        .stroke(PHONE_SHEET_STROKE, lineWidth: 1)
-                )
-                .shadow(color: PHONE_SHEET_SHADOW, radius: 26, x: 0, y: 16)
-        )
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-        .padding(.horizontal, 10)
-        .padding(.bottom, max(12, containerSize.height * 0.022))
+            }
+        }
     }
 }
 
 private struct PhoneHijriMonthsSheetView: View {
     let snapshot: ComputedIslamicDay
     let containerSize: CGSize
+    let onDismiss: () -> Void
+
+    private let columns = [
+        GridItem(.flexible(minimum: 136, maximum: 154), spacing: 14, alignment: .leading),
+        GridItem(.flexible(minimum: 136, maximum: 154), spacing: 14, alignment: .leading)
+    ]
 
     private var translationFontSize: CGFloat {
-        min(containerSize.width * 0.041, 17)
+        min(containerSize.width * 0.046, 17)
     }
 
     private var translationFont: Font {
-        phoneTextFont(size: translationFontSize, weight: .regular)
+        phoneTranslationFont(containerSize: containerSize)
     }
 
     private var ayahFont: Font {
-        phoneArabicFont(size: min(containerSize.width * 0.058, 24), weight: .medium)
+        phoneArabicFont(size: min(containerSize.width * 0.062, 23.5), weight: .medium)
     }
 
-    private var columnWidth: CGFloat { min((containerSize.width - 74) / 2, 170) }
-
     var body: some View {
-        PhoneOverlaySheet(containerSize: containerSize, maxHeightRatio: 0.64) {
+        PhoneOverlaySheet(
+            containerSize: containerSize,
+            maxHeightRatio: 1,
+            isCentered: true,
+            tone: .reading,
+            style: .fullScreen,
+            onTapDismiss: onDismiss
+        ) {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 18) {
-                    VStack(spacing: 10) {
+                VStack(spacing: 26) {
+                    VStack(spacing: 18) {
                         Text(PHONE_INSIGHT_AYAH_AR)
                             .font(ayahFont)
-                            .foregroundColor(PHONE_SACRED_WHITE)
+                            .foregroundColor(PHONE_SACRED_WHITE.opacity(0.95))
                             .multilineTextAlignment(.center)
-                            .lineSpacing(containerSize.height * 0.006)
+                            .lineSpacing(min(containerSize.width * 0.037, 14.5))
                             .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: min(containerSize.width - 52, 420))
+                            .frame(maxWidth: min(containerSize.width - 54, 352))
 
                         Text(PHONE_INSIGHT_AYAH_EN)
                             .font(translationFont)
-                            .foregroundColor(PHONE_SOFT_WHITE)
+                            .foregroundColor(PHONE_SOFT_WHITE.opacity(0.93))
                             .multilineTextAlignment(.center)
-                            .lineSpacing(containerSize.height * 0.004)
+                            .lineSpacing(min(containerSize.width * 0.022, 8))
                             .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: min(containerSize.width - 76, 360))
+                            .frame(maxWidth: min(containerSize.width - 66, 336))
                     }
 
-                    HStack(alignment: .top, spacing: 12) {
-                        monthColumn(indices: 0..<6)
-                        monthColumn(indices: 6..<12)
+                    Rectangle()
+                        .fill(PHONE_PANEL_STROKE.opacity(0.4))
+                        .frame(height: 1)
+                        .frame(maxWidth: min(containerSize.width - 112, 222))
+
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
+                        ForEach(PHONE_HIJRI_MONTH_NAMES.indices, id: \.self) { index in
+                            monthRow(index: index)
+                        }
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 18)
-                .padding(.bottom, 24)
+                .padding(.horizontal, PHONE_PANEL_HORIZONTAL_PADDING)
+                .padding(.vertical, PHONE_PANEL_VERTICAL_PADDING)
             }
         }
     }
 
     @ViewBuilder
-    private func monthColumn(indices: Range<Int>) -> some View {
-        VStack(alignment: .leading, spacing: containerSize.height * 0.005) {
-            ForEach(indices, id: \.self) { index in
-                let monthName = PHONE_HIJRI_MONTH_NAMES[index]
-                let isCurrentMonth = snapshot.hijriDate.monthNumber == index + 1
+    private func monthRow(index: Int) -> some View {
+        let monthName = PHONE_HIJRI_MONTH_NAMES[index]
+        let isCurrentMonth = snapshot.hijriDate.monthNumber == index + 1
 
-                HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Text("\(index + 1).")
-                        .font(phoneTextFont(size: translationFontSize, weight: .medium))
-                        .lineLimit(1)
-                        .frame(width: 34, alignment: .trailing)
-                    Text(phoneSentenceCaseMonth(monthName))
-                        .font(phoneTextFont(size: translationFontSize, weight: .regular))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-                .foregroundColor(isCurrentMonth ? PHONE_ANTIQUE_GOLD : PHONE_SOFT_WHITE)
-            }
+        HStack(alignment: .top, spacing: 10) {
+            Text("\(index + 1)")
+                .font(phoneTextFont(size: min(containerSize.width * 0.034, 13), weight: .medium))
+                .foregroundColor(PHONE_MUTED_META.opacity(0.62))
+                .frame(width: 18, alignment: .trailing)
+
+            Text(phoneSentenceCaseMonth(monthName))
+                .font(phoneTextFont(size: min(containerSize.width * 0.041, 15), weight: .regular))
+                .foregroundColor(isCurrentMonth ? PHONE_ANTIQUE_GOLD : PHONE_SOFT_WHITE.opacity(0.94))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+                .multilineTextAlignment(.leading)
         }
-        .frame(width: columnWidth, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -1817,10 +2532,70 @@ private struct PhoneCurrentCueView: View {
     }
 }
 
+private struct PhoneSecondaryScreenContainer: View {
+    let screen: PhoneSecondaryScreen
+    let snapshot: ComputedIslamicDay
+    let containerSize: CGSize
+    let onShowDalil: (String) -> Void
+    let onShowTechnical: (String) -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        switch screen {
+        case .hijri:
+            PhoneHijriMonthsSheetView(
+                snapshot: snapshot,
+                containerSize: containerSize,
+                onDismiss: onDismiss
+            )
+        case .dalil(let title):
+            PhoneSectorTitleSpotlightView(
+                title: title,
+                containerSize: containerSize,
+                mode: .dalil,
+                onDismiss: onDismiss,
+                onShowTechnical: { onShowTechnical(title) },
+                onReturnToDalil: {}
+            )
+        case .technical(let title):
+            PhoneSectorTitleSpotlightView(
+                title: title,
+                containerSize: containerSize,
+                mode: .technical,
+                onDismiss: onDismiss,
+                onShowTechnical: {},
+                onReturnToDalil: { onShowDalil(title) }
+            )
+        }
+    }
+}
+
 private struct PhoneSectorTitleSpotlightView: View {
     let title: String
     let containerSize: CGSize
-    @State private var showsTechnicalDetails = false
+    let mode: PhoneReadingScreenMode
+    let onDismiss: () -> Void
+    let onShowTechnical: () -> Void
+    let onReturnToDalil: () -> Void
+
+    private struct ReadingPassage: Identifiable {
+        let id: String
+        let arabic: String
+        let english: String
+        let source: String?
+    }
+
+    private struct TechnicalLine: Identifiable {
+        let id: String
+        let label: String
+        let detail: String
+    }
+
+    private struct TechnicalSectionEntry: Identifiable {
+        let id: String
+        let heading: String
+        let lines: [TechnicalLine]
+    }
 
     private var isPrayerTimingGroup: Bool {
         PHONE_JIBRIL_GROUP_ONE.contains(title)
@@ -1838,258 +2613,395 @@ private struct PhoneSectorTitleSpotlightView: View {
         title == "Last 3rd"
     }
 
-    private func calculationHeading(_ text: String) -> some View {
-        Text(text)
-            .font(phoneDisplayFont(size: 21, weight: .semibold))
-            .foregroundColor(PHONE_SACRED_WHITE)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity, alignment: .center)
+    private var readingPassages: [ReadingPassage] {
+        if isJumuah {
+            return [
+                ReadingPassage(
+                    id: "jumuah_ayah",
+                    arabic: PHONE_JUMUAH_AYAH_AR,
+                    english: PHONE_JUMUAH_AYAH_EN,
+                    source: nil
+                ),
+                ReadingPassage(
+                    id: "jumuah_one",
+                    arabic: PHONE_JUMUAH_HADITH_ONE_AR,
+                    english: PHONE_JUMUAH_HADITH_ONE_EN,
+                    source: "Sunan Abi Dawud 1067"
+                ),
+                ReadingPassage(
+                    id: "jumuah_two",
+                    arabic: PHONE_JUMUAH_HADITH_TWO_AR,
+                    english: PHONE_JUMUAH_HADITH_TWO_EN,
+                    source: "Sahih Muslim 857"
+                ),
+                ReadingPassage(
+                    id: "jumuah_three",
+                    arabic: PHONE_JUMUAH_HADITH_THREE_AR,
+                    english: PHONE_JUMUAH_HADITH_THREE_EN,
+                    source: "Sahih al-Bukhari 937"
+                )
+            ]
+        }
+
+        if isPrayerTimingGroup {
+            return [
+                ReadingPassage(
+                    id: "jibril",
+                    arabic: PHONE_JIBRIL_HADITH_AR,
+                    english: PHONE_JIBRIL_HADITH_EN,
+                    source: "Sunan Abi Dawud 393"
+                )
+            ]
+        }
+
+        if isSunDayGroup {
+            return [
+                ReadingPassage(
+                    id: "duha_one",
+                    arabic: PHONE_DUHA_HADITH_ONE_AR,
+                    english: PHONE_DUHA_HADITH_ONE_EN,
+                    source: "Jami` at-Tirmidhi 475"
+                ),
+                ReadingPassage(
+                    id: "duha_two",
+                    arabic: PHONE_DUHA_HADITH_TWO_AR,
+                    english: PHONE_DUHA_HADITH_TWO_EN,
+                    source: "Sahih Muslim 720"
+                ),
+                ReadingPassage(
+                    id: "duha_three",
+                    arabic: PHONE_DUHA_HADITH_THREE_AR,
+                    english: PHONE_DUHA_HADITH_THREE_EN,
+                    source: "Sahih Muslim 832"
+                )
+            ]
+        }
+
+        if isLastThird {
+            return [
+                ReadingPassage(
+                    id: "last_third",
+                    arabic: PHONE_LAST_THIRD_HADITH_AR,
+                    english: PHONE_LAST_THIRD_HADITH_EN,
+                    source: "Sahih Muslim 758"
+                )
+            ]
+        }
+
+        return []
     }
 
-    private func calculationLine(label: String, detail: String) -> some View {
+    private var technicalSections: [TechnicalSectionEntry] {
+        if isPrayerTimingGroup {
+            return [
+                TechnicalSectionEntry(
+                    id: "dhuhr",
+                    heading: "Dhuhr",
+                    lines: [
+                        TechnicalLine(
+                            id: "dhuhr_start",
+                            label: "Start",
+                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                        ),
+                        TechnicalLine(
+                            id: "dhuhr_end",
+                            label: "End",
+                            detail: "at the start of Asr."
+                        )
+                    ]
+                ),
+                TechnicalSectionEntry(
+                    id: "asr",
+                    heading: "Asr",
+                    lines: [
+                        TechnicalLine(
+                            id: "asr_start",
+                            label: "Start",
+                            detail: "when shadow length = object height + noon shadow (at the user’s coordinates)."
+                        ),
+                        TechnicalLine(
+                            id: "asr_end",
+                            label: "End",
+                            detail: "at the start of Maghrib."
+                        )
+                    ]
+                ),
+                TechnicalSectionEntry(
+                    id: "maghrib",
+                    heading: "Maghrib",
+                    lines: [
+                        TechnicalLine(
+                            id: "maghrib_start",
+                            label: "Start",
+                            detail: "at sunset, when the sun disappears below the horizon (at the user’s coordinates)."
+                        ),
+                        TechnicalLine(
+                            id: "maghrib_end",
+                            label: "End",
+                            detail: "at the start of Isha."
+                        )
+                    ]
+                ),
+                TechnicalSectionEntry(
+                    id: "isha",
+                    heading: "Isha",
+                    lines: [
+                        TechnicalLine(
+                            id: "isha_start",
+                            label: "Start",
+                            detail: "when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates)."
+                        ),
+                        TechnicalLine(
+                            id: "isha_end",
+                            label: "End",
+                            detail: "at the start of Fajr."
+                        )
+                    ]
+                ),
+                TechnicalSectionEntry(
+                    id: "fajr",
+                    heading: "Fajr",
+                    lines: [
+                        TechnicalLine(
+                            id: "fajr_start",
+                            label: "Start",
+                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                        ),
+                        TechnicalLine(
+                            id: "fajr_end",
+                            label: "End",
+                            detail: "at the start of Sunrise."
+                        )
+                    ]
+                )
+            ]
+        }
+
+        if isSunDayGroup {
+            return [
+                TechnicalSectionEntry(
+                    id: "sunrise",
+                    heading: "Sunrise",
+                    lines: [
+                        TechnicalLine(
+                            id: "sunrise_start",
+                            label: "Start",
+                            detail: "calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°)."
+                        ),
+                        TechnicalLine(
+                            id: "sunrise_end",
+                            label: "End",
+                            detail: "at the start of Duha."
+                        )
+                    ]
+                ),
+                TechnicalSectionEntry(
+                    id: "duha",
+                    heading: "Duha",
+                    lines: [
+                        TechnicalLine(
+                            id: "duha_start",
+                            label: "Start",
+                            detail: "when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise."
+                        ),
+                        TechnicalLine(
+                            id: "duha_end",
+                            label: "End",
+                            detail: "at the start of Midday."
+                        )
+                    ]
+                ),
+                TechnicalSectionEntry(
+                    id: "midday",
+                    heading: "Midday",
+                    lines: [
+                        TechnicalLine(
+                            id: "midday_start",
+                            label: "Start",
+                            detail: "5 minutes before Dhuhr."
+                        ),
+                        TechnicalLine(
+                            id: "midday_end",
+                            label: "End",
+                            detail: "at Dhuhr."
+                        )
+                    ]
+                )
+            ]
+        }
+
+        if isLastThird {
+            return [
+                TechnicalSectionEntry(
+                    id: "last_third",
+                    heading: "Last 3rd",
+                    lines: [
+                        TechnicalLine(
+                            id: "last_third_start",
+                            label: "Start",
+                            detail: "time between last Maghrib and Fajr divided by 3."
+                        ),
+                        TechnicalLine(
+                            id: "last_third_end",
+                            label: "End",
+                            detail: "at the start of Fajr."
+                        )
+                    ]
+                )
+            ]
+        }
+
+        return []
+    }
+
+    private func sectionLink(_ text: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(text)
+                .font(phoneMetadataFont(containerSize: containerSize))
+                .foregroundColor(PHONE_MUTED_META.opacity(0.94))
+                .tracking(0.15)
+                .padding(.vertical, 2)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func technicalLine(label: String, detail: String) -> some View {
         (
             Text("\(label): ")
-                .font(phoneTextFont(size: 17, weight: .semibold))
-                .foregroundColor(PHONE_SACRED_WHITE)
+                .font(phoneTextFont(size: min(containerSize.width * 0.041, 15.5), weight: .semibold))
+                .foregroundColor(PHONE_SACRED_WHITE.opacity(0.92))
             +
             Text(detail)
-                .font(phoneTextFont(size: 17, weight: .regular))
-                .foregroundColor(PHONE_SOFT_WHITE)
+                .font(phoneTextFont(size: min(containerSize.width * 0.043, 16), weight: .regular))
+                .foregroundColor(PHONE_SOFT_WHITE.opacity(0.92))
         )
+        .lineSpacing(min(containerSize.width * 0.015, 5.5))
         .multilineTextAlignment(.leading)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func hadithArabic(_ text: String) -> some View {
-        Text(text)
-            .font(phoneArabicFont(size: 21, weight: .medium))
-            .foregroundColor(PHONE_SACRED_WHITE)
-            .multilineTextAlignment(.trailing)
-            .lineSpacing(containerSize.height * 0.006)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-    }
+    @ViewBuilder
+    private func readingPassageGroup(_ passage: ReadingPassage) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(passage.arabic)
+                .font(phoneArabicFont(size: min(containerSize.width * 0.06, 22.5), weight: .medium))
+                .foregroundColor(PHONE_SACRED_WHITE.opacity(0.95))
+                .multilineTextAlignment(.trailing)
+                .lineSpacing(min(containerSize.width * 0.037, 14.5))
+                .frame(maxWidth: min(containerSize.width - 44, 352), alignment: .trailing)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.bottom, 22)
 
-    private func hadithEnglish(_ text: String) -> some View {
-        Text(text)
-            .font(phoneTextFont(size: 18, weight: .regular))
-            .foregroundColor(PHONE_SOFT_WHITE)
-            .multilineTextAlignment(.leading)
-            .lineSpacing(containerSize.height * 0.004)
-            .frame(maxWidth: .infinity, alignment: .leading)
-    }
+            Text(passage.english)
+                .font(phoneTextFont(size: min(containerSize.width * 0.044, 16.5), weight: .regular))
+                .foregroundColor(PHONE_SOFT_WHITE.opacity(0.93))
+                .multilineTextAlignment(.leading)
+                .lineSpacing(min(containerSize.width * 0.022, 8))
+                .frame(maxWidth: min(containerSize.width - 58, 336), alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 12)
 
-    private func hadithSource(_ text: String) -> some View {
-        Text(text)
-            .font(phoneTextFont(size: 15, weight: .medium))
-            .foregroundColor(PHONE_MUTED_META)
-            .multilineTextAlignment(.trailing)
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            if let source = passage.source {
+                Text(source)
+                    .font(phoneTextFont(size: min(containerSize.width * 0.037, 13.5), weight: .medium))
+                    .foregroundColor(PHONE_MUTED_META.opacity(0.86))
+                    .tracking(0.12)
+                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: min(containerSize.width - 58, 336), alignment: .trailing)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
     }
 
     private func technicalDetailsLink() -> some View {
-        Button {
+        sectionLink("Technical details") {
             phoneSelectionHaptic()
-            withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-                showsTechnicalDetails = true
-            }
-        } label: {
-            Text("Technical details")
-                .font(phoneTextFont(size: 15, weight: .medium))
-                .foregroundColor(PHONE_MUTED_META)
-                .underline()
-                .frame(maxWidth: .infinity, alignment: .center)
+            onShowTechnical()
         }
-        .buttonStyle(.plain)
-        .padding(.top, 10)
     }
 
-    private func backToReadingLink() -> some View {
-        Button {
+    private func meaningLink() -> some View {
+        sectionLink("← Meaning") {
             phoneSelectionHaptic()
-            withAnimation(.easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION)) {
-                showsTechnicalDetails = false
-            }
-        } label: {
-            Text("Back to meaning")
-                .font(phoneTextFont(size: 15, weight: .medium))
-                .foregroundColor(PHONE_MUTED_META)
-                .underline()
-                .frame(maxWidth: .infinity, alignment: .center)
+            onReturnToDalil()
         }
-        .buttonStyle(.plain)
-        .padding(.top, 10)
     }
 
     @ViewBuilder
-    private func mainSpotlightContent() -> some View {
-        VStack(spacing: 4) {
-            if isJumuah {
-                VStack(spacing: 4) {
-                    hadithArabic(PHONE_JUMUAH_AYAH_AR)
-                    Text("")
-                    hadithEnglish(PHONE_JUMUAH_AYAH_EN)
-                    Text("")
-                    hadithArabic(PHONE_JUMUAH_HADITH_ONE_AR)
-                    Text("")
-                    hadithEnglish(PHONE_JUMUAH_HADITH_ONE_EN)
-                    hadithSource("Sunan Abi Dawud 1067")
-                    Text("")
-                    hadithArabic(PHONE_JUMUAH_HADITH_TWO_AR)
-                    Text("")
-                    hadithEnglish(PHONE_JUMUAH_HADITH_TWO_EN)
-                    hadithSource("Sahih Muslim 857")
-                    Text("")
-                    hadithArabic(PHONE_JUMUAH_HADITH_THREE_AR)
-                    Text("")
-                    hadithEnglish(PHONE_JUMUAH_HADITH_THREE_EN)
-                    hadithSource("Sahih al-Bukhari 937")
+    private func dalilContent() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(readingPassages.enumerated()), id: \.element.id) { index, passage in
+                readingPassageGroup(passage)
+
+                if index < readingPassages.count - 1 {
+                    Rectangle()
+                        .fill(PHONE_PANEL_STROKE.opacity(0.4))
+                        .frame(height: 1)
+                        .frame(maxWidth: min(containerSize.width - 112, 222))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 30)
+                        .padding(.bottom, 34)
                 }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
-            } else if isPrayerTimingGroup {
-                VStack(spacing: 4) {
-                    hadithArabic(PHONE_JIBRIL_HADITH_AR)
-                    Text("")
-                    hadithEnglish(PHONE_JIBRIL_HADITH_EN)
-                    hadithSource("Sunan Abi Dawud, Hadith 393")
-                    technicalDetailsLink()
-                }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
-            } else if isSunDayGroup {
-                VStack(spacing: 4) {
-                    hadithArabic(PHONE_DUHA_HADITH_ONE_AR)
-                    Text("")
-                    hadithEnglish(PHONE_DUHA_HADITH_ONE_EN)
-                    hadithSource("Jami` at-Tirmidhi, Hadith 475")
-                    Text("")
-                    hadithArabic(PHONE_DUHA_HADITH_TWO_AR)
-                    Text("")
-                    hadithEnglish(PHONE_DUHA_HADITH_TWO_EN)
-                    hadithSource("Sahih Muslim, Hadith 720")
-                    Text("")
-                    hadithArabic(PHONE_DUHA_HADITH_THREE_AR)
-                    Text("")
-                    hadithEnglish(PHONE_DUHA_HADITH_THREE_EN)
-                    hadithSource("Sahih Muslim, Hadith 832")
-                    technicalDetailsLink()
-                }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
-            } else if isLastThird {
-                VStack(spacing: 4) {
-                    hadithArabic(PHONE_LAST_THIRD_HADITH_AR)
-                    Text("")
-                    hadithEnglish(PHONE_LAST_THIRD_HADITH_EN)
-                    hadithSource("Sahih Muslim, Hadith 758")
-                    technicalDetailsLink()
-                }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
             }
         }
         .frame(maxWidth: .infinity, alignment: .top)
-        .padding(.top, max(12, containerSize.height * 0.025))
-        .padding(.horizontal, 18)
-        .padding(.bottom, 24)
+        .padding(.horizontal, PHONE_PANEL_HORIZONTAL_PADDING)
+        .padding(.vertical, PHONE_PANEL_VERTICAL_PADDING)
     }
 
     @ViewBuilder
     private func technicalDetailsContent() -> some View {
-        VStack(spacing: 4) {
-            backToReadingLink()
-            Text("")
-            if isPrayerTimingGroup {
-                VStack(spacing: 4) {
-                    calculationHeading("Dhuhr calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Asr.")
-                    Text("")
-                    calculationHeading("Asr calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "when shadow length = object height + noon shadow (at the user’s coordinates)."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Maghrib.")
-                    Text("")
-                    calculationHeading("Maghrib calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "at sunset, when the sun disappears below the horizon (at the user’s coordinates)."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Isha.")
-                    Text("")
-                    calculationHeading("Isha calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates)."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Fajr.")
-                    Text("")
-                    calculationHeading("Fajr calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Sunrise.")
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .center) {
+                meaningLink()
+                Spacer()
+            }
+
+            Text("Technical details")
+                .font(phoneMetadataFont(containerSize: containerSize))
+                .foregroundColor(PHONE_MUTED_META.opacity(0.94))
+                .tracking(0.2)
+                .multilineTextAlignment(.leading)
+
+            ForEach(technicalSections) { section in
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(section.heading)
+                        .font(phoneDisplayFont(size: min(containerSize.width * 0.053, 20), weight: .semibold))
+                        .foregroundColor(PHONE_SACRED_WHITE.opacity(0.95))
+                        .multilineTextAlignment(.leading)
+
+                    VStack(alignment: .leading, spacing: 7) {
+                        ForEach(section.lines) { line in
+                            technicalLine(label: line.label, detail: line.detail)
+                        }
+                    }
                 }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
-            } else if isSunDayGroup {
-                VStack(spacing: 4) {
-                    calculationHeading("Sunrise calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°)."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Duha.")
-                    Text("")
-                    calculationHeading("Duha calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Midday.")
-                    Text("")
-                    calculationHeading("Midday calculation")
-                    calculationLine(label: "Start", detail: "5 minutes before Dhuhr.")
-                    calculationLine(label: "End", detail: "at Dhuhr.")
-                }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
-            } else if isLastThird {
-                VStack(spacing: 4) {
-                    calculationHeading("Last 3rd calculation")
-                    calculationLine(
-                        label: "Start",
-                        detail: "time between last Maghrib and Fajr divided by 3."
-                    )
-                    calculationLine(label: "End", detail: "at the start of Fajr.")
-                }
-                .frame(maxWidth: min(containerSize.width - 36, 420))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, section.id == technicalSections.last?.id ? 0 : 3)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .top)
-        .padding(.top, max(12, containerSize.height * 0.025))
-        .padding(.horizontal, 18)
-        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding(.horizontal, PHONE_PANEL_HORIZONTAL_PADDING)
+        .padding(.vertical, 18)
     }
 
     var body: some View {
-        PhoneOverlaySheet(containerSize: containerSize, maxHeightRatio: 0.72) {
-            ZStack {
-                ScrollView(showsIndicators: false) {
-                    mainSpotlightContent()
-                }
-                .frame(maxWidth: .infinity, alignment: .top)
-                .opacity(showsTechnicalDetails ? 0 : 1)
-                .allowsHitTesting(!showsTechnicalDetails)
-
-                if showsTechnicalDetails {
-                    ScrollView(showsIndicators: false) {
-                        technicalDetailsContent()
-                    }
-                    .frame(maxWidth: .infinity, alignment: .top)
-                    .transition(.opacity)
+        PhoneOverlaySheet(
+            containerSize: containerSize,
+            maxHeightRatio: mode == .technical ? 0.94 : 0.88,
+            isCentered: true,
+            tone: .reading,
+            style: mode == .dalil ? .fullScreen : .panel,
+            onTapDismiss: mode == .dalil ? onDismiss : nil
+        ) {
+            ScrollView(showsIndicators: false) {
+                if mode == .dalil {
+                    dalilContent()
+                } else {
+                    technicalDetailsContent()
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .top)
         }
     }
 }

@@ -10,9 +10,6 @@ enum PhonePhaseBackgroundKey: String, Equatable {
     case maghrib
     case isha
     case lastThird
-    case jumuah
-    case eidAlFitr
-    case eidAlAdha
 
     var assetName: String {
         switch self {
@@ -25,9 +22,6 @@ enum PhonePhaseBackgroundKey: String, Equatable {
         case .maghrib: return "LoadingMaghrib"
         case .isha: return "LoadingIsha"
         case .lastThird: return "LoadingLastThird"
-        case .jumuah: return "LoadingJumuah"
-        case .eidAlFitr: return "LoadingEidAlFitr"
-        case .eidAlAdha: return "LoadingEidAlAdha"
         }
     }
 }
@@ -126,6 +120,55 @@ func phoneReadingTitle(for presentation: PhoneHomePresentation) -> String? {
     return nil
 }
 
+private func phoneEidObservationalCue(for hijriDate: HijriDate) -> String {
+    if hijriDate.monthNumber == 10 && hijriDate.day == 1 {
+        return PHONE_CUE_EID_AL_FITR
+    }
+    if hijriDate.monthNumber == 12 && hijriDate.day == 10 {
+        return PHONE_CUE_EID_AL_ADHA
+    }
+    return ""
+}
+
+private func phoneEidHeadingTitle(hijriDate: HijriDate) -> String {
+    if hijriDate.monthNumber == 10 && hijriDate.day == 1 {
+        return "EID AL-FITR"
+    }
+    if hijriDate.monthNumber == 12 && hijriDate.day == 10 {
+        return "EID AL-ADHA"
+    }
+    return ""
+}
+
+/// Cue under the main title: Eid prayer copy during the noon window when the title shows the Eid heading; otherwise sector cue.
+private func phoneHomeCurrentCueText(
+    snapshot: ComputedIslamicDay,
+    now: Date,
+    rawSectorTitle: String,
+    displayTitle: String,
+    hijriParts: (dayMonth: String, year: String, isEid: Bool)
+) -> String {
+    guard hijriParts.isEid else {
+        return phoneObservationalCueText(for: displayTitle)
+    }
+    switch snapshot.currentPhase {
+    case .sunrise_to_dhuhr:
+        let sub = getSunriseToDhuhrSubPeriod(
+            now: now,
+            duhaStart: snapshot.timeline.duhaStart,
+            dhuhr: snapshot.timeline.dhuhr
+        )
+        if sub == .duha || sub == .midday {
+            return phoneEidObservationalCue(for: snapshot.hijriDate)
+        }
+    case .dhuhr_to_asr:
+        return phoneEidObservationalCue(for: snapshot.hijriDate)
+    default:
+        break
+    }
+    return phoneObservationalCueText(for: rawSectorTitle)
+}
+
 func makePhoneHomePresentation(snapshot: ComputedIslamicDay, now: Date) -> PhoneHomePresentation {
     let rawSectorTitle = getSectorDisplayName(
         now: now,
@@ -145,15 +188,16 @@ func makePhoneHomePresentation(snapshot: ComputedIslamicDay, now: Date) -> Phone
         : (ringLegendTitles.contains(rawSectorTitle) ? rawSectorTitle : nil)
 
     return PhoneHomePresentation(
-        backgroundKey: phoneBackgroundKey(
+        backgroundKey: phoneBackgroundKey(snapshot: snapshot, now: now),
+        rawSectorTitle: rawSectorTitle,
+        displayTitle: displayTitle,
+        currentCueText: phoneHomeCurrentCueText(
             snapshot: snapshot,
             now: now,
             rawSectorTitle: rawSectorTitle,
+            displayTitle: displayTitle,
             hijriParts: hijriParts
         ),
-        rawSectorTitle: rawSectorTitle,
-        displayTitle: displayTitle,
-        currentCueText: phoneObservationalCueText(for: displayTitle),
         ringLegendItems: ringLegendTitles.map {
             PhoneRingLegendItem(title: $0, isActive: $0 == highlightedRingTitle)
         },
@@ -162,22 +206,7 @@ func makePhoneHomePresentation(snapshot: ComputedIslamicDay, now: Date) -> Phone
     )
 }
 
-private func phoneBackgroundKey(
-    snapshot: ComputedIslamicDay,
-    now: Date,
-    rawSectorTitle: String,
-    hijriParts: (dayMonth: String, year: String, isEid: Bool)
-) -> PhonePhaseBackgroundKey {
-    if snapshot.hijriDate.monthNumber == 10 && snapshot.hijriDate.day == 1 {
-        return .eidAlFitr
-    }
-    if snapshot.hijriDate.monthNumber == 12 && snapshot.hijriDate.day == 10 {
-        return .eidAlAdha
-    }
-    if rawSectorTitle == "Jumu'ah", !hijriParts.isEid {
-        return .jumuah
-    }
-
+private func phoneBackgroundKey(snapshot: ComputedIslamicDay, now: Date) -> PhonePhaseBackgroundKey {
     switch snapshot.currentPhase {
     case .maghrib_to_isha:
         return .maghrib
@@ -223,10 +252,10 @@ private func phoneDisplayTitle(
             dhuhr: snapshot.timeline.dhuhr
         )
         if sub == .duha || sub == .midday {
-            return hijriParts.dayMonth
+            return phoneEidHeadingTitle(hijriDate: snapshot.hijriDate)
         }
     case .dhuhr_to_asr:
-        return hijriParts.dayMonth
+        return phoneEidHeadingTitle(hijriDate: snapshot.hijriDate)
     default:
         break
     }

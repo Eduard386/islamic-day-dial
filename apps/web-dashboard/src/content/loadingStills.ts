@@ -1,20 +1,13 @@
-import {
-  getSectorDisplayName,
-  getSunriseToDhuhrSubPeriod,
-  type ComputedIslamicDay,
-} from '@islamic-day-dial/core';
-import loadingAsr from '../assets/loading/loading-asr.jpg';
-import loadingDhuhr from '../assets/loading/loading-dhuhr.jpg';
-import loadingDuha from '../assets/loading/loading-duha.jpg';
-import loadingEidAlAdha from '../assets/loading/loading-eid-al-adha.jpg';
-import loadingEidAlFitr from '../assets/loading/loading-eid-al-fitr.jpg';
-import loadingFajr from '../assets/loading/loading-fajr.jpg';
-import loadingIsha from '../assets/loading/loading-isha.jpg';
-import loadingJumuah from '../assets/loading/loading-jumuah.jpg';
-import loadingLastThird from '../assets/loading/loading-last-third.jpg';
-import loadingMaghrib from '../assets/loading/loading-maghrib.jpg';
-import loadingMidday from '../assets/loading/loading-midday.jpg';
-import loadingSunrise from '../assets/loading/loading-sunrise.jpg';
+import { getSunriseToDhuhrSubPeriod, type ComputedIslamicDay } from '@islamic-day-dial/core';
+import loadingAsr from '../assets/loading/loading-asr.png';
+import loadingDhuhr from '../assets/loading/loading-dhuhr.png';
+import loadingDuha from '../assets/loading/loading-duha.png';
+import loadingFajr from '../assets/loading/loading-fajr.png';
+import loadingIsha from '../assets/loading/loading-isha.png';
+import loadingLastThird from '../assets/loading/loading-last-third.png';
+import loadingMaghrib from '../assets/loading/loading-maghrib.png';
+import loadingMidday from '../assets/loading/loading-midday.png';
+import loadingSunrise from '../assets/loading/loading-sunrise.png';
 
 export type LoadingStillKey =
   | 'fajr'
@@ -25,10 +18,7 @@ export type LoadingStillKey =
   | 'asr'
   | 'maghrib'
   | 'isha'
-  | 'lastThird'
-  | 'jumuah'
-  | 'eidAlFitr'
-  | 'eidAlAdha';
+  | 'lastThird';
 
 export const LOADING_STILL_SOURCES: Record<LoadingStillKey, string> = {
   fajr: loadingFajr,
@@ -40,28 +30,10 @@ export const LOADING_STILL_SOURCES: Record<LoadingStillKey, string> = {
   maghrib: loadingMaghrib,
   isha: loadingIsha,
   lastThird: loadingLastThird,
-  jumuah: loadingJumuah,
-  eidAlFitr: loadingEidAlFitr,
-  eidAlAdha: loadingEidAlAdha,
 };
 
+/** Background still matches the current phase (same on Eid / Jumu'ah days). */
 export function getLoadingStillKey(snapshot: ComputedIslamicDay, now: Date): LoadingStillKey {
-  if (snapshot.hijriDate.monthNumber === 10 && snapshot.hijriDate.day === 1) {
-    return 'eidAlFitr';
-  }
-  if (snapshot.hijriDate.monthNumber === 12 && snapshot.hijriDate.day === 10) {
-    return 'eidAlAdha';
-  }
-
-  const sectorTitle = getSectorDisplayName(
-    now,
-    snapshot.currentPhase,
-    { duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr },
-  );
-  if (sectorTitle === "Jumu'ah") {
-    return 'jumuah';
-  }
-
   switch (snapshot.currentPhase) {
     case 'maghrib_to_isha':
       return 'maghrib';

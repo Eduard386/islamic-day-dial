@@ -13,9 +13,6 @@ enum PrayerNotificationScheduler {
     private static let categoryId = "PRAYER_REMINDER"
     private static let identifierPrefix = "prayer_"
     private static let debugSequenceKeyPrefix = "prayer_debug_sequence"
-    private static let eidGreetingDelay: TimeInterval = 2 * 60 * 60
-    private static let eidGreetingTitle = "Taqabbal Allahu minna wa minkum!"
-    private static let eidGreetingBody = "May Allah accept from us and from you!"
 
     private enum NotificationKind: String {
         case fajr
@@ -25,7 +22,6 @@ enum PrayerNotificationScheduler {
         case isha
         case jumuah
         case eid
-        case eidGreeting
     }
 
     private struct NotificationPlan {
@@ -35,14 +31,15 @@ enum PrayerNotificationScheduler {
         let fireDate: Date
     }
 
-    private static let fajrTitle = PHONE_CUE_FAJR
-    private static let dhuhrTitle = PHONE_CUE_DHUHR
-    private static let asrTitle = PHONE_CUE_ASR
-    private static let maghribTitle = PHONE_CUE_MAGHRIB
-    private static let ishaTitle = PHONE_CUE_ISHA
-    private static let jumuahTitle = PHONE_CUE_JUMUAH
-    private static let eidAlFitrTitle = PHONE_CUE_EID_AL_FITR
-    private static let eidAlAdhaTitle = PHONE_CUE_EID_AL_ADHA
+    /// Short reminder line (text after the em dash in product copy).
+    private static let fajrTitle = "Fajr. Check the horizon"
+    private static let dhuhrTitle = "Dhuhr. Check the shadow"
+    private static let asrTitle = "Asr. Check the shadow"
+    private static let maghribTitle = "Maghrib. Watch for sunset"
+    private static let ishaTitle = "Isha. Check the sky"
+    private static let jumuahTitle = "Prepare for Jumu'ah"
+    private static let eidAlFitrTitle = "Eid al-Fitr"
+    private static let eidAlAdhaTitle = "Eid al-Adha"
 
     private static var authorizationOptions: UNAuthorizationOptions {
         #if os(watchOS)
@@ -101,29 +98,19 @@ enum PrayerNotificationScheduler {
         let hijriParts = formatHijriDateParts(hijriDate)
         let isFriday = Calendar.current.component(.weekday, from: prayerTimes.dhuhr) == 6
 
-        var plans = [
+        let plans = [
             prayerPlan(kind: .fajr, prayerName: "Fajr", fireDate: prayerTimes.fajr),
             noonPlan(
                 prayerTimes: prayerTimes,
                 duhaStart: snapshot.timeline.duhaStart,
                 isFriday: isFriday,
-                hijriParts: hijriParts
+                hijriParts: hijriParts,
+                hijriDate: hijriDate
             ),
             prayerPlan(kind: .asr, prayerName: "Asr", fireDate: prayerTimes.asr),
             prayerPlan(kind: .maghrib, prayerName: "Maghrib", fireDate: prayerTimes.maghrib),
             prayerPlan(kind: .isha, prayerName: "Isha", fireDate: prayerTimes.isha),
         ]
-
-        if hijriParts.isEid {
-            plans.append(
-                NotificationPlan(
-                    kind: .eidGreeting,
-                    title: eidGreetingTitle,
-                    body: eidGreetingBody,
-                    fireDate: snapshot.timeline.duhaStart.addingTimeInterval(eidGreetingDelay)
-                )
-            )
-        }
 
         return plans
     }
@@ -164,8 +151,6 @@ enum PrayerNotificationScheduler {
             default:
                 return "\(prayerName) prayer time has started."
             }
-        case .eidGreeting:
-            return prayerName == eidGreetingTitle ? eidGreetingTitle : prayerName
         }
     }
 
@@ -173,12 +158,14 @@ enum PrayerNotificationScheduler {
         prayerTimes: PrayerTimesData,
         duhaStart: Date,
         isFriday: Bool,
-        hijriParts: (dayMonth: String, year: String, isEid: Bool)
+        hijriParts: (dayMonth: String, year: String, isEid: Bool),
+        hijriDate: HijriDate
     ) -> NotificationPlan {
         if hijriParts.isEid {
+            let eidKey = hijriDate.monthNumber == 10 ? "EID AL-FITR" : "EID AL-ADHA"
             return prayerPlan(
                 kind: .eid,
-                prayerName: hijriParts.dayMonth,
+                prayerName: eidKey,
                 fireDate: duhaStart
             )
         }
@@ -295,6 +282,12 @@ enum PrayerNotificationScheduler {
             kind = .maghrib
         case "Isha":
             kind = .isha
+        case "Jumu'ah":
+            kind = .jumuah
+        case "EID AL-FITR":
+            kind = .eid
+        case "EID AL-ADHA":
+            kind = .eid
         default:
             kind = .dhuhr
         }

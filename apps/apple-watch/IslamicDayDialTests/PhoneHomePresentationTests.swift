@@ -85,7 +85,7 @@ final class PhoneHomePresentationTests: XCTestCase {
         let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
         let titles = presentation.ringLegendItems.map(\.title)
 
-        XCTAssertEqual(presentation.backgroundKey, .jumuah)
+        XCTAssertEqual(presentation.backgroundKey, .duha)
         XCTAssertEqual(presentation.rawSectorTitle, "Jumu'ah")
         XCTAssertEqual(presentation.displayTitle, "Jumu'ah")
         XCTAssertEqual(presentation.currentCueText, PHONE_CUE_JUMUAH)
@@ -113,7 +113,7 @@ final class PhoneHomePresentationTests: XCTestCase {
 
         let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
 
-        XCTAssertEqual(presentation.backgroundKey, .eidAlFitr)
+        XCTAssertEqual(presentation.backgroundKey, .duha)
         XCTAssertEqual(presentation.rawSectorTitle, "Jumu'ah")
         XCTAssertEqual(presentation.displayTitle, "EID AL-FITR")
         XCTAssertEqual(presentation.currentCueText, PHONE_CUE_EID_AL_FITR)
@@ -139,7 +139,7 @@ final class PhoneHomePresentationTests: XCTestCase {
 
         let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
 
-        XCTAssertEqual(presentation.backgroundKey, .eidAlAdha)
+        XCTAssertEqual(presentation.backgroundKey, .asr)
         XCTAssertEqual(presentation.rawSectorTitle, "Asr")
         XCTAssertEqual(presentation.displayTitle, "Asr")
         XCTAssertEqual(presentation.currentCueText, PHONE_CUE_ASR)
@@ -188,7 +188,7 @@ final class PhoneHomePresentationTests: XCTestCase {
 
     func testPhoneReadingTitle_FallsBackToRawTitleWhenDisplayTitleIsEid() {
         let presentation = PhoneHomePresentation(
-            backgroundKey: .eidAlFitr,
+            backgroundKey: .duha,
             rawSectorTitle: "Duha",
             displayTitle: "EID AL-FITR",
             currentCueText: PHONE_CUE_EID_AL_FITR,

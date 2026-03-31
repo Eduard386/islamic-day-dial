@@ -122,7 +122,7 @@ final class WidgetPresentationTests: XCTestCase {
             hijriDate: HijriDate(day: 1, monthNumber: 10, monthNameEn: "Shawwal", year: 1447)
         )
 
-        XCTAssertEqual(label.primary, "EID AL-FITR")
+        XCTAssertEqual(label.primary, "1 SHAWWAL")
         XCTAssertEqual(label.secondary, "1447")
         XCTAssertTrue(label.isEid)
     }

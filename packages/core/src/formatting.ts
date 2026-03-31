@@ -1,12 +1,6 @@
 import type { HijriDate, IslamicPhaseId } from './types.js';
 
 export function formatHijriDate(date: HijriDate): string {
-  if (date.monthNumber === 10 && date.day === 1) {
-    return 'EID AL-FITR';
-  }
-  if (date.monthNumber === 12 && date.day === 10) {
-    return 'EID AL-ADHA';
-  }
   return `${date.day} ${date.monthNameEn} ${date.year}`;
 }
 
@@ -17,17 +11,11 @@ export type HijriDateParts = {
 };
 
 export function formatHijriDateParts(date: HijriDate): HijriDateParts {
-  if (date.monthNumber === 10 && date.day === 1) {
-    return { dayMonth: 'EID AL-FITR', year: String(date.year), isEid: true };
-  }
-  if (date.monthNumber === 12 && date.day === 10) {
-    return { dayMonth: 'EID AL-ADHA', year: String(date.year), isEid: true };
-  }
-  return {
-    dayMonth: `${date.day} ${date.monthNameEn}`,
-    year: String(date.year),
-    isEid: false,
-  };
+  const dayMonth = `${date.day} ${date.monthNameEn}`;
+  const isEid =
+    (date.monthNumber === 10 && date.day === 1) ||
+    (date.monthNumber === 12 && date.day === 10);
+  return { dayMonth, year: String(date.year), isEid };
 }
 
 export function formatCountdown(ms: number): string {

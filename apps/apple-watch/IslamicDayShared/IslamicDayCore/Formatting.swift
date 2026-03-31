@@ -3,13 +3,11 @@ import Foundation
 /// Formatting for display. Mirrors packages/core/src/formatting.ts
 
 func formatHijriDateParts(_ date: HijriDate) -> (dayMonth: String, year: String, isEid: Bool) {
-    if date.monthNumber == 10 && date.day == 1 {
-        return ("EID AL-FITR", String(date.year), true)
-    }
-    if date.monthNumber == 12 && date.day == 10 {
-        return ("EID AL-ADHA", String(date.year), true)
-    }
-    return ("\(date.day) \(date.monthNameEn)", String(date.year), false)
+    let dayMonth = "\(date.day) \(date.monthNameEn)"
+    let isEid =
+        (date.monthNumber == 10 && date.day == 1)
+        || (date.monthNumber == 12 && date.day == 10)
+    return (dayMonth, String(date.year), isEid)
 }
 
 let PERIOD_NAMES: [IslamicPhaseId: String] = [
