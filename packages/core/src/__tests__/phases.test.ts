@@ -80,6 +80,27 @@ describe('getNextTransition', () => {
     expect(result.at).toEqual(timeline.fajr);
   });
 
+  it('returns Duha start during the sunrise sub-period', () => {
+    const now = new Date('2025-03-16T03:20:00.000Z');
+    const result = getNextTransition(now, timeline);
+    expect(result.id).toBe('duha_start');
+    expect(result.at).toEqual(timeline.duhaStart);
+  });
+
+  it('returns Duha end during the duha sub-period', () => {
+    const now = new Date('2025-03-16T06:00:00.000Z');
+    const result = getNextTransition(now, timeline);
+    expect(result.id).toBe('duha_end');
+    expect(result.at).toEqual(timeline.duhaEnd);
+  });
+
+  it('returns Dhuhr during the midday sub-period', () => {
+    const now = new Date('2025-03-16T09:12:00.000Z');
+    const result = getNextTransition(now, timeline);
+    expect(result.id).toBe('dhuhr');
+    expect(result.at).toEqual(timeline.dhuhr);
+  });
+
   it('returns nextMaghrib when in asr_to_maghrib phase', () => {
     const now = new Date('2025-03-16T14:00:00.000Z');
     const result = getNextTransition(now, timeline);

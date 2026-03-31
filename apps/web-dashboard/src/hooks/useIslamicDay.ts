@@ -46,7 +46,12 @@ const FALLBACK_LOCATION: Location = { latitude: 21.4225, longitude: 39.8262 }; /
 const CURRENT_CITY = 'My location';
 const DEFAULT_PRESET = CURRENT_CITY;
 
-const TICK_INTERVAL_MS = 1_000;
+const TICK_INTERVAL_MS = 60_000;
+
+function msUntilNextMinute(from: Date): number {
+  const remainder = from.getTime() % TICK_INTERVAL_MS;
+  return remainder === 0 ? TICK_INTERVAL_MS : TICK_INTERVAL_MS - remainder;
+}
 
 export function useIslamicDay(): DashboardState {
   const [location, setLocation] = useState<Location>(FALLBACK_LOCATION);
@@ -89,13 +94,21 @@ export function useIslamicDay(): DashboardState {
     setLiveNow(getEffectiveNow(timeMode));
   }, [timeMode]);
 
-  // Live mode: tick every second so sector label, sun position, and countdown stay visibly live.
+  // Live mode: refresh on minute boundaries. There is no visible ticking countdown in the UI,
+  // so minute-level updates keep the dial current without recomputing the full snapshot every second.
   useEffect(() => {
     if (timeMode.kind !== 'live') return;
     const tick = () => setLiveNow(new Date());
     tick();
-    const timer = setInterval(tick, TICK_INTERVAL_MS);
-    return () => clearInterval(timer);
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const timeout = setTimeout(() => {
+      tick();
+      interval = setInterval(tick, TICK_INTERVAL_MS);
+    }, msUntilNextMinute(new Date()));
+    return () => {
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+    };
   }, [timeMode]);
 
   // Safari iOS: when returning to tab (after lock/switch), timers may have been throttled — force refresh

@@ -34,6 +34,8 @@ export function getNextTransition(
     { id: 'last_third_start', at: timeline.lastThirdStart },
     { id: 'fajr', at: timeline.fajr },
     { id: 'sunrise', at: timeline.sunrise },
+    { id: 'duha_start', at: timeline.duhaStart },
+    { id: 'duha_end', at: timeline.duhaEnd },
     { id: 'dhuhr', at: timeline.dhuhr },
     { id: 'asr', at: timeline.asr },
     { id: 'maghrib', at: timeline.nextMaghrib },

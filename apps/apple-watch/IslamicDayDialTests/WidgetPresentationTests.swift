@@ -69,6 +69,46 @@ final class WidgetPresentationTests: XCTestCase {
         XCTAssertEqual(refreshDate.timeIntervalSince1970, 1_010.25, accuracy: 0.001)
     }
 
+    func testNextWidgetRefreshDate_UsesDuhaStartDuringSunriseSubperiod() {
+        let now = Date(timeIntervalSince1970: 881)
+        let timeline = makeTimeline(
+            lastMaghrib: 0,
+            isha: 100,
+            lastThirdStart: 300,
+            fajr: 400,
+            sunrise: 500,
+            duhaStart: 890,
+            dhuhr: 1_300,
+            asr: 1_700,
+            nextMaghrib: 2_400
+        )
+        let snapshot = makeSnapshot(timeline: timeline)
+
+        let refreshDate = nextWidgetRefreshDate(from: now, snapshot: snapshot)
+
+        XCTAssertEqual(refreshDate.timeIntervalSince1970, 890.25, accuracy: 0.001)
+    }
+
+    func testNextWidgetRefreshDate_UsesDuhaEndDuringDuhaSubperiod() {
+        let now = Date(timeIntervalSince1970: 901)
+        let timeline = makeTimeline(
+            lastMaghrib: 0,
+            isha: 100,
+            lastThirdStart: 300,
+            fajr: 400,
+            sunrise: 500,
+            duhaStart: 700,
+            dhuhr: 1_215,
+            asr: 1_700,
+            nextMaghrib: 2_400
+        )
+        let snapshot = makeSnapshot(timeline: timeline)
+
+        let refreshDate = nextWidgetRefreshDate(from: now, snapshot: snapshot)
+
+        XCTAssertEqual(refreshDate.timeIntervalSince1970, 915.25, accuracy: 0.001)
+    }
+
     func testNextWidgetRefreshDate_UsesNextMinuteWhenSoonerThanTransition() {
         let now = Date(timeIntervalSince1970: 1_001)
         let timeline = makeTimeline(

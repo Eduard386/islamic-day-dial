@@ -122,13 +122,13 @@ The companion watchOS app. It is now render-only: iPhone computes the current Is
 
 ### Prayer notifications (iOS)
 
-`PrayerNotificationScheduler` schedules local notifications for Fajr, Asr, Maghrib, Isha, plus a midday special slot. On normal days that slot is `Dhuhr` at `Dhuhr`. On Fridays it becomes `Jumu'ah` at `Duha`, with no `Dhuhr` notification later. On Eid it becomes the Eid name at `Duha`, with no `Dhuhr` notification later, including when Eid falls on Friday. Eid days also get an extra greeting notification 2 hours after `Duha`: title `Taqabbal Allahu minna wa minkum!`, body `May Allah accept from us and from you!`. Titles use the marker name and bodies use the Hijri date unless the notification is this fixed Eid greeting. Rescheduled on app launch and when returning from background (handles travel).
+`PrayerNotificationScheduler` schedules local notifications for Fajr, Asr, Maghrib, Isha, plus a midday special slot. On normal days that slot is `Dhuhr` at `Dhuhr`. On Fridays it becomes `Jumu'ah` at `Duha`, with no `Dhuhr` notification later. On Eid it becomes the Eid name at `Duha`, with no `Dhuhr` notification later, including when Eid falls on Friday. Titles use the marker name and bodies use the Hijri date. Rescheduled on app launch and when returning from background (handles travel).
 
 Apple Watch app presence does not replace prayer notifications. Notification scheduling stays on iPhone and relies on normal iPhone-to-Watch mirroring behavior when system settings allow it.
 
 ### `IslamicDayDialWidget`
 
-The iPhone widget extension. It uses the same snapshot and ring logic to show the current phase, countdown, and mini dial from the Home Screen.
+The iPhone widget extension. It uses the same snapshot and ring logic to show the current Hijri date from the Home Screen.
 
 ## Shared Swift logic
 

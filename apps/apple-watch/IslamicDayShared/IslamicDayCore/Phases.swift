@@ -31,6 +31,8 @@ func getNextTransition(now: Date, timeline: ComputedTimeline) -> (id: String, at
         ("last_third_start", timeline.lastThirdStart),
         ("fajr", timeline.fajr),
         ("sunrise", timeline.sunrise),
+        ("duha_start", timeline.duhaStart),
+        ("duha_end", timeline.duhaEnd),
         ("dhuhr", timeline.dhuhr),
         ("asr", timeline.asr),
         ("maghrib", timeline.nextMaghrib),
