@@ -37,19 +37,11 @@ func makeWidgetSnapshotPayload(date: Date, prefersPreviewData: Bool) async -> Wi
 }
 
 func nextWidgetRefreshDate(from date: Date, snapshot: ComputedIslamicDay?) -> Date {
-    let calendar = Calendar.current
-    let nextMinute = calendar.nextDate(
-        after: date,
-        matching: DateComponents(second: 0),
-        matchingPolicy: .nextTime
-    ) ?? date.addingTimeInterval(60)
-
     guard let snapshot else {
-        return nextMinute
+        return date.addingTimeInterval(60 * 60)
     }
 
-    let nextTransition = getNextTransition(now: date, timeline: snapshot.timeline).at.addingTimeInterval(0.25)
-    return min(nextMinute, nextTransition)
+    return getNextTransition(now: date, timeline: snapshot.timeline).at.addingTimeInterval(0.25)
 }
 
 func nextHijriDateRefreshDate(from date: Date, snapshot: ComputedIslamicDay?) -> Date {

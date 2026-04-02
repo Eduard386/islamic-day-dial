@@ -29,14 +29,9 @@ Important product note:
    xcodegen generate
    ```
 
-### Visit analytics (Supabase)
+### App analytics
 
-The iPhone and watch apps POST to `visits` on launch (after geo resolves). Values come from **Info.plist** keys `SupabaseURL` / `SupabaseAnonKey`, which are filled from build settings `SUPABASE_URL` / `SUPABASE_ANON_KEY`.
-
-1. Copy `IslamicDayDial/Config.xcconfig.example` → `IslamicDayDial/Config.xcconfig` (the real file is gitignored).
-2. Put your project URL and anon key in **double quotes**. In `.xcconfig` files, `//` starts a comment, so an unquoted `https://…` is truncated to `https:` and **no rows appear in Supabase** with no obvious error in the UI.
-3. `project.yml` attaches `Config.xcconfig` to the **iOS app** and **watch app** targets; after changing secrets, **Clean Build Folder** and run again.
-4. In **Debug**, open the **Console** app (or Xcode console) and filter for `com.islamicdaydial.analytics` — `VisitTracker` logs skips (missing config) and non-2xx HTTP responses.
+Apple-platform analytics now rely on **App Store Connect / App Analytics** rather than direct Supabase requests from the iPhone or watch app. This keeps the release build simpler from a privacy and review perspective.
 
 ### Watch install fails: free Apple Developer account (MIInstallerErrorDomain 111)
 

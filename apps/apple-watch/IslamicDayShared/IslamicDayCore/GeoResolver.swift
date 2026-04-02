@@ -1,11 +1,10 @@
 import Foundation
 import CoreLocation
 
-/// Resolve location: GPS first, IP (ipapi) fallback, timezone fallback, Mecca default.
+/// Resolve location: GPS first, timezone fallback, Mecca default.
 
 public enum GeoSource {
     case gps
-    case ip
     case timezone
     case `default`
 }
@@ -32,7 +31,6 @@ extension GeoSource {
     public var apiValue: String {
         switch self {
         case .gps: return "gps"
-        case .ip: return "ip"
         case .timezone: return "timezone"
         case .default: return "default"
         }
@@ -136,43 +134,6 @@ private func getDeviceLocation() async -> Location? {
     return await coordinator.requestLocation()
 }
 
-private struct IpApiGeo {
-    let location: Location
-    let country: String?
-    let city: String?
-    let region: String?
-}
-
-/// Fetch location and geo from ipapi.co. Returns nil on error.
-private func fetchIpApiGeo() async -> IpApiGeo? {
-    guard let url = URL(string: "https://ipapi.co/json/") else { return nil }
-    var request = URLRequest(url: url)
-    request.timeoutInterval = 3
-    do {
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return nil }
-        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let lat = json["latitude"] as? Double,
-              let lng = json["longitude"] as? Double else { return nil }
-        let country = (json["country_name"] as? String) ?? (json["country"] as? String)
-        let city = json["city"] as? String
-        let region = json["region"] as? String
-        return IpApiGeo(
-            location: Location(latitude: lat, longitude: lng),
-            country: country,
-            city: city,
-            region: region
-        )
-    } catch {
-        return nil
-    }
-}
-
-/// Fetch location from ipapi.co. Returns nil on error.
-func fetchLocationFromIP() async -> Location? {
-    await fetchIpApiGeo().map(\.location)
-}
-
 private func getTimezoneFallback(offline: Bool) -> GeoResolveResult {
     let loc = getTimezoneFallbackLocation()
     let source: GeoSource = TIMEZONE_TO_LOCATION[TimeZone.current.identifier] != nil ? .timezone : .default
@@ -185,18 +146,15 @@ func getTimezoneFallbackLocation() -> Location {
     return TIMEZONE_TO_LOCATION[tz] ?? Location.mecca
 }
 
-/// GPS first, then IP, then timezone, Mecca default.
+/// GPS first, then timezone, Mecca default.
 public func resolveGeoResult() async -> GeoResolveResult {
     if let loc = await getDeviceLocation() {
         return GeoResolveResult(location: loc, source: .gps, offline: false)
     }
-    if let ip = await fetchIpApiGeo() {
-        return GeoResolveResult(location: ip.location, source: .ip, offline: false, country: ip.country, city: ip.city, region: ip.region)
-    }
     return getTimezoneFallback(offline: true)
 }
 
-/// GPS first, then IP, then timezone. Backward compatible.
+/// GPS first, then timezone. Backward compatible.
 public func resolveLocation() async -> Location {
     await resolveGeoResult().location
 }

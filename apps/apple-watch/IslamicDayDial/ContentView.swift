@@ -93,13 +93,13 @@ private func normalizedDialAngle(_ angle: Double) -> Double {
 private func phoneHomeBackgroundScrimOpacity(for key: PhonePhaseBackgroundKey) -> Double {
     switch key {
     case .sunrise, .duha, .midday, .dhuhr, .asr:
-        return 0.42
+        return 0.34
     case .maghrib:
-        return 0.26
+        return 0.21
     case .fajr:
-        return 0.3
+        return 0.24
     case .isha, .lastThird:
-        return 0.16
+        return 0.12
     }
 }
 
@@ -396,8 +396,8 @@ struct ContentView: View {
                 try? await Task.sleep(for: .seconds(secondsUntilNextRefresh(from: currentNow, snapshot: currentSnapshot)))
             }
         }
-        .onChange(of: timeOffsetMs) { _, _ in recalcSnapshot() }
-        .onChange(of: snapshot != nil) { _, hasSnapshot in
+        .onChange(of: timeOffsetMs) { _ in recalcSnapshot() }
+        .onChange(of: snapshot != nil) { hasSnapshot in
             guard hasSnapshot, showsStartupLoadingStill else { return }
             Task {
                 try? await Task.sleep(for: .milliseconds(120))
@@ -415,8 +415,8 @@ struct ContentView: View {
                 }
             }
         }
-        .onChange(of: scenePhase) { oldPhase, newPhase in
-            if oldPhase == .background && newPhase == .active {
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active {
                 Task { await refreshSnapshot(forceResolveLocation: true) }
             }
         }
@@ -445,7 +445,7 @@ struct ContentView: View {
                 returnToMainScreenForNotification()
             }
         }
-        .onChange(of: notificationOverlay.presentationID) { _, _ in
+        .onChange(of: notificationOverlay.presentationID) { _ in
             guard notificationOverlay.currentMessage != nil else { return }
             if showsStartupLoadingStill {
                 notificationOverlay.suspendPresentation()
@@ -610,7 +610,6 @@ struct ContentView: View {
             automaticLocation = result.location
             if forceResolveLocation {
                 Task {
-                    await trackVisit(geo: result)
                     await PrayerNotificationScheduler.requestAndSchedule(location: automaticLocation)
                 }
             }

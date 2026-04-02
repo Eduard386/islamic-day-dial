@@ -109,7 +109,7 @@ final class WidgetPresentationTests: XCTestCase {
         XCTAssertEqual(refreshDate.timeIntervalSince1970, 915.25, accuracy: 0.001)
     }
 
-    func testNextWidgetRefreshDate_UsesNextMinuteWhenSoonerThanTransition() {
+    func testNextWidgetRefreshDate_UsesNextTransitionWithoutMinuteTicking() {
         let now = Date(timeIntervalSince1970: 1_001)
         let timeline = makeTimeline(
             lastMaghrib: 0,
@@ -126,7 +126,7 @@ final class WidgetPresentationTests: XCTestCase {
 
         let refreshDate = nextWidgetRefreshDate(from: now, snapshot: snapshot)
 
-        XCTAssertEqual(refreshDate.timeIntervalSince1970, 1_020, accuracy: 0.001)
+        XCTAssertEqual(refreshDate.timeIntervalSince1970, 1_300.25, accuracy: 0.001)
     }
 
     func testNextHijriDateRefreshDate_UsesNextMaghrib() {

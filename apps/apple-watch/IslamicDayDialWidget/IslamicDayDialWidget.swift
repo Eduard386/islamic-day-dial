@@ -1,6 +1,72 @@
 import SwiftUI
 import WidgetKit
 
+private enum WidgetBackgroundKey: String {
+    case fajr
+    case sunrise
+    case duha
+    case midday
+    case dhuhr
+    case asr
+    case maghrib
+    case isha
+    case lastThird
+
+    var assetName: String {
+        switch self {
+        case .fajr: return "LoadingFajr"
+        case .sunrise: return "LoadingSunrise"
+        case .duha: return "LoadingDuha"
+        case .midday: return "LoadingMidday"
+        case .dhuhr: return "LoadingDhuhr"
+        case .asr: return "LoadingAsr"
+        case .maghrib: return "LoadingMaghrib"
+        case .isha: return "LoadingIsha"
+        case .lastThird: return "LoadingLastThird"
+        }
+    }
+}
+
+private func widgetBackgroundKey(snapshot: ComputedIslamicDay, now: Date) -> WidgetBackgroundKey {
+    switch widgetCurrentPhase(snapshot: snapshot, now: now) {
+    case .maghrib_to_isha:
+        return .maghrib
+    case .isha_to_last_third:
+        return .isha
+    case .last_third_to_fajr:
+        return .lastThird
+    case .fajr_to_sunrise:
+        return .fajr
+    case .sunrise_to_dhuhr:
+        switch getSunriseToDhuhrSubPeriod(now: now, duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr) {
+        case .sunrise:
+            return .sunrise
+        case .duha:
+            return .duha
+        case .midday:
+            return .midday
+        }
+    case .dhuhr_to_asr:
+        return .dhuhr
+    case .asr_to_maghrib:
+        return .asr
+    }
+}
+
+private struct WidgetBackgroundModifier<Background: View>: ViewModifier {
+    @ViewBuilder let background: () -> Background
+
+    func body(content: Content) -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            content.containerBackground(for: .widget) {
+                background()
+            }
+        } else {
+            content.background(background())
+        }
+    }
+}
+
 private struct WidgetHijriEngravedLabelsModifier: ViewModifier {
     let isEid: Bool
 
@@ -85,7 +151,7 @@ struct IslamicDayDialProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<IslamicDayDialEntry>) -> Void) {
         Task {
             let entry = await makeEntry(date: Date(), prefersPreviewData: false)
-            let refreshDate = nextHijriDateRefreshDate(from: entry.date, snapshot: entry.snapshot)
+            let refreshDate = nextWidgetRefreshDate(from: entry.date, snapshot: entry.snapshot)
             completion(Timeline(entries: [entry], policy: .after(refreshDate)))
         }
     }
@@ -117,7 +183,9 @@ struct IslamicDayDialWidgetEntryView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .multilineTextAlignment(.center)
         .padding(8)
-        .containerBackground(Color(red: 0.06, green: 0.06, blue: 0.1), for: .widget)
+        .modifier(WidgetBackgroundModifier {
+            widgetBackground
+        })
     }
 
     private var placeholderContent: some View {
@@ -146,6 +214,30 @@ struct IslamicDayDialWidgetEntryView: View {
             Text("—")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Colors.secondaryGold)
+        }
+    }
+
+    @ViewBuilder
+    private var widgetBackground: some View {
+        if let snapshot = entry.snapshot {
+            ZStack {
+                Image(widgetBackgroundKey(snapshot: snapshot, now: entry.date).assetName)
+                    .resizable()
+                    .scaledToFill()
+                    .scaleEffect(1.12)
+                    .offset(y: -8)
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.16),
+                        Color.black.opacity(0.34)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+            .clipped()
+        } else {
+            Color(red: 0.06, green: 0.06, blue: 0.1)
         }
     }
 

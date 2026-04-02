@@ -33,7 +33,7 @@ private struct WatchLifecycleSceneProbe: View {
 
     var body: some View {
         Color.clear
-            .onChange(of: scenePhase) { _, phase in
+            .onChange(of: scenePhase) { phase in
                 watchLifecycleLog.notice(
                     "IDD_WATCH watch: scenePhase=\(String(describing: phase), privacy: .public)"
                 )

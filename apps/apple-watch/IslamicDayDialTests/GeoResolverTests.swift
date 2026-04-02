@@ -1,7 +1,7 @@
 import XCTest
 
-/// Tests for geo resolution: IP first, timezone fallback, Mecca default.
-/// Covers: empty/unknown timezone → Mecca, network failure → timezone/default, valid result structure.
+/// Tests for geo resolution: GPS first, timezone fallback, Mecca default.
+/// Covers: empty/unknown timezone → Mecca, denied/unavailable location → timezone/default, valid result structure.
 final class GeoResolverTests: XCTestCase {
 
     override func setUp() {
@@ -12,7 +12,7 @@ final class GeoResolverTests: XCTestCase {
         super.tearDown()
     }
 
-    /// resolveGeoResult always returns a valid location (IP, timezone, or Mecca).
+    /// resolveGeoResult always returns a valid location (GPS, timezone, or Mecca).
     func testResolveGeoResult_ReturnsValidLocation() async {
         let result = await resolveGeoResult()
         XCTAssertGreaterThanOrEqual(result.location.latitude, -90)
@@ -26,7 +26,6 @@ final class GeoResolverTests: XCTestCase {
         let result = await resolveGeoResult()
         switch result.source {
         case .gps: break
-        case .ip: break
         case .timezone: break
         case .default: break
         }

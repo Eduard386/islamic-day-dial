@@ -183,6 +183,25 @@ export default function App() {
             onPresetSelect={state.setSelectedPreset}
             onCurrentCity={state.applyCurrentCity}
           />
+          <section className="site-meta-card" id="support" aria-labelledby="support-title">
+            <h2 id="support-title">Support</h2>
+            <p>
+              Islamic Day Dial is designed for iPhone, Apple Watch companion use, and the iPhone widget.
+              If you need help, use the support email listed in the App Store listing.
+            </p>
+          </section>
+          <section className="site-meta-card" id="privacy" aria-labelledby="privacy-title">
+            <h2 id="privacy-title">Privacy</h2>
+            <p>
+              Location access is recommended for the most accurate prayer times and phase transitions.
+              On Apple platforms, analytics rely on App Store Connect / App Analytics rather than direct
+              third-party tracking from the app.
+            </p>
+            <p>
+              The public web dashboard may use separate website analytics. The Apple app does not require
+              account creation to work.
+            </p>
+          </section>
         </div>
       </main>
     </div>
