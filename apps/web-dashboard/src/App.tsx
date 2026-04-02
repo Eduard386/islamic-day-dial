@@ -187,7 +187,7 @@ export default function App() {
             <h2 id="support-title">Support</h2>
             <p>
               Islamic Day Dial is designed for iPhone, Apple Watch companion use, and the iPhone widget.
-              If you need help, use the support email listed in the App Store listing.
+              If you need help, contact <a href="mailto:islamicdaydial@gmail.com">islamicdaydial@gmail.com</a>.
             </p>
           </section>
           <section className="site-meta-card" id="privacy" aria-labelledby="privacy-title">
@@ -199,7 +199,7 @@ export default function App() {
             </p>
             <p>
               The public web dashboard may use separate website analytics. The Apple app does not require
-              account creation to work.
+              account creation to work. For privacy questions, contact <a href="mailto:islamicdaydial@gmail.com">islamicdaydial@gmail.com</a>.
             </p>
           </section>
         </div>

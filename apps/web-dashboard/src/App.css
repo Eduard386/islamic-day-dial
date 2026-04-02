@@ -771,6 +771,15 @@ body {
   line-height: 1.55;
 }
 
+.site-meta-card a {
+  color: var(--primary-gold);
+  text-decoration: none;
+}
+
+.site-meta-card a:hover {
+  text-decoration: underline;
+}
+
 /* ---------- Controls ---------- */
 
 .controls {

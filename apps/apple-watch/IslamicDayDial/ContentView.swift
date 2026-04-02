@@ -91,16 +91,7 @@ private func normalizedDialAngle(_ angle: Double) -> Double {
 }
 
 private func phoneHomeBackgroundScrimOpacity(for key: PhonePhaseBackgroundKey) -> Double {
-    switch key {
-    case .sunrise, .duha, .midday, .dhuhr, .asr:
-        return 0.34
-    case .maghrib:
-        return 0.21
-    case .fajr:
-        return 0.24
-    case .isha, .lastThird:
-        return 0.12
-    }
+    0
 }
 
 private func phoneOverlayScrimOpacity(isSecondaryScreenPresented: Bool) -> Double {
