@@ -15,7 +15,10 @@ private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔pe
 private let PHONE_INFO_RADIUS_EXPANSION_RATIO: CGFloat = 10 / 420
 private let PHONE_RING_DRIFT_DURATION: Double = 132
 private let PHONE_RING_DRIFT_BAND_DEG: CGFloat = 18
-private let PHONE_DUHA_CLUSTER_GAP_FACTOR: CGFloat = 0.24
+/// After global sector shrink, pull sunrise↔duha and duha↔midday arcs closer than other inter-sector gaps (see web `explodedRing` DUHA_CLUSTER).
+private let PHONE_DUHA_CLUSTER_GAP_FACTOR: CGFloat = 0.14
+/// Shortens each phone arc so gaps appear between sectors (fixed dial size; expansion still scales via `radiusScale`).
+private let PHONE_RING_EXPLODED_ARC_SCALE: CGFloat = 0.925
 
 private struct MoonPhaseParams {
     let shadowOffset: Double
@@ -279,7 +282,8 @@ func buildPhoneRingArcSpecs(
         return []
     }
 
-    let radiusScale = baseRadius / max(ringRadius, baseRadius)
+    let expansionScale = baseRadius / max(ringRadius, baseRadius)
+    let arcSpanScale = PHONE_RING_EXPLODED_ARC_SCALE * expansionScale
     let timeline = snapshot.timeline
 
     func angle(for timestamp: Date) -> Double {
@@ -294,7 +298,7 @@ func buildPhoneRingArcSpecs(
         let adjusted = adjustedArcBounds(
             startDeg: CGFloat(start),
             endDeg: CGFloat(end),
-            radiusScale: radiusScale
+            radiusScale: arcSpanScale
         )
         return PhoneRingArcSpec(
             kind: kind,
@@ -315,8 +319,6 @@ func buildPhoneRingArcSpecs(
         makeSpec(kind: .dhuhrToAsr, start: dhuhrToAsr.startAngleDeg, end: dhuhrToAsr.endAngleDeg),
         makeSpec(kind: .asrToMaghrib, start: asrToMaghrib.startAngleDeg, end: asrToMaghrib.endAngleDeg),
     ]
-
-    guard ringRadius > baseRadius else { return specs }
 
     return tightenedPhoneDuhaCluster(specs: specs, gapFactor: PHONE_DUHA_CLUSTER_GAP_FACTOR)
 }
