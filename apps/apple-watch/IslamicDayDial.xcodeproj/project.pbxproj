@@ -99,6 +99,7 @@
 		FCF1651DCC07EE4821CF4145 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A616ADCAF43A68D76AB049 /* Geometry.swift */; };
 		FECE7BB77A83000ED472BA60 /* RingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684C8B93B4B6CAD8AC39EEC1 /* RingView.swift */; };
 		FFE4EB7ADDCEECC9061DC718 /* Ring.swift in Sources */ = {isa = PBXBuildFile; fileRef = B760D9D0257F4809C03962AA /* Ring.swift */; };
+		A203B4C55D6E78901F2A3B4C /* ScheherazadeNew-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -198,6 +199,7 @@
 		E62613E106128F27FFA2118A /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
 		F5FC7B4E3A74A600017506DB /* IslamicDayDialWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWatchApp.swift; sourceTree = "<group>"; };
 		F618B8CDAF9F87887992E08F /* DuhaStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuhaStartTests.swift; sourceTree = "<group>"; };
+		F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ScheherazadeNew-Regular.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -286,6 +288,7 @@
 			isa = PBXGroup;
 			children = (
 				980A19E58FF771E3ADFC7D4D /* Assets.xcassets */,
+				F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */,
 				B8D4E76B6C1A49D289148AA3 /* Config.xcconfig */,
 				6BADD107DFD9B46327A36775 /* Config.xcconfig.example */,
 				D3715B31AE84BE3336BA0F3D /* ContentView.swift */,
@@ -489,6 +492,7 @@
 			files = (
 				D32E7B21E7DA15BBF0A9F6A9 /* Assets.xcassets in Resources */,
 				75AE222AD747118DF48DB6B6 /* Config.xcconfig.example in Resources */,
+				A203B4C55D6E78901F2A3B4C /* ScheherazadeNew-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,6 +658,7 @@
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IslamicDayDial/AppInfoAdditions.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Islamic Day Dial";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Islamic Day Dial uses your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -923,6 +928,7 @@
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IslamicDayDial/AppInfoAdditions.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Islamic Day Dial";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Islamic Day Dial uses your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

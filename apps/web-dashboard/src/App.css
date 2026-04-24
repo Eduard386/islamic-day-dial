@@ -146,10 +146,10 @@ body {
 /* Quran 9:36 — как раньше (тот же масштаб, что у заголовка до укрупнения) */
 .header-ayah {
   color: var(--warm-sacred-white);
-  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
   font-size: var(--header-main-size);
-  font-weight: 500;
-  line-height: 1.85;
+  font-weight: 400;
+  line-height: 2;
   direction: rtl;
   max-width: min(34em, 100%);
   margin: 0 auto 20px;
@@ -246,9 +246,10 @@ body {
 
 .desktop-months-ayah {
   color: #ede8df;
-  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
   font-size: clamp(1.45rem, 2.6vw, 1.85rem);
-  line-height: 1.55;
+  font-weight: 400;
+  line-height: 1.92;
   text-align: center;
   width: 100%;
   margin: 0;
@@ -1239,9 +1240,10 @@ button.center-date.center-date-clickable {
 
 .desktop-reading-block--arabic {
   color: var(--warm-sacred-white);
-  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
   font-size: 1.55rem;
-  line-height: 1.58;
+  font-weight: 400;
+  line-height: 1.92;
   text-align: right;
 }
 
@@ -1259,6 +1261,281 @@ button.center-date.center-date-clickable {
   line-height: 1.4;
 }
 
+/* ---------- Dalil reading column (black field, gold accents) ---------- */
+.desktop-reading-panel--dalil.desktop-reading-panel--content {
+  background: #000000;
+}
+
+.desktop-reading-panel--dalil .desktop-reading-panel-foreground.desktop-dalil-foreground {
+  padding: 0;
+  background: #000000;
+}
+
+.desktop-dalil-top-bar {
+  display: grid;
+  grid-template-columns: minmax(44px, 1fr) auto minmax(44px, 1fr);
+  align-items: center;
+  min-height: 56px;
+  padding: 10px 16px 14px;
+  box-sizing: border-box;
+  border-bottom: 0.5px solid rgba(199, 161, 91, 0.25);
+}
+
+.desktop-dalil-back {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #f2ebdd;
+  cursor: pointer;
+  font: inherit;
+  justify-self: start;
+  padding: 8px 4px;
+  opacity: 0.95;
+}
+
+.desktop-dalil-back:hover {
+  opacity: 1;
+}
+
+.desktop-dalil-back--trailing {
+  justify-self: end;
+  text-align: right;
+}
+
+.desktop-dalil-back-chevron {
+  display: block;
+  font-size: 1.65rem;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.desktop-dalil-title {
+  margin: 0;
+  text-align: center;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', 'Times New Roman', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #f2ebdd;
+}
+
+.desktop-dalil-top-spacer {
+  width: 44px;
+  height: 1px;
+  justify-self: end;
+}
+
+.desktop-dalil-close-text {
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  color: rgba(242, 235, 221, 0.78);
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.desktop-dalil-scroll {
+  padding: 28px 24px 40px;
+  gap: 0;
+}
+
+.desktop-dalil-entries {
+  max-width: 32rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.desktop-dalil-section-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0 0 1.35rem;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(199, 161, 91, 0.92);
+}
+
+.desktop-dalil-section-ornament {
+  width: 3.5px;
+  height: 3.5px;
+  background: rgba(199, 161, 91, 0.88);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.desktop-dalil-entry:not(:first-child) .desktop-dalil-section-label {
+  padding-top: 0.35rem;
+}
+
+.desktop-dalil-arabic {
+  margin: 0 auto 2rem;
+  text-align: center;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  font-size: clamp(1.65rem, 2.1vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.92;
+  color: #f2ebdd;
+  max-width: 40rem;
+}
+
+.desktop-dalil-english {
+  margin: 0 auto 1.35rem;
+  text-align: center;
+  max-width: 26rem;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: clamp(1.05rem, 1.25vw, 1.2rem);
+  line-height: 1.62;
+  color: #d8cfc1;
+}
+
+.desktop-dalil-english--prose {
+  text-align: left;
+  max-width: 24rem;
+}
+
+.desktop-dalil-source {
+  margin: 0 auto 2.5rem;
+  text-align: center;
+  max-width: 28rem;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(199, 161, 91, 0.9);
+}
+
+.desktop-dalil-entry:last-child .desktop-dalil-source {
+  margin-bottom: 1.25rem;
+}
+
+.desktop-dalil-between-entries {
+  margin: 0 auto 2.75rem;
+  max-width: 20rem;
+  padding: 0 0.25rem;
+}
+
+.desktop-dalil-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.desktop-dalil-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(199, 161, 91, 0.25);
+  border-radius: 1px;
+}
+
+.desktop-dalil-divider-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(184, 152, 110, 0.72);
+  flex-shrink: 0;
+}
+
+.desktop-dalil-divider-rosette {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.92;
+  flex-shrink: 0;
+  display: block;
+}
+
+.desktop-dalil-technical-link {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgba(199, 161, 91, 0.85);
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  margin: 2.5rem auto 0;
+  display: block;
+  text-align: center;
+}
+
+.desktop-dalil-scroll--technical {
+  padding: 28px 24px 40px;
+}
+
+/* Technical details — same black field, gold cadence, and ornaments as Dalil */
+.desktop-technical-entries {
+  max-width: 32rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.desktop-technical-entry {
+  margin: 0;
+}
+
+.desktop-technical-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0 0 1.35rem;
+  text-align: center;
+}
+
+.desktop-technical-entry:not(:first-child) .desktop-technical-section-heading {
+  padding-top: 0.35rem;
+}
+
+.desktop-technical-section-heading-text {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: rgba(199, 161, 91, 0.92);
+}
+
+.desktop-technical-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.desktop-technical-block {
+  margin: 0;
+}
+
+.desktop-technical-label-line {
+  margin: 0 0 0.45rem;
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(199, 161, 91, 0.88);
+}
+
+.desktop-technical-detail-paragraph {
+  margin: 0;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: clamp(1.02rem, 1.15vw, 1.12rem);
+  font-weight: 400;
+  line-height: 1.68;
+  color: #d8cfc1;
+  text-align: left;
+  max-width: 28rem;
+}
+
+.desktop-technical-between-sections {
+  margin-top: 0.5rem;
+}
+
 .desktop-technical-link {
   appearance: none;
   border: 0;
@@ -1271,47 +1548,6 @@ button.center-date.center-date-clickable {
   cursor: pointer;
   align-self: center;
   padding: 4px 0 0;
-}
-
-.desktop-technical-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.desktop-technical-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.desktop-technical-heading {
-  color: var(--warm-sacred-white);
-  font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 1.08rem;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.desktop-technical-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.desktop-technical-line {
-  color: var(--soft-quote-white);
-  font-size: 0.98rem;
-  line-height: 1.5;
-}
-
-.desktop-technical-label {
-  color: var(--warm-sacred-white);
-  font-weight: 600;
-}
-
-.desktop-technical-detail {
-  color: var(--soft-quote-white);
 }
 
 .desktop-still-shell {

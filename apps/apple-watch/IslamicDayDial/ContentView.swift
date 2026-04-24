@@ -31,7 +31,7 @@ private let PHONE_PANEL_VERTICAL_PADDING: CGFloat = 22
 private let PHONE_SECONDARY_SCREEN_OFFSET: CGFloat = 18
 private let PHONE_DUST_TINT = Color(red: 0.23, green: 0.18, blue: 0.13)
 private let PHONE_DRY_SHADE = Color(red: 0.06, green: 0.05, blue: 0.04)
-private let PHONE_INSIGHT_AYAH_AR = "قال الله تعالى: إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
+private let PHONE_INSIGHT_AYAH_AR = "قَالَ اللَّهُ تَعَالَى: إِنَّ عِدَّةَ الشُّهُورِ عِنْدَ اللَّهِ اثْنَا عَشَرَ شَهْرًا"
 private let PHONE_INSIGHT_AYAH_EN = "Allah, the Exalted, said:\"Indeed, the number of months ordained by Allah is twelve\" [9:36]"
 private let PHONE_HIJRI_MONTH_NAMES = [
     "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
@@ -40,7 +40,7 @@ private let PHONE_HIJRI_MONTH_NAMES = [
 ]
 private let PHONE_JIBRIL_GROUP_ONE: Set<String> = ["Dhuhr", "Asr", "Maghrib", "Isha", "Fajr"]
 private let PHONE_JIBRIL_GROUP_TWO: Set<String> = ["Sunrise", "Duha", "Midday"]
-private let PHONE_JIBRIL_HADITH_AR = "قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أَمَّنِي جِبْرِيلُ عَلَيْهِ السَّلاَمُ عِنْدَ الْبَيْتِ مَرَّتَيْنِ فَصَلَّى بِيَ الظُّهْرَ حِينَ زَالَتِ الشَّمْسُ وَكَانَتْ قَدْرَ الشِّرَاكِ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ - يَعْنِي الْمَغْرِبَ - حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ حِينَ غَابَ الشَّفَقُ وَصَلَّى بِيَ الْفَجْرَ حِينَ حَرُمَ الطَّعَامُ وَالشَّرَابُ عَلَى الصَّائِمِ فَلَمَّا كَانَ الْغَدُ صَلَّى بِيَ الظُّهْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَيْهِ وَصَلَّى بِيَ الْمَغْرِبَ حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ إِلَى ثُلُثِ اللَّيْلِ وَصَلَّى بِيَ الْفَجْرَ فَأَسْفَرَ ثُمَّ الْتَفَتَ إِلَىَّ فَقَالَ يَا مُحَمَّدُ هَذَا وَقْتُ الأَنْبِيَاءِ مِنْ قَبْلِكَ وَالْوَقْتُ مَا بَيْنَ هَذَيْنِ الْوَقْتَيْنِ ‏\"‏ ‏."
+private let PHONE_JIBRIL_HADITH_AR = "قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ‏ \"‏ أَمَّنِي جِبْرِيلُ عَلَيْهِ السَّلاَمُ عِنْدَ الْبَيْتِ مَرَّتَيْنِ فَصَلَّى بِيَ الظُّهْرَ حِينَ زَالَتِ الشَّمْسُ وَكَانَتْ قَدْرَ الشِّرَاكِ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ - يَعْنِي الْمَغْرِبَ - حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ حِينَ غَابَ الشَّفَقُ وَصَلَّى بِيَ الْفَجْرَ حِينَ حَرُمَ الطَّعَامُ وَالشَّرَابُ عَلَى الصَّائِمِ فَلَمَّا كَانَ الْغَدُ صَلَّى بِيَ الظُّهْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَيْهِ وَصَلَّى بِيَ الْمَغْرِبَ حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ إِلَى ثُلُثِ اللَّيْلِ وَصَلَّى بِيَ الْفَجْرَ فَأَسْفَرَ ثُمَّ الْتَفَتَ إِلَىَّ فَقَالَ يَا مُحَمَّدُ هَذَا وَقْتُ الأَنْبِيَاءِ مِنْ قَبْلِكَ وَالْوَقْتُ مَا بَيْنَ هَذَيْنِ الْوَقْتَيْنِ ‏\"‏ ‏."
 private let PHONE_JIBRIL_HADITH_EN = """
 The Messenger of Allah (ﷺ) said: Gabriel (ﷺ) led me in prayer at the House (i.e. the Ka'bah). He prayed the noon prayer with me when the sun had passed the meridian to the extent of the thong of a sandal; he prayed the afternoon prayer with me when the shadow of everything was as long as itself; he prayed the sunset prayer with me when one who is fasting breaks the fast; he prayed the night prayer with me when the twilight had ended; and he prayed the dawn prayer with me when food and drink become forbidden to one who is keeping the fast.
 
@@ -48,21 +48,21 @@ On the following day he prayed the noon prayer with me when his shadow was as lo
 
 Then turning to me he said: Muhammad, this is the time observed by the prophets before you, and the time is anywhere between two times.
 """
-private let PHONE_DUHA_HADITH_ONE_AR = "حَدَّثَنَا أَبُو جَعْفَرٍ السِّمْنَانِيُّ، حَدَّثَنَا أَبُو مُسْهِرٍ، حَدَّثَنَا إِسْمَاعِيلُ بْنُ عَيَّاشٍ، عَنْ بَحِيرِ بْنِ سَعْدٍ، عَنْ خَالِدِ بْنِ مَعْدَانَ، عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، عَنْ أَبِي الدَّرْدَاءِ، وَأَبِي، ذَرٍّ عَنْ رَسُولِ اللَّهِ صلى الله عليه وسلم ‏ \"‏ عَنِ اللَّهِ، عَزَّ وَجَلَّ أَنَّهُ قَالَ ابْنَ آدَمَ ارْكَعْ لِي مِنْ أَوَّلِ النَّهَارِ أَرْبَعَ رَكَعَاتٍ أَكْفِكَ آخِرَهُ ‏\"‏."
+private let PHONE_DUHA_HADITH_ONE_AR = "حَدَّثَنَا أَبُو جَعْفَرٍ السِّمْنَانِيُّ، حَدَّثَنَا أَبُو مُسْهِرٍ، حَدَّثَنَا إِسْمَاعِيلُ بْنُ عَيَّاشٍ، عَنْ بَحِيرِ بْنِ سَعْدٍ، عَنْ خَالِدِ بْنِ مَعْدَانَ، عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، عَنْ أَبِي الدَّرْدَاءِ، وَأَبِي، ذَرٍّ عَنْ رَسُولِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ‏ \"‏ عَنِ اللَّهِ، عَزَّ وَجَلَّ أَنَّهُ قَالَ ابْنَ آدَمَ ارْكَعْ لِي مِنْ أَوَّلِ النَّهَارِ أَرْبَعَ رَكَعَاتٍ أَكْفِكَ آخِرَهُ ‏\"‏."
 private let PHONE_DUHA_HADITH_ONE_EN = "Allah's Messenger narrated that Allah, Blessed and Most High said: \"Son of Adam: Perform four Rak'ah for Me in the beginning of the day it will suffice you for the latter part of it\"."
-private let PHONE_DUHA_HADITH_TWO_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مُحَمَّدِ بْنِ أَسْمَاءَ الضُّبَعِيُّ، حَدَّثَنَا مَهْدِيٌّ، - وَهُوَ ابْنُ مَيْمُونٍ - حَدَّثَنَا وَاصِلٌ، مَوْلَى أَبِي عُيَيْنَةَ عَنْ يَحْيَى بْنِ عُقَيْلٍ، عَنْ يَحْيَى بْنِ يَعْمَرَ، عَنْ أَبِي الأَسْوَدِ الدُّؤَلِيِّ، عَنْ أَبِي ذَرٍّ، عَنِ النَّبِيِّ صلى الله عليه وسلم أَنَّهُ قَالَ ‏ \"‏ يُصْبِحُ عَلَى كُلِّ سُلاَمَى مِنْ أَحَدِكُمْ صَدَقَةٌ فَكُلُّ تَسْبِيحَةٍ صَدَقَةٌ وَكُلُّ تَحْمِيدَةٍ صَدَقَةٌ وَكُلُّ تَهْلِيلَةٍ صَدَقَةٌ وَكُلُّ تَكْبِيرَةٍ صَدَقَةٌ وَأَمْرٌ بِالْمَعْرُوفِ صَدَقَةٌ وَنَهْىٌ عَنِ الْمُنْكَرِ صَدَقَةٌ وَيُجْزِئُ مِنْ ذَلِكَ رَكْعَتَانِ يَرْكَعُهُمَا مِنَ الضُّحَى‏\"."
+private let PHONE_DUHA_HADITH_TWO_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مُحَمَّدِ بْنِ أَسْمَاءَ الضُّبَعِيُّ، حَدَّثَنَا مَهْدِيٌّ، - وَهُوَ ابْنُ مَيْمُونٍ - حَدَّثَنَا وَاصِلٌ، مَوْلَى أَبِي عُيَيْنَةَ عَنْ يَحْيَى بْنِ عُقَيْلٍ، عَنْ يَحْيَى بْنِ يَعْمَرَ، عَنْ أَبِي الأَسْوَدِ الدُّؤَلِيِّ، عَنْ أَبِي ذَرٍّ، عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ أَنَّهُ قَالَ ‏ \"‏ يُصْبِحُ عَلَى كُلِّ سُلاَمَى مِنْ أَحَدِكُمْ صَدَقَةٌ فَكُلُّ تَسْبِيحَةٍ صَدَقَةٌ وَكُلُّ تَحْمِيدَةٍ صَدَقَةٌ وَكُلُّ تَهْلِيلَةٍ صَدَقَةٌ وَكُلُّ تَكْبِيرَةٍ صَدَقَةٌ وَأَمْرٌ بِالْمَعْرُوفِ صَدَقَةٌ وَنَهْىٌ عَنِ الْمُنْكَرِ صَدَقَةٌ وَيُجْزِئُ مِنْ ذَلِكَ رَكْعَتَانِ يَرْكَعُهُمَا مِنَ الضُّحَى‏\"."
 private let PHONE_DUHA_HADITH_TWO_EN = "Abu Dharr reported Allah's Apostle (ﷺ) as saying: \"In the morning charity is due from every bone in the body of every one of you. Every utterance of Allah's glorification is an act of charity. Every utterance of praise of Him is an act of charity, every utterance of profession of His Oneness is an act of charity, every utterance of profession of His Greatness is an act of charity, enjoining good is an act of charity, forbidding what is distreputable is an act of charity, and two rak'ahs which one prays in the forenoon will suffice\"."
-private let PHONE_DUHA_HADITH_THREE_AR = "قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏صَلِّ صَلاَةَ الصُّبْحِ ثُمَّ أَقْصِرْ عَنِ الصَّلاَةِ حَتَّى تَطْلُعَ الشَّمْسُ حَتَّى تَرْتَفِعَ فَإِنَّهَا تَطْلُعُ حِينَ تَطْلُعُ بَيْنَ قَرْنَىْ شَيْطَانٍ وَحِينَئِذٍ يَسْجُدُ لَهَا الْكُفَّارُ ثُمَّ صَلِّ فَإِنَّ الصَّلاَةَ مَشْهُودَةٌ مَحْضُورَةٌ حَتَّى يَسْتَقِلَّ الظِّلُّ بِالرُّمْحِ ثُمَّ أَقْصِرْ عَنِ الصَّلاَةِ فَإِنَّ حِينَئِذٍ تُسْجَرُ جَهَنَّمُ”"
+private let PHONE_DUHA_HADITH_THREE_AR = "قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ‏\"‏صَلِّ صَلاَةَ الصُّبْحِ ثُمَّ أَقْصِرْ عَنِ الصَّلاَةِ حَتَّى تَطْلُعَ الشَّمْسُ حَتَّى تَرْتَفِعَ فَإِنَّهَا تَطْلُعُ حِينَ تَطْلُعُ بَيْنَ قَرْنَىْ شَيْطَانٍ وَحِينَئِذٍ يَسْجُدُ لَهَا الْكُفَّارُ ثُمَّ صَلِّ فَإِنَّ الصَّلاَةَ مَشْهُودَةٌ مَحْضُورَةٌ حَتَّى يَسْتَقِلَّ الظِّلُّ بِالرُّمْحِ ثُمَّ أَقْصِرْ عَنِ الصَّلاَةِ فَإِنَّ حِينَئِذٍ تُسْجَرُ جَهَنَّمُ ‏\"‏."
 private let PHONE_DUHA_HADITH_THREE_EN = "Messenger of Allah (ﷺ) said: “Observe the dawn prayer, then stop praying when the sun is rising till it is fully up, for when it rises it comes up between the horns of Satan, and the unbelievers prostrate themselves to it at that time. Then pray, for the prayer is witnessed and attended (by angels) till the shadow becomes about the length of a lance; then cease prayer, for at that time Hell is heated up.”"
-private let PHONE_LAST_THIRD_HADITH_AR = "أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ فَيَقُولُ مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ وَمَنْ يَسْأَلُنِي فَأُعْطِيَهُ وَمَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ ‏\"‏.‏"
+private let PHONE_LAST_THIRD_HADITH_AR = "أَنَّ رَسُولَ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ ‏ \"يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الْآخِرِ فَيَقُولُ مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ وَمَنْ يَسْأَلُنِي فَأُعْطِيَهُ وَمَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ ‏\"‏.‏"
 private let PHONE_LAST_THIRD_HADITH_EN = "Allah's Messenger (ﷺ) said, \"Our Lord, the Blessed and the Exalted, descends every night to the lowest heaven when one-third of the latter part of the night is left, and says: Who supplicates Me so that I may answer him? Who asks Me so that I may give to him? Who asks Me forgiveness so that I may forgive him?\""
-private let PHONE_JUMUAH_AYAH_AR = "قال الله تعالى: يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوٓا۟ إِذَا نُودِىَ لِلصَّلَوٰةِ مِن يَوْمِ ٱلْجُمُعَةِ فَٱسْعَوْا۟ إِلَىٰ ذِكْرِ ٱللَّهِ وَذَرُوا۟ ٱلْبَيْعَ ۚ ذَٰلِكُمْ خَيْرٌۭ لَّكُمْ إِن كُنتُمْ تَعْلَمُونَ"
+private let PHONE_JUMUAH_AYAH_AR = "قَالَ اللَّهُ تَعَالَى: يَـٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوٓا۟ إِذَا نُودِىَ لِلصَّلَوٰةِ مِن يَوْمِ ٱلْجُمُعَةِ فَٱسْعَوْا۟ إِلَىٰ ذِكْرِ ٱللَّهِ وَذَرُوا۟ ٱلْبَيْعَ ۚ ذَٰلِكُمْ خَيْرٌۭ لَّكُمْ إِن كُنتُمْ تَعْلَمُونَ"
 private let PHONE_JUMUAH_AYAH_EN = "Allah, the Exalted, said: \"O believers! When the call to prayer is made on Friday, then proceed (diligently) to the remembrance of Allah and leave off (your) business. That is best for you, if only you knew\" [62:9]"
-private let PHONE_JUMUAH_HADITH_ONE_AR = "عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"الْجُمُعَةُ حَقٌّ وَاجِبٌ عَلَى كُلِّ مُسْلِمٍ فِي جَمَاعَةٍ إِلاَّ أَرْبَعَةً عَبْدٌ مَمْلُوكٌ أَوِ امْرَأَةٌ أَوْ صَبِيٌّ أَوْ مَرِيضٌ‏\""
+private let PHONE_JUMUAH_HADITH_ONE_AR = "عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ ‏ \"الْجُمُعَةُ حَقٌّ وَاجِبٌ عَلَى كُلِّ مُسْلِمٍ فِي جَمَاعَةٍ إِلاَّ أَرْبَعَةً عَبْدٌ مَمْلُوكٌ أَوِ امْرَأَةٌ أَوْ صَبِيٌّ أَوْ مَرِيضٌ‏\""
 private let PHONE_JUMUAH_HADITH_ONE_EN = "The Prophet (ﷺ) said: \"The Friday prayer in congregation is a necessary duty for every Muslim, with four exceptions; a slave, a woman, a boy, and a sick person.\""
-private let PHONE_JUMUAH_HADITH_TWO_AR = "عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"مَنِ اغْتَسَلَ ثُمَّ أَتَى الْجُمُعَةَ فَصَلَّى مَا قُدِّرَ لَهُ ثُمَّ أَنْصَتَ حَتَّى يَفْرُغَ مِنْ خُطْبَتِهِ ثُمَّ يُصَلِّيَ مَعَهُ غُفِرَ لَهُ مَا بَيْنَهُ وَبَيْنَ الْجُمُعَةِ الأُخْرَى وَفَضْلَ ثَلاَثَةِ أَيَّامٍ‏\"‏‏"
+private let PHONE_JUMUAH_HADITH_TWO_AR = "عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ ‏ \"مَنِ اغْتَسَلَ ثُمَّ أَتَى الْجُمُعَةَ فَصَلَّى مَا قُدِّرَ لَهُ ثُمَّ أَنْصَتَ حَتَّى يَفْرُغَ مِنْ خُطْبَتِهِ ثُمَّ يُصَلِّيَ مَعَهُ غُفِرَ لَهُ مَا بَيْنَهُ وَبَيْنَ الْجُمُعَةِ الأُخْرَى وَفَضْلَ ثَلاَثَةِ أَيَّامٍ‏\"‏‏"
 private let PHONE_JUMUAH_HADITH_TWO_EN = "The Prophet (ﷺ) said: \"He who took a bath and then came for Jumu'ah prayer and then prayed what was fixed for him, then kept silence till the Imam finished the sermon, and then prayed along with him, his sins between that time and the next Friday would be forgiven, and even of three days more.\""
-private let PHONE_JUMUAH_HADITH_THREE_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ نَافِعٍ، عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يُصَلِّي قَبْلَ الظُّهْرِ رَكْعَتَيْنِ، وَبَعْدَهَا رَكْعَتَيْنِ، وَبَعْدَ الْمَغْرِبِ رَكْعَتَيْنِ فِي بَيْتِهِ، وَبَعْدَ الْعِشَاءِ رَكْعَتَيْنِ وَكَانَ لاَ يُصَلِّي بَعْدَ الْجُمُعَةِ حَتَّى يَنْصَرِفَ فَيُصَلِّي رَكْعَتَيْنِ‏.‏"
+private let PHONE_JUMUAH_HADITH_THREE_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ نَافِعٍ، عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ، أَنَّ رَسُولَ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ كَانَ يُصَلِّي قَبْلَ الظُّهْرِ رَكْعَتَيْنِ، وَبَعْدَهَا رَكْعَتَيْنِ، وَبَعْدَ الْمَغْرِبِ رَكْعَتَيْنِ فِي بَيْتِهِ، وَبَعْدَ الْعِشَاءِ رَكْعَتَيْنِ وَكَانَ لاَ يُصَلِّي بَعْدَ الْجُمُعَةِ حَتَّى يَنْصَرِفَ فَيُصَلِّي رَكْعَتَيْنِ‏.‏"
 private let PHONE_JUMUAH_HADITH_THREE_EN = "Narrated `Abdullah bin `Umar: Allah's Messenger (ﷺ) used to pray two rak`at before the Zuhr prayer and two rak`at after it. He also used to pray two rak`at after the Maghrib prayer in his house, and two rak`at after the `Isha' prayer. He never prayed after Jumu'ah prayer till he departed (from the Mosque), and then he would pray two rak`at at home."
 
 private func phoneSelectionHaptic() {
@@ -93,14 +93,13 @@ private func phoneTextFont(size: CGFloat, weight: Font.Weight = .regular) -> Fon
     .system(size: size, weight: weight, design: .default)
 }
 
+/// Arabic UI text uses **Scheherazade New** only. Add `ScheherazadeNew-Regular.ttf` (or variable font) to the app target
+/// and list it under “Fonts provided by application” in Info.plist so these names resolve.
 private func phoneArabicUIFont(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
     let preferredNames: [String] = [
-        "Amiri-Regular",
-        "Amiri",
-        "NotoNaskhArabic-Medium",
-        "NotoNaskhArabic-Regular",
-        "Noto Naskh Arabic",
-        "SFArabic-Regular"
+        "ScheherazadeNew-Regular",
+        "ScheherazadeNew",
+        "Scheherazade New",
     ]
     for name in preferredNames {
         if let font = UIFont(name: name, size: size) {
@@ -997,6 +996,8 @@ private struct PhoneOverlaySheet<Content: View>: View {
     let isCentered: Bool
     let tone: PhoneSurfaceTone
     let style: PhoneOverlaySheetStyle
+    /// When true, full-screen overlay uses solid black (Dalil reading) instead of manuscript gradients.
+    let solidBlackBackdrop: Bool
     let onTapDismiss: (() -> Void)?
     private let content: Content
 
@@ -1006,6 +1007,7 @@ private struct PhoneOverlaySheet<Content: View>: View {
         isCentered: Bool = false,
         tone: PhoneSurfaceTone = .standard,
         style: PhoneOverlaySheetStyle = .panel,
+        solidBlackBackdrop: Bool = false,
         onTapDismiss: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
@@ -1014,6 +1016,7 @@ private struct PhoneOverlaySheet<Content: View>: View {
         self.isCentered = isCentered
         self.tone = tone
         self.style = style
+        self.solidBlackBackdrop = solidBlackBackdrop
         self.onTapDismiss = onTapDismiss
         self.content = content()
     }
@@ -1039,37 +1042,45 @@ private struct PhoneOverlaySheet<Content: View>: View {
 
             case .fullScreen:
                 ZStack {
-                    LinearGradient(
-                        colors: [
-                            tone.fillTop.opacity(0.99),
-                            tone.fillBottom.opacity(1)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+                    Group {
+                        if solidBlackBackdrop {
+                            Color.black
+                        } else {
+                            LinearGradient(
+                                colors: [
+                                    tone.fillTop.opacity(0.99),
+                                    tone.fillBottom.opacity(1)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
+                    }
                     .ignoresSafeArea()
 
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.16),
-                            Color.clear,
-                            PHONE_DUST_TINT.opacity(0.08)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .blendMode(.multiply)
-                    .ignoresSafeArea()
+                    if !solidBlackBackdrop {
+                        LinearGradient(
+                            colors: [
+                                Color.black.opacity(0.16),
+                                Color.clear,
+                                PHONE_DUST_TINT.opacity(0.08)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .blendMode(.multiply)
+                        .ignoresSafeArea()
+                    }
 
                     content
                         .frame(
-                            maxWidth: min(containerSize.width - 36, 420),
+                            maxWidth: solidBlackBackdrop ? .infinity : min(containerSize.width - 36, 420),
                             maxHeight: .infinity,
                             alignment: .top
                         )
-                        .padding(.horizontal, 18)
-                        .padding(.top, max(28, containerSize.height * 0.058))
-                        .padding(.bottom, max(26, containerSize.height * 0.05))
+                        .padding(.horizontal, solidBlackBackdrop ? 0 : 18)
+                        .padding(.top, solidBlackBackdrop ? 0 : max(28, containerSize.height * 0.058))
+                        .padding(.bottom, solidBlackBackdrop ? 0 : max(26, containerSize.height * 0.05))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
@@ -1151,7 +1162,7 @@ private struct PhoneHijriMonthsSheetView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .center, spacing: 0) {
                         Text(PHONE_INSIGHT_AYAH_AR)
-                            .font(phoneArabicFont(size: ayahSize, weight: .medium))
+                            .font(phoneArabicFont(size: ayahSize, weight: .regular))
                             .foregroundColor(PHONE_HIJRI_MONTHS_IVORY)
                             .multilineTextAlignment(.center)
                             .lineSpacing(10)
@@ -1349,6 +1360,93 @@ private struct PhoneSecondaryScreenContainer: View {
                 onReturnToDalil: { onShowDalil(title) }
             )
         }
+    }
+}
+
+// MARK: - Dalil (evidence) reading chrome
+
+private enum PhoneDalilChrome {
+    static let arabicIvory = Color(red: 0.949, green: 0.922, blue: 0.867) // #F2EBDD
+    static let englishMist = Color(red: 0.847, green: 0.812, blue: 0.757) // #D8CFC1
+    static let accentGold = Color(red: 199 / 255, green: 161 / 255, blue: 91 / 255) // #C7A15B
+
+    private static let sectionLabels = [
+        "الدَّلِيلُ الأَوَّلُ",
+        "الدَّلِيلُ الثَّانِي",
+        "الدَّلِيلُ الثَّالِثُ",
+        "الدَّلِيلُ الرَّابِعُ",
+        "الدَّلِيلُ الْخَامِسُ",
+        "الدَّلِيلُ السَّادِسُ",
+        "الدَّلِيلُ السَّابِعُ",
+        "الدَّلِيلُ الثَّامِنُ",
+    ]
+
+    static func sectionLabel(at index: Int) -> String {
+        guard index >= 0, index < sectionLabels.count else { return sectionLabels[0] }
+        return sectionLabels[index]
+    }
+}
+
+private struct DalilDiamondGlyph: View {
+    var body: some View {
+        Rectangle()
+            .fill(PhoneDalilChrome.accentGold.opacity(0.88))
+            .frame(width: 3, height: 3)
+            .rotationEffect(.degrees(45))
+    }
+}
+
+private struct DalilSectionLabelRow: View {
+    let index: Int
+    let layoutWidth: CGFloat
+
+    private var labelSize: CGFloat {
+        min(layoutWidth * 0.038, 14.5)
+    }
+
+    var body: some View {
+        HStack(spacing: 9) {
+            DalilDiamondGlyph()
+            Text(PhoneDalilChrome.sectionLabel(at: index))
+                .font(.system(size: labelSize, weight: .medium, design: .default))
+                .tracking(0.6)
+                .foregroundStyle(PhoneDalilChrome.accentGold.opacity(0.92))
+            DalilDiamondGlyph()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, index == 0 ? 8 : 36)
+        .padding(.bottom, 22)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct DalilOrnamentalRule: View {
+    let maxWidth: CGFloat
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Rectangle()
+                .fill(PhoneDalilChrome.accentGold.opacity(0.25))
+                .frame(height: 0.5)
+                .frame(maxWidth: .infinity)
+            Circle()
+                .fill(PhoneDalilChrome.accentGold.opacity(0.72))
+                .frame(width: 2.5, height: 2.5)
+            Image("HijriOrnamentDivider")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 26, height: 26)
+                .opacity(0.92)
+            Circle()
+                .fill(PhoneDalilChrome.accentGold.opacity(0.72))
+                .frame(width: 2.5, height: 2.5)
+            Rectangle()
+                .fill(PhoneDalilChrome.accentGold.opacity(0.25))
+                .frame(height: 0.5)
+                .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: maxWidth)
+        .accessibilityHidden(true)
     }
 }
 
@@ -1662,37 +1760,107 @@ private struct PhoneSectorTitleSpotlightView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private func dalilSourceDisplay(_ raw: String) -> String {
+        let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.hasPrefix("—") || t.hasPrefix("–") || t.hasPrefix("-") { return t }
+        return "— \(t)"
+    }
+
     @ViewBuilder
-    private func readingPassageGroup(_ passage: ReadingPassage) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+    private func dalilTopBar(safeTop: CGFloat) -> some View {
+        let titleSize = min(containerSize.width * 0.048, 19)
+        let chevSize = min(containerSize.width * 0.042, 17)
+        ZStack {
+            HStack {
+                Button {
+                    phoneSelectionHaptic()
+                    onDismiss()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: chevSize, weight: .medium))
+                        .foregroundStyle(PhoneDalilChrome.arabicIvory.opacity(0.95))
+                }
+                .buttonStyle(.plain)
+                Spacer()
+            }
+            Text("Dalil")
+                .font(.system(size: titleSize, weight: .regular, design: .serif))
+                .foregroundStyle(PhoneDalilChrome.arabicIvory.opacity(0.96))
+        }
+        .padding(.horizontal, 18)
+        .padding(.top, max(safeTop + 6, 16))
+        .padding(.bottom, 14)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(PhoneDalilChrome.accentGold.opacity(0.25))
+                .frame(height: 0.55)
+        }
+    }
+
+    @ViewBuilder
+    private func dalilEntryView(entryIndex: Int, passage: ReadingPassage) -> some View {
+        let layoutWidth = containerSize.width
+        let arabicSize = min(layoutWidth * 0.09, 40)
+        let englishSize = min(layoutWidth * 0.048, 21)
+        let sourceSize = min(layoutWidth * 0.04, 14.5)
+        let isLongEnglish = passage.english.count >= 220
+
+        VStack(alignment: .center, spacing: 0) {
+            DalilSectionLabelRow(index: entryIndex, layoutWidth: layoutWidth)
+
             Text(passage.arabic)
-                .font(phoneArabicFont(size: min(containerSize.width * 0.06, 22.5), weight: .medium))
-                .foregroundColor(PHONE_SACRED_WHITE.opacity(0.95))
-                .multilineTextAlignment(.trailing)
-                .lineSpacing(min(containerSize.width * 0.037, 14.5))
-                .frame(maxWidth: min(containerSize.width - 44, 352), alignment: .trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.bottom, 22)
+                .font(phoneArabicFont(size: arabicSize, weight: .regular))
+                .foregroundStyle(PhoneDalilChrome.arabicIvory)
+                .multilineTextAlignment(.center)
+                .lineSpacing(min(layoutWidth * 0.028, 11))
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: min(layoutWidth - 40, 400))
+                .padding(.bottom, 28)
 
             Text(passage.english)
-                .font(phoneTextFont(size: min(containerSize.width * 0.044, 16.5), weight: .regular))
-                .foregroundColor(PHONE_SOFT_WHITE.opacity(0.93))
-                .multilineTextAlignment(.leading)
-                .lineSpacing(min(containerSize.width * 0.022, 8))
-                .frame(maxWidth: min(containerSize.width - 58, 336), alignment: .leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 12)
+                .font(.system(size: englishSize, weight: .regular, design: .serif))
+                .foregroundStyle(PhoneDalilChrome.englishMist)
+                .multilineTextAlignment(isLongEnglish ? .leading : .center)
+                .lineSpacing(min(layoutWidth * 0.022, 9))
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(
+                    maxWidth: min(layoutWidth - 52, isLongEnglish ? 340 : 380),
+                    alignment: isLongEnglish ? .leading : .center
+                )
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 20)
 
             if let source = passage.source {
-                Text(source)
-                    .font(phoneTextFont(size: min(containerSize.width * 0.037, 13.5), weight: .medium))
-                    .foregroundColor(PHONE_MUTED_META.opacity(0.86))
-                    .tracking(0.12)
-                    .multilineTextAlignment(.trailing)
-                    .frame(maxWidth: min(containerSize.width - 58, 336), alignment: .trailing)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                Text(dalilSourceDisplay(source))
+                    .font(.system(size: sourceSize, weight: .medium, design: .serif))
+                    .foregroundStyle(PhoneDalilChrome.accentGold.opacity(0.9))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: min(layoutWidth - 44, 360))
+                    .padding(.bottom, 4)
             }
         }
+        .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private func dalilContent() -> some View {
+        let ruleWidth = min(containerSize.width - 56, 300)
+        VStack(alignment: .center, spacing: 0) {
+            ForEach(Array(readingPassages.enumerated()), id: \.element.id) { index, passage in
+                dalilEntryView(entryIndex: index, passage: passage)
+                if index < readingPassages.count - 1 {
+                    DalilOrnamentalRule(maxWidth: ruleWidth)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 36)
+                        .padding(.bottom, 8)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 22)
+        .padding(.top, 12)
+        .padding(.bottom, 36)
     }
 
     private func technicalDetailsLink() -> some View {
@@ -1707,28 +1875,6 @@ private struct PhoneSectorTitleSpotlightView: View {
             phoneSelectionHaptic()
             onReturnToDalil()
         }
-    }
-
-    @ViewBuilder
-    private func dalilContent() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(readingPassages.enumerated()), id: \.element.id) { index, passage in
-                readingPassageGroup(passage)
-
-                if index < readingPassages.count - 1 {
-                    Rectangle()
-                        .fill(PHONE_PANEL_STROKE.opacity(0.4))
-                        .frame(height: 1)
-                        .frame(maxWidth: min(containerSize.width - 112, 222))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 30)
-                        .padding(.bottom, 34)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .top)
-        .padding(.horizontal, PHONE_PANEL_HORIZONTAL_PADDING)
-        .padding(.vertical, PHONE_PANEL_VERTICAL_PADDING)
     }
 
     @ViewBuilder
@@ -1768,23 +1914,34 @@ private struct PhoneSectorTitleSpotlightView: View {
     }
 
     var body: some View {
-        PhoneOverlaySheet(
-            containerSize: containerSize,
-            maxHeightRatio: mode == .technical ? 0.94 : 0.88,
-            isCentered: true,
-            tone: .reading,
-            style: mode == .dalil ? .fullScreen : .panel,
-            onTapDismiss: mode == .dalil ? onDismiss : nil
-        ) {
-            ScrollView(showsIndicators: false) {
-                if mode == .dalil {
-                    dalilContent()
-                } else {
-                    technicalDetailsContent()
+        GeometryReader { geo in
+            PhoneOverlaySheet(
+                containerSize: containerSize,
+                maxHeightRatio: mode == .technical ? 0.94 : 0.88,
+                isCentered: true,
+                tone: .reading,
+                style: mode == .dalil ? .fullScreen : .panel,
+                solidBlackBackdrop: mode == .dalil,
+                onTapDismiss: mode == .dalil ? onDismiss : nil
+            ) {
+                Group {
+                    if mode == .dalil {
+                        VStack(spacing: 0) {
+                            dalilTopBar(safeTop: geo.safeAreaInsets.top)
+                            ScrollView(showsIndicators: false) {
+                                dalilContent()
+                            }
+                        }
+                    } else {
+                        ScrollView(showsIndicators: false) {
+                            technicalDetailsContent()
+                        }
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .top)
             }
-            .frame(maxWidth: .infinity, alignment: .top)
         }
+        .frame(width: containerSize.width, height: containerSize.height)
     }
 }
 
