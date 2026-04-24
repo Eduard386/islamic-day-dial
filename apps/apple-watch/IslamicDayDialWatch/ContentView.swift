@@ -89,7 +89,7 @@ struct ContentView: View {
                             HijriYearLabel(
                                 snapshot: snap,
                                 now: effectiveNow,
-                                isVisible: !isEidJumuahConflict(snapshot: snap, now: effectiveNow),
+                                isVisible: true,
                                 dialSize: metrics.dialSize,
                                 maxTextWidth: metrics.maxTextWidth
                             )
@@ -125,14 +125,17 @@ struct ContentView: View {
 
     @ViewBuilder
     private func currentPeriodView(snapshot snap: ComputedIslamicDay, now: Date, dialSize: CGFloat) -> some View {
-        if isEidJumuahConflict(snapshot: snap, now: now) {
-            EmptyView()
+        if shouldSuppressWatchSectorOnEid(snapshot: snap, now: now) {
+            Color.clear
+                .frame(maxWidth: .infinity)
+                .frame(height: dialSize * WATCH_CURRENT_PERIOD_FONT_RATIO * 1.35)
+                .allowsHitTesting(false)
         } else {
-        let phase = currentPhase(snapshot: snap, now: now)
-        Text(periodLabel(snapshot: snap, now: now).uppercased())
-            .font(.system(size: dialSize * WATCH_CURRENT_PERIOD_FONT_RATIO, weight: .regular))
-            .foregroundColor(periodColor(snapshot: snap, now: now))
-            .modifier(IshaShadowModifier(phase: phase))
+            let phase = currentPhase(snapshot: snap, now: now)
+            Text(periodLabel(snapshot: snap, now: now).uppercased())
+                .font(.system(size: dialSize * WATCH_CURRENT_PERIOD_FONT_RATIO, weight: .regular))
+                .foregroundColor(periodColor(snapshot: snap, now: now))
+                .modifier(IshaShadowModifier(phase: phase))
         }
     }
 
@@ -161,8 +164,11 @@ struct ContentView: View {
         return "\(phase.rawValue)-\(minuteBucket)-\(Int(dialSize.rounded()))"
     }
 
-    private func isEidJumuahConflict(snapshot snap: ComputedIslamicDay, now: Date) -> Bool {
-        formatHijriDateParts(snap.hijriDate).isEid && periodLabel(snapshot: snap, now: now) == "Jumu'ah"
+    /// On Eid, hide the sector line during Duha / Midday / Dhuhr / Jumu'ah (holiday uses the Hijri row).
+    private func shouldSuppressWatchSectorOnEid(snapshot snap: ComputedIslamicDay, now: Date) -> Bool {
+        guard formatHijriDateParts(snap.hijriDate).isEid else { return false }
+        let pl = periodLabel(snapshot: snap, now: now)
+        return pl == "Duha" || pl == "Midday" || pl == "Dhuhr" || pl == "Jumu'ah"
     }
 }
 
@@ -203,25 +209,6 @@ private func watchEidHeadingTitle(hijriDate: HijriDate) -> String {
     return ""
 }
 
-private func watchShowsEidHeading(snapshot: ComputedIslamicDay, now: Date) -> Bool {
-    let parts = formatHijriDateParts(snapshot.hijriDate)
-    guard parts.isEid else { return false }
-
-    switch getCurrentPhase(now: now, timeline: snapshot.timeline) {
-    case .sunrise_to_dhuhr:
-        let sub = getSunriseToDhuhrSubPeriod(
-            now: now,
-            duhaStart: snapshot.timeline.duhaStart,
-            dhuhr: snapshot.timeline.dhuhr
-        )
-        return sub == .duha || sub == .midday
-    case .dhuhr_to_asr:
-        return true
-    default:
-        return false
-    }
-}
-
 private func getWatchHijriLabelParts(
     hijriDate: HijriDate,
     snapshot: ComputedIslamicDay,
@@ -230,7 +217,7 @@ private func getWatchHijriLabelParts(
     let parts = formatHijriDateParts(hijriDate)
     let monthName = hijriDate.monthNameEn
     let isEid = parts.isEid
-    let showsEidHeading = watchShowsEidHeading(snapshot: snapshot, now: now)
+    let showsEidHeading = isEid
     let dayText = showsEidHeading ? watchEidHeadingTitle(hijriDate: hijriDate) : String(hijriDate.day)
     let monthText = showsEidHeading ? "" : monthName
     let lowerMonthName = monthName.lowercased()

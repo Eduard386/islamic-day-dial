@@ -1,6 +1,6 @@
-import type { ComputedIslamicDay } from '@islamic-day-dial/core';
+import { formatHijriDateParts, type ComputedIslamicDay } from '@islamic-day-dial/core';
 import { polarToXY } from '../lib/geometry';
-import { getExplodedArcMidAngle, getExplodedRingArcSpecs, type ExplodedArcId } from '../lib/explodedRing';
+import { getDialFootnoteAnchorAngleDeg, getExplodedRingArcSpecs, type ExplodedArcId } from '../lib/explodedRing';
 
 type Props = {
   snapshot: ComputedIslamicDay;
@@ -71,6 +71,7 @@ export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92, activeLa
   const labelConnectorGap = 10;
   const specs = getExplodedRingArcSpecs(snapshot);
   const specById = new Map(specs.map((spec) => [spec.id, spec]));
+  const isEidDay = formatHijriDateParts(snapshot.hijriDate).isEid;
   const leftColumnLeft = labelInset;
   const rightColumnLeft = totalW - labelInset - columnWidth;
 
@@ -78,7 +79,7 @@ export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92, activeLa
     const spec = specById.get(def.arcId);
     if (!spec) return [];
 
-    const angle = getExplodedArcMidAngle(spec);
+    const angle = getDialFootnoteAnchorAngleDeg(spec, isEidDay);
     const anchor = footnoteAnchorPoints(dialSize, angle);
     const xStart = sidePad + anchor.xCenter;
     const yStart = anchor.yCenter;

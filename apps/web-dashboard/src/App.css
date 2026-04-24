@@ -13,6 +13,11 @@
   --neutral-heading-white: #e5e7ee;
   --cool-muted-subtitle: #aeb6c8;
   --soft-quote-white: #d2cdc3;
+  /* Jumu'ah sector title — iOS ContentView sectorTitleColor (0.06, 0.73, 0.51) */
+  --jumuah-label: rgb(15, 186, 130);
+  /* Phase guidance header (aligned with iOS ceremonial block) */
+  --phase-sand-primary: #c9a06a;
+  --phase-sand-soft: #b89161;
   /* UI chrome (controls): gold family aligned with palette */
   --accent: var(--primary-gold);
   --accent-dim: #8f6f22;
@@ -132,6 +137,12 @@ body {
   padding-top: 8px;
 }
 
+/* Mobile: header is only phase guidance (no 9:36 ayah block). */
+.app:not(.app--desktop) .app-header {
+  padding-top: 12px;
+  margin-bottom: 10px;
+}
+
 /* Quran 9:36 — как раньше (тот же масштаб, что у заголовка до укрупнения) */
 .header-ayah {
   color: var(--warm-sacred-white);
@@ -176,13 +187,14 @@ body {
   display: grid;
   grid-template-columns: minmax(240px, 290px) minmax(420px, 1fr) minmax(320px, 390px);
   gap: 34px;
-  align-items: stretch;
+  align-items: start;
   min-height: 0;
+  /* Set from App (ResizeObserver on months rail) so reading panel matches months column height. */
+  --desktop-reading-panel-height: 720px;
 }
 
 .desktop-months-rail,
 .desktop-reading-panel {
-  min-height: 720px;
   border: 1px solid rgba(139, 132, 119, 0.28);
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.025), transparent 52%),
@@ -194,10 +206,17 @@ body {
 }
 
 .desktop-months-rail {
+  align-self: start;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 28px 24px 24px;
+  padding: 28px 24px 20px;
+}
+
+.desktop-reading-panel--empty {
+  align-self: start;
+  padding: 0;
 }
 
 .desktop-shell-subtitle {
@@ -279,7 +298,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -294,8 +313,94 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 12px;
   min-height: 720px;
+}
+
+/* ---------- Phase guidance (OBSERVE + cue + divider) ---------- */
+.phase-guidance-header {
+  width: 100%;
+  max-width: min(28rem, 92vw);
+  margin-inline: auto;
+  padding-inline: 12px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.phase-guidance-overline {
+  margin: 0;
+  font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: clamp(0.62rem, 1.1vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(184, 145, 97, 0.88);
+  line-height: 1.35;
+}
+
+.phase-guidance-main {
+  margin: 0.75rem 0 0;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(0.95rem, 1.65vw, 1.2rem);
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: 0.01em;
+  color: var(--phase-sand-primary);
+}
+
+.phase-guidance-main--flush {
+  margin-top: 0;
+}
+
+.phase-guidance-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  max-width: min(22rem, 88vw);
+  margin: 1.15rem auto 0;
+}
+
+.phase-guidance-divider-line {
+  flex: 1 1 auto;
+  height: 1px;
+  min-width: 1.5rem;
+  background: rgba(201, 160, 106, 0.28);
+  border-radius: 1px;
+}
+
+.phase-guidance-divider-ornament {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(184, 145, 97, 0.55);
+}
+
+/* Critical: unstyled SVG defaults to ~300×150 and can cover the dial */
+.phase-guidance-ornament-svg {
+  width: 12px;
+  height: 12px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.phase-guidance-header--desktop {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.phase-guidance-header--mobile {
+  margin-top: 12px;
+}
+
+@media (max-width: 1179px) {
+  .phase-guidance-main {
+    max-width: min(26rem, 94vw);
+    margin-inline: auto;
+  }
 }
 
 /* ---------- Dial ---------- */
@@ -479,8 +584,15 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 2;
   transform: translate(-50%, calc(-50% - 10px));
   text-align: center;
+  pointer-events: none;
+}
+
+/* Eid noon window: reserve space for sector line when Duha/Dhuhr/Jumu'ah title is hidden */
+.center-info-eid-sector-spacer {
+  min-height: 1.35em;
   pointer-events: none;
 }
 
@@ -511,7 +623,8 @@ body {
   padding: 0;
 }
 
-.center-info-abs .current-period:not(.current-period-empty):not(.current-period-isha-neon) {
+.center-info-abs
+  .current-period:not(.current-period-empty):not(.current-period-isha-neon):not(.current-period--jumuah) {
   color: var(--cool-label);
 }
 
@@ -520,6 +633,40 @@ body {
   color: var(--cool-label);
   font-size: 0.85em;
   font-weight: 300;
+}
+
+.center-info-abs .current-period--jumuah,
+.center-info-abs .current-period--jumuah .current-period-subsectors {
+  color: var(--jumuah-label);
+}
+
+.center-info-abs .current-period-clickable.current-period--jumuah:hover,
+.center-info-abs .current-period-clickable.current-period--jumuah.is-selected {
+  color: rgb(93, 232, 184);
+}
+
+.center-info-abs .hijri-eid-title {
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+}
+
+button.center-date.center-date-clickable {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+
+.center-date-clickable.is-selected .hijri-eid-title,
+.center-date-clickable.is-selected .hijri-year-sector-style,
+.center-date-clickable:hover .hijri-eid-title,
+.center-date-clickable:hover .hijri-year-sector-style {
+  filter: brightness(1.15);
 }
 
 .center-info-abs .hijri-date-sector-style:not(.eid-date) {
@@ -903,13 +1050,52 @@ body {
 .desktop-reading-panel {
   overflow: hidden;
   position: relative;
+  align-self: start;
+  height: var(--desktop-reading-panel-height);
+  min-height: var(--desktop-reading-panel-height);
 }
 
 .desktop-reading-panel--content {
   display: flex;
   flex-direction: column;
+  padding: 0;
+}
+
+/* Phase still (“sticks”) stay visible behind reading text — same asset column as prod empty state. */
+.desktop-reading-panel-still-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.desktop-reading-panel-still-layer .desktop-still-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  transform: scale(1.028);
+  filter: saturate(0.96) contrast(1.02);
+}
+
+.desktop-reading-panel-reading-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, transparent 32%, rgba(0, 0, 0, 0.38) 62%, rgba(0, 0, 0, 0.76) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.9));
+}
+
+.desktop-reading-panel-foreground {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding: 24px 22px 18px;
-  height: 720px;
 }
 
 .desktop-panel-header {
@@ -1050,16 +1236,20 @@ body {
   color: var(--soft-quote-white);
 }
 
-.desktop-reading-panel--empty {
-  padding: 0;
-}
-
 .desktop-still-shell {
   position: relative;
   width: 100%;
   height: 100%;
   min-height: 720px;
   overflow: hidden;
+}
+
+.desktop-reading-panel--empty .desktop-still-shell {
+  min-height: 0;
+}
+
+.desktop-reading-panel--empty .desktop-still-image {
+  object-position: center top;
 }
 
 .desktop-still-image {

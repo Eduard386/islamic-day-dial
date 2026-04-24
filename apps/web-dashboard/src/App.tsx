@@ -1,5 +1,5 @@
 import { getSectorDisplayName } from '@islamic-day-dial/core';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useIslamicDay } from './hooks/useIslamicDay';
 import { IslamicRing } from './components/IslamicRing';
 import { DialFootnotes } from './components/DialFootnotes';
@@ -10,9 +10,10 @@ import { DesktopReadingPanel } from './components/DesktopReadingPanel';
 import {
   getReadingKeyForFootnoteId,
   getReadingKeyForSectorDisplayName,
-  WEB_INSIGHT_AYAH_AR,
+  getWebObservationalCueForSector,
   type ReadingKey,
 } from './content/desktopContent';
+import { PhaseGuidanceHeader } from './components/PhaseGuidanceHeader';
 import { trackVisit } from './lib/analytics';
 import './App.css';
 
@@ -39,6 +40,8 @@ function useIsDesktop() {
 export default function App() {
   const state = useIslamicDay();
   const isDesktop = useIsDesktop();
+  const monthsRailRef = useRef<HTMLElement | null>(null);
+  const [monthsRailHeightPx, setMonthsRailHeightPx] = useState<number | null>(null);
   const [selectedReading, setSelectedReading] = useState<{ key: ReadingKey; emphasisId?: string } | null>(null);
 
   useEffect(() => {
@@ -50,6 +53,20 @@ export default function App() {
       setSelectedReading(null);
     }
   }, [isDesktop, selectedReading]);
+
+  useLayoutEffect(() => {
+    if (!isDesktop) {
+      setMonthsRailHeightPx(null);
+      return undefined;
+    }
+    const el = monthsRailRef.current;
+    if (!el) return undefined;
+    const apply = () => setMonthsRailHeightPx(Math.round(el.getBoundingClientRect().height));
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isDesktop]);
 
   const { snapshot, timezone, timeMode, selectedPreset, effectiveNow } = state;
 
@@ -64,6 +81,13 @@ export default function App() {
   );
 
   const currentReadableKey = getReadingKeyForSectorDisplayName(currentPeriodLabel);
+
+  const observationalCue = useMemo(
+    () => getWebObservationalCueForSector(currentPeriodLabel),
+    [currentPeriodLabel],
+  );
+
+  const phaseGuidanceOverline = currentPeriodLabel === "Jumu'ah" ? '' : 'OBSERVE';
 
   const openCurrentReading = () => {
     if (!isDesktop || !currentReadableKey) return;
@@ -127,23 +151,32 @@ export default function App() {
     <div className={`app${isDesktop ? ' app--desktop' : ''}`}>
       {!isDesktop && (
         <header className="app-header">
-          <p className="header-ayah" dir="rtl" lang="ar">
-            {WEB_INSIGHT_AYAH_AR}
-          </p>
-          <div className="header-titles">
-            <h1>Islamic Day Dial</h1>
-          </div>
+          <PhaseGuidanceHeader
+            modeLabel={phaseGuidanceOverline}
+            guidanceText={observationalCue}
+            className="phase-guidance-header--mobile"
+          />
         </header>
       )}
 
       <main className="app-main">
         {isDesktop ? (
-          <div className="desktop-shell">
-            <DesktopMonthsRail snapshot={snapshot} />
+          <div
+            className="desktop-shell"
+            style={
+              monthsRailHeightPx != null
+                ? ({ ['--desktop-reading-panel-height' as string]: `${monthsRailHeightPx}px` } as CSSProperties)
+                : undefined
+            }
+          >
+            <DesktopMonthsRail ref={monthsRailRef} snapshot={snapshot} />
 
             <section className="desktop-stage">
-              <h1 className="desktop-shell-title">Islamic Day Dial</h1>
-              <p className="subtitle desktop-stage-subtitle">Maghrib to Maghrib</p>
+              <PhaseGuidanceHeader
+                modeLabel={phaseGuidanceOverline}
+                guidanceText={observationalCue}
+                className="phase-guidance-header--desktop"
+              />
               <div className="desktop-stage-ring">
                 {renderDial(420, 132, true)}
               </div>
@@ -159,15 +192,11 @@ export default function App() {
         ) : (
           <div className="dial-section dial-section--balanced">
             <div className="dial-stack dial-stack--balanced">
-              <p className="subtitle dial-stack-subtitle">Maghrib to Maghrib</p>
               <div className="dial-stack-middle">
                 <div className="dial-stack-spring" aria-hidden />
                 {renderDial(420, 92, false)}
                 <div className="dial-stack-spring" aria-hidden />
               </div>
-              <p className="dial-ayah-translation" lang="en">
-                &quot;Indeed, the number of months ordained by Allah is twelve&quot; [9:36]
-              </p>
             </div>
           </div>
         )}

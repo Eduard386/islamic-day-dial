@@ -10,7 +10,12 @@ import {
 import { describeArc, polarToXY } from '../lib/geometry';
 import { getSegmentGradientStops, getConicGradientCss, type MirrorSegment } from '../lib/segment-gradients';
 import { getCurrentMarkerVisualState } from '../lib/current-marker';
-import { adjustExplodedAngle, getCurrentExplodedArcId, getExplodedRingArcSpecs } from '../lib/explodedRing';
+import {
+  adjustExplodedAngle,
+  getCurrentExplodedArcId,
+  getExplodedRingArcSpecs,
+  getExplodedTickAngleDeg,
+} from '../lib/explodedRing';
 import { CurrentMarker, CurrentMarkerDefs } from './CurrentMarker';
 
 type Props = {
@@ -402,7 +407,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
         const tickLen = size * 0.0125;
         const tickStartR = ringInner - tickStrokeWidth / 2;
         const tickEndR = tickStartR - tickLen;
-        const angle = m.angleDeg;
+        const angle = getExplodedTickAngleDeg(m.id, m.angleDeg, explodedArcById);
         const inner = polarToXY(cx, cy, tickStartR, angle);
 
         if (isPrimary || isSecondary) {

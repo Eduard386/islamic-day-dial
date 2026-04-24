@@ -106,6 +106,47 @@ export function getExplodedArcMidAngle(spec: ExplodedArcSpec): number {
   return spec.startAngleDeg + angleSpan(spec.startAngleDeg, spec.endAngleDeg) / 2;
 }
 
+/** Map prayer marker → exploded arc whose *visual start* is that boundary (ticks must use exploded angles). */
+export const MARKER_ID_TO_EXPLODED_ARC_START: Readonly<Partial<Record<string, ExplodedArcId>>> = {
+  maghrib: 'maghrib',
+  isha: 'isha',
+  last_third_start: 'lastThird',
+  fajr: 'fajr',
+  sunrise: 'sunrise',
+  duha_start: 'duha',
+  duha_end: 'midday',
+  dhuhr: 'dhuhr',
+  asr: 'asr',
+};
+
+export function getExplodedTickAngleDeg(
+  markerId: string,
+  fallbackAngleDeg: number,
+  explodedArcById: Map<ExplodedArcId, ExplodedArcSpec>,
+): number {
+  const arcId = MARKER_ID_TO_EXPLODED_ARC_START[markerId];
+  if (arcId) {
+    const spec = explodedArcById.get(arcId);
+    if (spec) return spec.startAngleDeg;
+  }
+  return fallbackAngleDeg;
+}
+
+/** Duha / Midday / Dhuhr: keep leader anchors on exploded (tightened) geometry; all other arcs use timeline angles. */
+const DIAL_FOOTNOTE_EXPLODED_ANCHOR_ON_EID: ReadonlySet<ExplodedArcId> = new Set(['duha', 'midday', 'dhuhr']);
+
+function originalArcMidAngle(spec: ExplodedArcSpec): number {
+  return spec.originalStartAngleDeg + angleSpan(spec.originalStartAngleDeg, spec.originalEndAngleDeg) / 2;
+}
+
+/** Dial footnote leader attachment: on Eid, non-noon sectors stay aligned with the real ring gradient. */
+export function getDialFootnoteAnchorAngleDeg(spec: ExplodedArcSpec, isEidDay: boolean): number {
+  if (isEidDay && !DIAL_FOOTNOTE_EXPLODED_ANCHOR_ON_EID.has(spec.id)) {
+    return originalArcMidAngle(spec);
+  }
+  return getExplodedArcMidAngle(spec);
+}
+
 export function adjustExplodedAngle(spec: ExplodedArcSpec, originalAngle: number): number {
   const originalSpan = angleSpan(spec.originalStartAngleDeg, spec.originalEndAngleDeg);
   if (originalSpan <= 0) return originalAngle;

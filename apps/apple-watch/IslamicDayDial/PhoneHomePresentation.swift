@@ -241,24 +241,8 @@ private func phoneDisplayTitle(
     hijriParts: (dayMonth: String, year: String, isEid: Bool)
 ) -> String {
     guard hijriParts.isEid else { return rawSectorTitle }
-
-    switch snapshot.currentPhase {
-    case .sunrise_to_dhuhr:
-        let sub = getSunriseToDhuhrSubPeriod(
-            now: now,
-            duhaStart: snapshot.timeline.duhaStart,
-            dhuhr: snapshot.timeline.dhuhr
-        )
-        if sub == .duha || sub == .midday {
-            return phoneEidHeadingTitle(hijriDate: snapshot.hijriDate)
-        }
-    case .dhuhr_to_asr:
-        return phoneEidHeadingTitle(hijriDate: snapshot.hijriDate)
-    default:
-        break
-    }
-
-    return rawSectorTitle
+    let eid = phoneEidHeadingTitle(hijriDate: snapshot.hijriDate)
+    return eid.isEmpty ? rawSectorTitle : eid
 }
 
 private func phoneRingLegendTitles(now: Date, isEidDay: Bool) -> [String] {

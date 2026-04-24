@@ -24,6 +24,38 @@ export type TechnicalSection = {
 export const WEB_INSIGHT_AYAH_AR = 'إِنَّ عِدَّةَ الشُّهُورِ عِندَ اللَّهِ اثْنَا عَشَرَ شَهْرًا';
 export const WEB_INSIGHT_AYAH_EN = '"Indeed, the number of months ordained by Allah is twelve" [9:36]';
 
+/** Observational cues above the dial — aligned with iOS `phoneObservationalCueText`. */
+export function getWebObservationalCueForSector(sectorTitle: string): string {
+  switch (sectorTitle) {
+    case 'Fajr':
+      return 'The sky is brightening, look to the east.';
+    case 'Sunrise':
+      return 'Watch the horizon. Has the sun begun to rise?';
+    case 'Duha':
+      return 'Look at the sun and the shadow. Has the morning opened?';
+    case 'Midday':
+      return 'Check the shadow. Is it nearing its shortest point?';
+    case 'Dhuhr':
+      return 'Is your shadow lengthening again?';
+    case 'Asr':
+      return 'Compare the object and its shadow after the noon minimum.';
+    case 'Maghrib':
+      return 'Look west. Has the sun gone down?';
+    case 'Isha':
+      return 'Check the sky to see if the last twilight has disappeared.';
+    case 'Last 3rd':
+      return 'Check the night sky. The last third of the night is here.';
+    case "Jumu'ah":
+      return 'Prepare for Jumu’ah: take a bath, use perfume, dress well, and remain silent during the khutba.';
+    case 'EID AL-FITR':
+      return 'Eid al-Fitr prayer time has started.';
+    case 'EID AL-ADHA':
+      return 'Eid al-Adha prayer time has started.';
+    default:
+      return sectorTitle;
+  }
+}
+
 export const WEB_HIJRI_MONTH_NAMES = [
   'Muharram',
   'Safar',

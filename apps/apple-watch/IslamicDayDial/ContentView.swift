@@ -3,6 +3,14 @@ import UIKit
 
 private let DIAL_VERTICAL_GAP: CGFloat = 18
 private let DIAL_SECTION_HEIGHT: CGFloat = 436
+/// Horizontal inset on the home `ZStack` (must match `.padding(.horizontal, …)` on that stack).
+private let PHONE_HOME_EDGE_INSET: CGFloat = 20
+/// Push phase guidance (OBSERVE block) slightly lower inside the cue band above the ring.
+private let PHONE_PHASE_GUIDANCE_VERTICAL_NUDGE: CGFloat = 16
+
+private func phoneHomeDialOuterDiameter(contentWidth: CGFloat) -> CGFloat {
+    min(max(contentWidth - 8, 0), DIAL_SECTION_HEIGHT) * 1.28
+}
 private let MS_PER_HOUR: Int64 = 3_600_000
 private let MS_PER_DAY: Int64 = 24 * MS_PER_HOUR
 private let PHONE_PRIMARY_TRANSITION_DURATION = 0.6
@@ -260,7 +268,7 @@ struct ContentView: View {
                         secondaryScreen == nil
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, PHONE_HOME_EDGE_INSET)
                     .overlay {
                         ShakeDetectorView { showTimeTravel = true }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -426,17 +434,14 @@ struct ContentView: View {
         Group {
             if let snapshot {
                 let homePresentation = makePhoneHomePresentation(snapshot: snapshot, now: effectiveNow)
-                VStack(spacing: 0) {
-                    Spacer(minLength: 0)
-                    Text(homePresentation.currentCueText)
-                        .font(phoneTextFont(size: min(containerSize.width * 0.041, 17), weight: .medium))
-                        .foregroundColor(PHONE_SOFT_WHITE.opacity(0.78))
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(containerSize.height * 0.004)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: min(containerSize.width - 48, 340))
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 10)
+                let contentWidth = max(0, containerSize.width - PHONE_HOME_EDGE_INSET * 2)
+                let dialSize = phoneHomeDialOuterDiameter(contentWidth: contentWidth)
+                let h = containerSize.height
+                // Outer top of ring: same geometry as PhonePreStillsDialView (ring centered in full height).
+                let ringOuterTop = h * 0.5 - dialSize * 0.5
+                let cueBandHeight = max(0, ringOuterTop)
+
+                ZStack(alignment: .top) {
                     PhonePreStillsDialView(
                         snapshot: snapshot,
                         now: effectiveNow,
@@ -445,8 +450,27 @@ struct ContentView: View {
                         onDateTap: beginInsightPresentation,
                         onCurrentSectorTap: beginCurrentSectorReading
                     )
-                    .frame(height: DIAL_SECTION_HEIGHT)
-                    Spacer(minLength: 0)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                    Color.clear
+                        .frame(height: cueBandHeight)
+                        .frame(maxWidth: .infinity)
+                        .overlay {
+                            GeometryReader { bandGeo in
+                                PhaseGuidanceHeader(
+                                    modeLabel: homePresentation.displayTitle == "Jumu'ah" ? "" : "OBSERVE",
+                                    guidanceText: homePresentation.currentCueText,
+                                    layoutWidth: bandGeo.size.width,
+                                    layoutHeight: containerSize.height
+                                )
+                                .fixedSize(horizontal: false, vertical: true)
+                                .position(
+                                    x: bandGeo.size.width * 0.5,
+                                    y: bandGeo.size.height * 0.5 + PHONE_PHASE_GUIDANCE_VERTICAL_NUDGE
+                                )
+                            }
+                        }
+                        .allowsHitTesting(false)
                 }
                 .opacity(startupDialOpacity)
             } else {
@@ -775,6 +799,7 @@ private struct PhoneHijriDimensionalGoldModifier: ViewModifier {
 }
 
 private struct HijriDateLabels: View {
+    private let hijriDate: HijriDate
     private let parts: (dayMonth: String, year: String, isEid: Bool)
     private let showYear: Bool
     private let useCompactDayMonth: Bool
@@ -789,12 +814,21 @@ private struct HijriDateLabels: View {
         isInteractive: Bool = false,
         onTap: (() -> Void)? = nil
     ) {
+        self.hijriDate = hijriDate
         self.parts = formatHijriDateParts(hijriDate)
         self.showYear = showYear
         self.useCompactDayMonth = COMPACT_MONTH_NAMES.contains(hijriDate.monthNameEn.lowercased())
         self.infoProgress = max(0, min(1, infoProgress))
         self.isInteractive = isInteractive
         self.onTap = onTap
+    }
+
+    private var firstLineUppercased: String {
+        if parts.isEid {
+            if hijriDate.monthNumber == 10 && hijriDate.day == 1 { return "EID AL-FITR" }
+            if hijriDate.monthNumber == 12 && hijriDate.day == 10 { return "EID AL-ADHA" }
+        }
+        return parts.dayMonth.uppercased()
     }
 
     var body: some View {
@@ -809,7 +843,7 @@ private struct HijriDateLabels: View {
             let whiteRadius = CGFloat(3) + glowStrength * CGFloat(2) + phaseValue * CGFloat(6)
 
             VStack(spacing: 2) {
-                Text(parts.dayMonth.uppercased())
+                Text(firstLineUppercased)
                     .font(.system(size: useCompactDayMonth ? 15 : 18, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -861,44 +895,76 @@ private struct PhonePreStillsDialView: View {
     let onDateTap: () -> Void
     let onCurrentSectorTap: () -> Void
 
+    /// Sector line in the hole: always the observational sector (e.g. Isha). On Eid, hide during Duha / Midday / Dhuhr / Jumu'ah — holiday sits in the date row instead.
+    private var centerHoleSectorUpper: String? {
+        if presentation.isEidDay {
+            let raw = presentation.rawSectorTitle
+            if raw == "Duha" || raw == "Midday" || raw == "Dhuhr" || raw == "Jumu'ah" {
+                return nil
+            }
+            return raw.uppercased()
+        }
+        return presentation.displayTitle.uppercased()
+    }
+
     private var sectorTitleColor: Color {
-        presentation.displayTitle == "Jumu'ah"
-            ? Color(red: 0.06, green: 0.73, blue: 0.51)
-            : Colors.coolLabel
+        let name = presentation.isEidDay ? presentation.rawSectorTitle : presentation.displayTitle
+        if name == "Jumu'ah" {
+            return Color(red: 0.06, green: 0.73, blue: 0.51)
+        }
+        return Colors.coolLabel
     }
 
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height
-            // Fixed diameter: matches legacy `min(dialFrameWidth, DIAL_SECTION_HEIGHT) * 1.28` (not `min(w,h)` so height doesn’t inflate the ring).
-            let dialSize = min(max(w - 8, 0), DIAL_SECTION_HEIGHT) * 1.28
+            let dialSize = phoneHomeDialOuterDiameter(contentWidth: w)
             let dialCenter = CGPoint(x: w / 2, y: h / 2)
             let titleFontSize: CGFloat = 20
-            let innerLabelWidth = min(dialSize * 0.48, 220)
-            // Same subtle nudge as pre-stills layout; stack is centered in the ring hole (not offset from frame top).
-            let labelStackOffsetY = dialSize * (-10 / 420)
+            /// Matches web `center-info-abs` width ratio (200px / 420px dial).
+            let innerLabelWidth = min(dialSize * (200.0 / 420.0), 220)
+            // Same nudge as web `.center-overlay` translate(-50%, calc(-50% - 10px)).
+            let labelStackOffsetY = dialSize * (-10.0 / 420.0)
+            // Hole geometry + label Y: same as Watch `WatchDialMetrics` / web `--sector-top` & `--date-top` in a 212px-tall inner box.
+            let holeTop = dialSize * (0.5 - 0.25125)
+            let holeHeight = dialSize * 0.5025
+            let sectorY = holeTop + holeHeight * (55.0 / 212.0)
+            let dateY = holeTop + holeHeight * (100.0 / 212.0)
 
             ZStack {
                 PhoneRingView(snapshot: snapshot, now: now, phoneInfoProgress: 0)
                     .frame(width: dialSize, height: dialSize)
 
-                VStack(spacing: 10) {
-                    Button {
-                        onCurrentSectorTap()
-                    } label: {
-                        Text(presentation.displayTitle.uppercased())
-                            .font(.system(size: titleFontSize, weight: .light))
-                            .tracking(titleFontSize * 0.1)
-                            .foregroundColor(sectorTitleColor)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.75)
+                ZStack(alignment: .top) {
+                    Color.clear
+
+                    if let sectorUpper = centerHoleSectorUpper {
+                        Button {
+                            onCurrentSectorTap()
+                        } label: {
+                            Text(sectorUpper)
+                                .font(.system(size: titleFontSize, weight: .light))
+                                .tracking(titleFontSize * 0.1)
+                                .foregroundColor(sectorTitleColor)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.75)
+                                .frame(maxWidth: innerLabelWidth)
+                                .padding(.vertical, 6)
+                        }
+                        .buttonStyle(.plain)
+                        .allowsHitTesting(interactionsEnabled)
+                        .frame(maxWidth: .infinity)
+                        .offset(y: sectorY)
+                    } else if presentation.isEidDay {
+                        Color.clear
                             .frame(maxWidth: innerLabelWidth)
-                            .padding(.vertical, 6)
+                            .frame(height: titleFontSize + 18)
+                            .allowsHitTesting(false)
+                            .frame(maxWidth: .infinity)
+                            .offset(y: sectorY)
                     }
-                    .buttonStyle(.plain)
-                    .allowsHitTesting(interactionsEnabled)
 
                     HijriDateLabels(
                         hijriDate: snapshot.hijriDate,
@@ -906,7 +972,9 @@ private struct PhonePreStillsDialView: View {
                         isInteractive: interactionsEnabled,
                         onTap: onDateTap
                     )
-                    .frame(width: innerLabelWidth)
+                    .frame(maxWidth: innerLabelWidth)
+                    .frame(maxWidth: .infinity)
+                    .offset(y: dateY)
                 }
                 .frame(width: dialSize, height: dialSize)
                 .offset(y: labelStackOffsetY)
@@ -1020,15 +1088,6 @@ private struct PhoneHijriMonthsSheetView: View {
     let containerSize: CGSize
     let onDismiss: () -> Void
 
-    private let columns = [
-        GridItem(.flexible(minimum: 136, maximum: 154), spacing: 14, alignment: .leading),
-        GridItem(.flexible(minimum: 136, maximum: 154), spacing: 14, alignment: .leading)
-    ]
-
-    private var translationFontSize: CGFloat {
-        min(containerSize.width * 0.046, 17)
-    }
-
     private var translationFont: Font {
         phoneTranslationFont(containerSize: containerSize)
     }
@@ -1071,10 +1130,20 @@ private struct PhoneHijriMonthsSheetView: View {
                         .frame(height: 1)
                         .frame(maxWidth: min(containerSize.width - 112, 222))
 
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
-                        ForEach(PHONE_HIJRI_MONTH_NAMES.indices, id: \.self) { index in
-                            monthRow(index: index)
+                    HStack(alignment: .top, spacing: 18) {
+                        VStack(alignment: .leading, spacing: 15) {
+                            ForEach(0..<6, id: \.self) { index in
+                                monthRow(index: index)
+                            }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        VStack(alignment: .leading, spacing: 15) {
+                            ForEach(6..<12, id: \.self) { index in
+                                monthRow(index: index)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -1775,6 +1844,142 @@ private struct TimeTravelSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color.black)
         }
+    }
+}
+
+// MARK: - Phase guidance header (above dial)
+
+private enum PhaseGuidancePalette {
+    static let sandPrimary = Color(red: 201 / 255, green: 160 / 255, blue: 106 / 255)
+    static let sandSoft = Color(red: 184 / 255, green: 145 / 255, blue: 97 / 255)
+}
+
+private struct PhaseGuidanceDivider: View {
+    let lineColor: Color
+    let ornamentColor: Color
+    let layoutWidth: CGFloat
+
+    private var contentWidth: CGFloat {
+        min(layoutWidth - PHONE_HOME_EDGE_INSET * 2, min(layoutWidth - 40, 352))
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Rectangle()
+                .fill(lineColor)
+                .frame(height: 0.5)
+                .frame(maxWidth: .infinity)
+
+            PhaseGuidanceRosette(color: ornamentColor)
+
+            Rectangle()
+                .fill(lineColor)
+                .frame(height: 0.5)
+                .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: contentWidth)
+    }
+}
+
+private struct TinyDiamond: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let c = CGPoint(x: rect.midX, y: rect.midY)
+        let r = min(rect.width, rect.height) / 2
+        p.move(to: CGPoint(x: c.x, y: c.y - r))
+        p.addLine(to: CGPoint(x: c.x + r, y: c.y))
+        p.addLine(to: CGPoint(x: c.x, y: c.y + r))
+        p.addLine(to: CGPoint(x: c.x - r, y: c.y))
+        p.closeSubpath()
+        return p
+    }
+}
+
+private struct PhaseGuidanceRosette: View {
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .strokeBorder(color.opacity(0.9), lineWidth: 0.45)
+                .frame(width: 9, height: 9)
+            TinyDiamond()
+                .fill(color.opacity(0.9))
+                .frame(width: 3.4, height: 3.4)
+        }
+        .frame(width: 12, height: 12)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct PhaseGuidanceHeader: View {
+    var modeLabel: String = "OBSERVE"
+    var guidanceText: String
+    var layoutWidth: CGFloat
+    var layoutHeight: CGFloat
+
+    private var contentWidth: CGFloat {
+        min(layoutWidth - PHONE_HOME_EDGE_INSET * 2, min(layoutWidth - 40, 352))
+    }
+
+    private var overlineSize: CGFloat {
+        min(layoutWidth * 0.028, 11)
+    }
+
+    private var mainSize: CGFloat {
+        min(layoutWidth * 0.052, 21)
+    }
+
+    private var overlineTracking: CGFloat { 3.8 }
+
+    private var mainLineSpacing: CGFloat {
+        max(2.5, min(4.5, layoutHeight * 0.0038))
+    }
+
+    private var dividerLine: Color {
+        PhaseGuidancePalette.sandPrimary.opacity(0.28)
+    }
+
+    private var dividerOrnament: Color {
+        PhaseGuidancePalette.sandSoft.opacity(0.55)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if !modeLabel.isEmpty {
+                Text(modeLabel.uppercased())
+                    .font(.system(size: overlineSize, weight: .medium, design: .default))
+                    .tracking(overlineTracking)
+                    .foregroundStyle(PhaseGuidancePalette.sandSoft.opacity(0.88))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: contentWidth)
+
+                Spacer()
+                    .frame(height: 12)
+            }
+
+            Text(guidanceText)
+                .font(.system(size: mainSize, weight: .regular, design: .serif))
+                .foregroundStyle(PhaseGuidancePalette.sandPrimary)
+                .multilineTextAlignment(.center)
+                .lineSpacing(mainLineSpacing)
+                .lineLimit(4)
+                .minimumScaleFactor(0.86)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: contentWidth)
+
+            Spacer()
+                .frame(height: 20)
+
+            PhaseGuidanceDivider(
+                lineColor: dividerLine,
+                ornamentColor: dividerOrnament,
+                layoutWidth: layoutWidth
+            )
+        }
+        .frame(maxWidth: layoutWidth)
+        .animation(.easeInOut(duration: 0.42), value: guidanceText)
+        .animation(.easeInOut(duration: 0.42), value: modeLabel)
     }
 }
 

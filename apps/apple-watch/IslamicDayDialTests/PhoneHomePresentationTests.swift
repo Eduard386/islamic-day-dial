@@ -141,7 +141,7 @@ final class PhoneHomePresentationTests: XCTestCase {
 
         XCTAssertEqual(presentation.backgroundKey, .asr)
         XCTAssertEqual(presentation.rawSectorTitle, "Asr")
-        XCTAssertEqual(presentation.displayTitle, "Asr")
+        XCTAssertEqual(presentation.displayTitle, "EID AL-ADHA")
         XCTAssertEqual(presentation.currentCueText, PHONE_CUE_ASR)
         XCTAssertEqual(presentation.highlightedRingTitle, "Asr")
     }

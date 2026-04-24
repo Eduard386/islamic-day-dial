@@ -1,4 +1,5 @@
 import type { ComputedIslamicDay } from '@islamic-day-dial/core';
+import { forwardRef } from 'react';
 import {
   WEB_HIJRI_MONTH_NAMES,
   WEB_INSIGHT_AYAH_AR,
@@ -9,11 +10,14 @@ type Props = {
   snapshot: ComputedIslamicDay;
 };
 
-export function DesktopMonthsRail({ snapshot }: Props) {
+export const DesktopMonthsRail = forwardRef<HTMLElement, Props>(function DesktopMonthsRail(
+  { snapshot },
+  ref,
+) {
   const currentMonthIndex = Math.max(0, snapshot.hijriDate.monthNumber - 1);
 
   return (
-    <aside className="desktop-months-rail">
+    <aside ref={ref} className="desktop-months-rail">
       <div className="desktop-months-ayah-block">
         <p className="desktop-months-ayah" dir="rtl" lang="ar">
           {WEB_INSIGHT_AYAH_AR}
@@ -36,4 +40,4 @@ export function DesktopMonthsRail({ snapshot }: Props) {
       </ol>
     </aside>
   );
-}
+});

@@ -191,6 +191,35 @@ func adjustedPhoneMarkerAngle(phoneArcSpecs: [PhoneRingArcSpec], originalAngle: 
     return originalAngle
 }
 
+/// Inner ticks must use exploded arc *starts* (same boundary as colored segments), not raw marker angles.
+private func explodedPhoneTickAngleDeg(marker: RingMarker, phoneArcSpecs: [PhoneRingArcSpec]) -> CGFloat {
+    let byKind = Dictionary(uniqueKeysWithValues: phoneArcSpecs.map { ($0.kind, $0) })
+    func spec(_ kind: PhoneRingArcKind) -> PhoneRingArcSpec? { byKind[kind] }
+
+    switch marker.id {
+    case "maghrib":
+        return spec(.maghribToIsha)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "isha":
+        return spec(.ishaGroup)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "last_third_start":
+        return CGFloat(adjustedPhoneMarkerAngle(phoneArcSpecs: phoneArcSpecs, originalAngle: marker.angleDeg))
+    case "fajr":
+        return spec(.fajrToSunrise)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "sunrise":
+        return spec(.sunrise)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "duha_start":
+        return spec(.duha)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "duha_end":
+        return spec(.midday)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "dhuhr":
+        return spec(.dhuhrToAsr)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "asr":
+        return spec(.asrToMaghrib)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    default:
+        return CGFloat(marker.angleDeg)
+    }
+}
+
 private func adjustedArcBounds(startDeg: CGFloat, endDeg: CGFloat, radiusScale: CGFloat) -> (start: CGFloat, end: CGFloat) {
     let span = angleSpan(startDeg: startDeg, endDeg: endDeg)
     let midpoint = startDeg + span / 2
@@ -670,8 +699,14 @@ struct RingView: View {
                         let isHiddenPhoneTick = renderVariant == .phone && PHONE_HIDDEN_TICK_IDS.contains(m.id)
                         if isHiddenPhoneTick { continue }
                         guard PRIMARY_MARKER_IDS.contains(m.id) || SECONDARY_MARKER_IDS.contains(m.id) else { continue }
-                        let innerPt = polarToXY(cx: ccx, cy: ccy, r: tickStartR, angleDeg: m.angleDeg)
-                        let outerPt = polarToXY(cx: ccx, cy: ccy, r: tickEndR, angleDeg: m.angleDeg)
+                        let tickAngleDeg: Double = {
+                            if renderVariant == .phone, !phoneArcSpecs.isEmpty {
+                                return Double(explodedPhoneTickAngleDeg(marker: m, phoneArcSpecs: phoneArcSpecs))
+                            }
+                            return m.angleDeg
+                        }()
+                        let innerPt = polarToXY(cx: ccx, cy: ccy, r: tickStartR, angleDeg: tickAngleDeg)
+                        let outerPt = polarToXY(cx: ccx, cy: ccy, r: tickEndR, angleDeg: tickAngleDeg)
                         var linePath = Path()
                         linePath.move(to: innerPt)
                         linePath.addLine(to: outerPt)
