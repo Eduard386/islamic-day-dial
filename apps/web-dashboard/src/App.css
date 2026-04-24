@@ -767,6 +767,13 @@ button.center-date.center-date-clickable {
   transform: translateX(-50%);
 }
 
+/* Keep sector titles like "LAST 3RD" on one line (avoids overlap with Hijri date). */
+.center-info-abs > .current-period {
+  white-space: nowrap;
+  max-width: calc(100% - 4px);
+  box-sizing: border-box;
+}
+
 .center-date {
   position: absolute;
   left: 50%;

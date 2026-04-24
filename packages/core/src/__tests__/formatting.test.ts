@@ -128,4 +128,8 @@ describe('getSectorDisplayName', () => {
   it('returns Maghrib for maghrib_to_isha', () => {
     expect(getSectorDisplayName(new Date(), 'maghrib_to_isha', timeline)).toBe('Maghrib');
   });
+
+  it('returns Last 3rd in last_third_to_fajr (distinct from Isha sector)', () => {
+    expect(getSectorDisplayName(new Date(), 'last_third_to_fajr', timeline)).toBe('Last 3rd');
+  });
 });
