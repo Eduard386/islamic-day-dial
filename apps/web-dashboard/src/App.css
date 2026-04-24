@@ -2,17 +2,19 @@
   --bg: #000000;
   --surface: #0e0e24;
   --surface-light: #1a1a3e;
-  --text: #e8e8f0;
+  /* Light copy — same as 4:103 English (`.dial-below-ring-ayah__english`) */
+  --verse-translation-tone: rgba(200, 194, 184, 0.92);
+  --text: var(--verse-translation-tone);
   --text-secondary: #8888aa;
   /* Dial / sacred palette */
   --primary-gold: #c89b2c;
   --secondary-gold: #b88a34;
   --cool-label: #c1c6d8;
-  --soft-utility: #ddd6c9;
-  --warm-sacred-white: #f2eee3;
-  --neutral-heading-white: #e5e7ee;
+  --soft-utility: var(--verse-translation-tone);
+  --warm-sacred-white: var(--verse-translation-tone);
+  --neutral-heading-white: var(--verse-translation-tone);
   --cool-muted-subtitle: #aeb6c8;
-  --soft-quote-white: #d2cdc3;
+  --soft-quote-white: var(--verse-translation-tone);
   /* Jumu'ah sector title — iOS ContentView sectorTitleColor (0.06, 0.73, 0.51) */
   --jumuah-label: rgb(15, 186, 130);
   /* Phase guidance header (aligned with iOS ceremonial block) */
@@ -22,7 +24,7 @@
   --accent: var(--primary-gold);
   --accent-dim: #8f6f22;
   --border: #2a2a4e;
-  --ivory: #fff8e7;
+  --ivory: var(--verse-translation-tone);
 }
 
 /* Last third breathing: adjust opacity range (0.15/0.4) and duration (5s = 2 cycles per 10s) */
@@ -245,7 +247,7 @@ body {
 }
 
 .desktop-months-ayah {
-  color: #ede8df;
+  color: var(--verse-translation-tone);
   font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
   font-size: clamp(1.45rem, 2.6vw, 1.85rem);
   font-weight: 400;
@@ -257,7 +259,7 @@ body {
 }
 
 .desktop-months-translation {
-  color: rgba(200, 194, 184, 0.92);
+  color: var(--verse-translation-tone);
   font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
   font-size: 0.98rem;
   line-height: 1.55;
@@ -357,7 +359,7 @@ body {
   font-size: 0.95rem;
   font-weight: 400;
   letter-spacing: 0.02em;
-  color: #e8e3d9;
+  color: var(--verse-translation-tone);
 }
 
 .desktop-month-item.is-active .desktop-month-name {
@@ -642,8 +644,7 @@ body {
   font-weight: 400;
   line-height: 1.48;
   letter-spacing: 0.02em;
-  /* Same as 9:36 English in `.desktop-months-translation` */
-  color: rgba(200, 194, 184, 0.92);
+  color: var(--verse-translation-tone);
 }
 
 /* Dial + optional side footnotes (leader lines from ticks) */
@@ -685,7 +686,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: rgba(221, 214, 202, 0.72);
+  color: var(--verse-translation-tone);
   pointer-events: none;
   line-height: 1.15;
   max-width: calc(var(--footnote-side) - 12px);
@@ -705,7 +706,8 @@ body {
 }
 
 .footnote-label.is-active {
-  color: var(--warm-sacred-white);
+  color: var(--verse-translation-tone);
+  filter: brightness(1.14);
 }
 
 .footnote-label-button {
@@ -795,7 +797,7 @@ body {
   --sector-top: 55px;
   --date-top: 100px;
   --countdown-top: 165px;
-  --ring-text: #fbeccb;
+  --ring-text: var(--verse-translation-tone);
   position: relative;
   width: 200px; /* ~95% of inner hole 212px, matches iOS padding */
   height: 212px; /* inner diameter for 420 dial: 0.25125 * 420 * 2 ≈ 211 */
@@ -1355,7 +1357,7 @@ button.center-date.center-date-clickable {
 }
 
 .desktop-reading-block--english {
-  color: var(--soft-white, #ddd6ca);
+  color: var(--verse-translation-tone);
   font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.02rem;
   line-height: 1.58;
@@ -1392,7 +1394,7 @@ button.center-date.center-date-clickable {
   appearance: none;
   border: 0;
   background: transparent;
-  color: #f2ebdd;
+  color: var(--verse-translation-tone);
   cursor: pointer;
   font: inherit;
   justify-self: start;
@@ -1423,7 +1425,7 @@ button.center-date.center-date-clickable {
   font-size: 1.15rem;
   font-weight: 400;
   letter-spacing: 0.02em;
-  color: #f2ebdd;
+  color: var(--verse-translation-tone);
 }
 
 .desktop-dalil-top-spacer {
@@ -1435,7 +1437,7 @@ button.center-date.center-date-clickable {
 .desktop-dalil-close-text {
   font-size: 0.88rem;
   letter-spacing: 0.04em;
-  color: rgba(242, 235, 221, 0.78);
+  color: var(--verse-translation-tone);
   font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -1483,7 +1485,7 @@ button.center-date.center-date-clickable {
   font-size: clamp(1.65rem, 2.1vw, 2.15rem);
   font-weight: 400;
   line-height: 1.92;
-  color: #f2ebdd;
+  color: var(--verse-translation-tone);
   max-width: 40rem;
 }
 
@@ -1494,7 +1496,7 @@ button.center-date.center-date-clickable {
   font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
   font-size: clamp(1.05rem, 1.25vw, 1.2rem);
   line-height: 1.62;
-  color: #d8cfc1;
+  color: var(--verse-translation-tone);
 }
 
 .desktop-dalil-english--prose {
@@ -1634,7 +1636,7 @@ button.center-date.center-date-clickable {
   font-size: clamp(1.02rem, 1.15vw, 1.12rem);
   font-weight: 400;
   line-height: 1.68;
-  color: #d8cfc1;
+  color: var(--verse-translation-tone);
   text-align: left;
   max-width: 28rem;
 }
@@ -1703,7 +1705,7 @@ button.center-date.center-date-clickable {
 }
 
 .desktop-panel-empty-copy {
-  color: rgba(221, 214, 202, 0.82);
+  color: var(--verse-translation-tone);
   font-size: 0.96rem;
   line-height: 1.45;
   max-width: 24rem;

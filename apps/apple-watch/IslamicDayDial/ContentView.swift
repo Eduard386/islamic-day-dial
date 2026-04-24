@@ -5,6 +5,8 @@ private let DIAL_VERTICAL_GAP: CGFloat = 18
 private let DIAL_SECTION_HEIGHT: CGFloat = 436
 /// Horizontal inset on the home `ZStack` (must match `.padding(.horizontal, …)` on that stack).
 private let PHONE_HOME_EDGE_INSET: CGFloat = 20
+/// Nudges the home dial slightly upward; post-ring guidance uses the same offset so layout stays aligned.
+private let PHONE_HOME_DIAL_UP_SHIFT: CGFloat = 18
 
 private func phoneHomeDialOuterDiameter(contentWidth: CGFloat) -> CGFloat {
     min(max(contentWidth - 8, 0), DIAL_SECTION_HEIGHT) * 1.28
@@ -250,7 +252,11 @@ struct ContentView: View {
         NavigationStack {
             GeometryReader { geo in
                 ZStack {
-                    Color.black
+                    Image("PhoneHomeNightSkyBackground")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .clipped()
                         .ignoresSafeArea()
 
                     homeSummarySection(containerSize: geo.size)
@@ -434,7 +440,7 @@ struct ContentView: View {
                 let contentWidth = max(0, containerSize.width - PHONE_HOME_EDGE_INSET * 2)
                 let dialSize = phoneHomeDialOuterDiameter(contentWidth: contentWidth)
                 let h = containerSize.height
-                let ringOuterTop = h * 0.5 - dialSize * 0.5
+                let ringOuterTop = h * 0.5 - dialSize * 0.5 - PHONE_HOME_DIAL_UP_SHIFT
 
                 ZStack(alignment: .top) {
                     PhonePreStillsDialView(
@@ -929,7 +935,7 @@ private struct PhonePreStillsDialView: View {
             let w = geo.size.width
             let h = geo.size.height
             let dialSize = phoneHomeDialOuterDiameter(contentWidth: w)
-            let dialCenter = CGPoint(x: w / 2, y: h / 2)
+            let dialCenter = CGPoint(x: w / 2, y: h / 2 - PHONE_HOME_DIAL_UP_SHIFT)
             let titleFontSize: CGFloat = 20
             /// Matches web `center-info-abs` width ratio (200px / 420px dial).
             let innerLabelWidth = min(dialSize * (200.0 / 420.0), 220)
