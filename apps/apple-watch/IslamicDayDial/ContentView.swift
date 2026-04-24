@@ -250,92 +250,99 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            GeometryReader { geo in
-                ZStack {
-                    Image("PhoneHomeNightSkyBackground")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .clipped()
-                        .ignoresSafeArea()
+            ZStack {
+                // Fills the window under safe areas; avoids white gaps when GeometryReader’s
+                // proposed size is shorter than the physical screen (seen on some simulators / tall devices).
+                Color.black
+                    .ignoresSafeArea(edges: .all)
 
+                Image("PhoneHomeNightSkyBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    .clipped()
+                    .ignoresSafeArea(edges: .all)
+
+                GeometryReader { geo in
                     homeSummarySection(containerSize: geo.size)
-                    .opacity(secondaryScreen == nil ? 1 : 0.08)
-                    .animation(
-                        .easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION),
-                        value: secondaryScreen != nil
-                    )
-                    .allowsHitTesting(
-                        !showsStartupLoadingStill &&
-                        !isInteractionLocked &&
-                        secondaryScreen == nil
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, PHONE_HOME_EDGE_INSET)
-                    .overlay {
-                        ShakeDetectorView { showTimeTravel = true }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .allowsHitTesting(false)
-                    }
-                    .overlay {
-                        if secondaryScreen != nil {
-                            ZStack {
-                                Color(red: 0.07, green: 0.055, blue: 0.042)
-                                    .opacity(0.46)
+                        .opacity(secondaryScreen == nil ? 1 : 0.08)
+                        .animation(
+                            .easeInOut(duration: PHONE_PRIMARY_TRANSITION_DURATION),
+                            value: secondaryScreen != nil
+                        )
+                        .allowsHitTesting(
+                            !showsStartupLoadingStill &&
+                            !isInteractionLocked &&
+                            secondaryScreen == nil
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(.horizontal, PHONE_HOME_EDGE_INSET)
+                        .overlay {
+                            ShakeDetectorView { showTimeTravel = true }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .allowsHitTesting(false)
+                        }
+                        .overlay {
+                            if secondaryScreen != nil {
+                                ZStack {
+                                    Color(red: 0.07, green: 0.055, blue: 0.042)
+                                        .opacity(0.46)
 
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0.11, green: 0.085, blue: 0.062).opacity(0.34),
-                                        Color.black.opacity(0.22),
-                                        Color(red: 0.045, green: 0.036, blue: 0.028).opacity(0.44)
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
+                                    LinearGradient(
+                                        colors: [
+                                            Color(red: 0.11, green: 0.085, blue: 0.062).opacity(0.34),
+                                            Color.black.opacity(0.22),
+                                            Color(red: 0.045, green: 0.036, blue: 0.028).opacity(0.44)
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
 
-                                RadialGradient(
-                                    colors: [
-                                        Color(red: 0.23, green: 0.18, blue: 0.13).opacity(0.05),
-                                        Color.clear
-                                    ],
-                                    center: .top,
-                                    startRadius: 0,
-                                    endRadius: min(geo.size.width * 0.7, 320)
-                                )
+                                    RadialGradient(
+                                        colors: [
+                                            Color(red: 0.23, green: 0.18, blue: 0.13).opacity(0.05),
+                                            Color.clear
+                                        ],
+                                        center: .top,
+                                        startRadius: 0,
+                                        endRadius: min(geo.size.width * 0.7, 320)
+                                    )
 
-                                PHONE_DUST_TINT
-                                    .opacity(0.12)
-                                    .blendMode(.multiply)
-                            }
-                            .ignoresSafeArea()
-                            .allowsHitTesting(!isInteractionLocked)
-                            .onTapGesture {
-                                dismissSecondaryScreen(triggerHaptic: false)
+                                    PHONE_DUST_TINT
+                                        .opacity(0.12)
+                                        .blendMode(.multiply)
+                                }
+                                .ignoresSafeArea()
+                                .allowsHitTesting(!isInteractionLocked)
+                                .onTapGesture {
+                                    dismissSecondaryScreen(triggerHaptic: false)
+                                }
                             }
                         }
-                    }
-                    .overlay {
-                        if let snapshot, let secondaryScreen {
-                            PhoneSecondaryScreenContainer(
-                                screen: secondaryScreen,
-                                snapshot: snapshot,
-                                containerSize: geo.size,
-                                onShowDalil: presentDalilScreen,
-                                onShowTechnical: presentTechnicalScreen,
-                                onDismiss: { dismissSecondaryScreen(triggerHaptic: false) }
-                            )
-                            .allowsHitTesting(!isInteractionLocked)
-                            .transition(
-                                .asymmetric(
-                                    insertion: .offset(y: PHONE_SECONDARY_SCREEN_OFFSET).combined(with: .opacity),
-                                    removal: .opacity
+                        .overlay {
+                            if let snapshot, let secondaryScreen {
+                                PhoneSecondaryScreenContainer(
+                                    screen: secondaryScreen,
+                                    snapshot: snapshot,
+                                    containerSize: geo.size,
+                                    onShowDalil: presentDalilScreen,
+                                    onShowTechnical: presentTechnicalScreen,
+                                    onDismiss: { dismissSecondaryScreen(triggerHaptic: false) }
                                 )
-                            )
+                                .allowsHitTesting(!isInteractionLocked)
+                                .transition(
+                                    .asymmetric(
+                                        insertion: .offset(y: PHONE_SECONDARY_SCREEN_OFFSET).combined(with: .opacity),
+                                        removal: .opacity
+                                    )
+                                )
+                            }
                         }
-                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .toolbarBackground(.hidden, for: .navigationBar)
         .task {
             await refreshSnapshot(forceResolveLocation: true)
         }
