@@ -154,18 +154,8 @@ export default function App() {
     </div>
   );
 
-  const rootStyle: CSSProperties | undefined = !isDesktop
-    ? {
-        backgroundColor: 'var(--bg)',
-        backgroundImage: `url(${import.meta.env.BASE_URL}mobile-night-sky-bg.png)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }
-    : undefined;
-
   return (
-    <div className={`app${isDesktop ? ' app--desktop' : ''}`} style={rootStyle}>
+    <div className={`app${isDesktop ? ' app--desktop' : ''}`}>
       {!isDesktop && (
         <header className="app-header">
           <div className="dial-ceremony-block dial-ceremony-block--mobile dial-ceremony-block--ayah-only">
