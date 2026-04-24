@@ -473,6 +473,16 @@ struct ContentView: View {
                             }
                         }
                         .allowsHitTesting(false)
+
+                    // Quran 4:103 — directly under ring (matches web `DialBelowRingAyah`).
+                    VStack(spacing: 0) {
+                        Spacer()
+                            .frame(height: ringOuterTop + dialSize + 12)
+                        PhoneDialBelowRingAyah(layoutWidth: containerSize.width)
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
                 }
                 .opacity(startupDialOpacity)
             } else {
@@ -985,6 +995,47 @@ private struct PhonePreStillsDialView: View {
             .position(dialCenter)
             .frame(width: w, height: h)
         }
+    }
+}
+
+/// Quran 4:103 under the ring — Scheherazade + gold / serif translation (web `dial-below-ring-ayah`).
+private struct PhoneDialBelowRingAyah: View {
+    let layoutWidth: CGFloat
+
+    private var contentWidth: CGFloat {
+        min(layoutWidth - PHONE_HOME_EDGE_INSET * 2, min(layoutWidth - 40, 352))
+    }
+
+    private var arabicSize: CGFloat {
+        min(layoutWidth * 0.05, 20)
+    }
+
+    private var englishSize: CGFloat {
+        min(layoutWidth * 0.039, 15.5)
+    }
+
+    var body: some View {
+        VStack(alignment: .center, spacing: 9) {
+            Text(PHONE_DIAL_FOOTER_AYAH_4_103_AR)
+                .font(Font(phoneArabicUIFont(size: arabicSize)))
+                .foregroundStyle(Colors.primaryGold)
+                .shadow(color: Color.black.opacity(0.38), radius: 0, x: 0, y: 1)
+                .shadow(color: Color.white.opacity(0.1), radius: 0, x: 0, y: -0.5)
+                .multilineTextAlignment(.center)
+                .lineSpacing(5)
+                .environment(\.layoutDirection, .rightToLeft)
+                .frame(maxWidth: contentWidth)
+
+            Text(PHONE_DIAL_FOOTER_AYAH_4_103_EN)
+                .font(.system(size: englishSize, weight: .regular, design: .serif))
+                .foregroundStyle(Colors.softQuoteWhite)
+                .multilineTextAlignment(.center)
+                .lineSpacing(3)
+                .frame(maxWidth: contentWidth)
+        }
+        .padding(.bottom, 10)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Quran 4:103")
     }
 }
 

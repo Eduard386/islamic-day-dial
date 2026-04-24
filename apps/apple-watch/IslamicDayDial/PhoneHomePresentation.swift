@@ -60,6 +60,10 @@ May Allah accept [this worship] from you and us!
 let PHONE_CUE_EID_AL_FITR = "Eid al-Fitr prayer time has started."
 let PHONE_CUE_EID_AL_ADHA = "Eid al-Adha prayer time has started."
 
+/// Quran 4:103 — below the dial on home (matches web `DialBelowRingAyah`).
+let PHONE_DIAL_FOOTER_AYAH_4_103_AR = "إِنَّ ٱلصَّلَوٰةَ كَانَتْ عَلَى ٱلْمُؤْمِنِينَ كِتَـٰبًۭا مَّوْقُوتًۭا"
+let PHONE_DIAL_FOOTER_AYAH_4_103_EN = "\"Indeed, performing prayers is a duty on the believers at the appointed times.\" [4:103]"
+
 private let PHONE_BASE_RING_LEGEND_TITLES = [
     "Fajr",
     "Duha",

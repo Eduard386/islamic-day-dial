@@ -7,11 +7,12 @@ cd "$(dirname "$0")/../apps/apple-watch"
 if [[ -n "${IOS_TEST_DESTINATION:-}" ]]; then
   DESTINATIONS=("$IOS_TEST_DESTINATION")
 else
+  # Pin OS so xcodebuild does not request OS=latest (can fail when multiple runtimes exist).
   DESTINATIONS=(
-    "platform=iOS Simulator,name=iPhone 17,arch=arm64"
-    "platform=iOS Simulator,name=iPhone 16,arch=arm64"
-    "platform=iOS Simulator,name=iPhone 17 Pro,arch=arm64"
-    "platform=iOS Simulator,name=iPhone SE (3rd generation),arch=arm64"
+    "platform=iOS Simulator,name=iPhone 17,OS=26.3.1,arch=arm64"
+    "platform=iOS Simulator,name=iPhone 16,OS=18.3.1,arch=arm64"
+    "platform=iOS Simulator,name=iPhone 17 Pro,OS=26.3.1,arch=arm64"
+    "platform=iOS Simulator,name=iPhone SE (3rd generation),OS=18.3.1,arch=arm64"
   )
 fi
 

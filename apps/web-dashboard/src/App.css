@@ -386,7 +386,8 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 12px;
-  min-height: 720px;
+  /* Dial + footnotes + 4:103 block below ring */
+  min-height: 860px;
 }
 
 /* ---------- Phase guidance (OBSERVE + cue + divider) ---------- */
@@ -563,6 +564,53 @@ body {
   margin: 10px 16px 0;
   flex: 0 0 auto;
   letter-spacing: 0.02em;
+}
+
+/* Dial column: ring + Quran line below */
+.dial-assembly {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.dial-below-ring-ayah {
+  margin: 0;
+  padding: 0 18px 8px;
+  margin-top: 1.35rem;
+  width: 100%;
+  max-width: min(32rem, 94vw);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.dial-below-ring-ayah__arabic {
+  margin: 0;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  font-size: clamp(1.05rem, 2.35vw, 1.38rem);
+  font-weight: 400;
+  line-height: 1.72;
+  letter-spacing: 0.02em;
+  color: var(--primary-gold);
+  text-shadow:
+    0 -0.5px 0 rgba(255, 255, 255, 0.1),
+    0 1px 0 rgba(0, 0, 0, 0.38);
+}
+
+.dial-below-ring-ayah__english {
+  margin: 0.7rem 0 0;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(0.84rem, 1.6vw, 1.02rem);
+  font-weight: 400;
+  line-height: 1.48;
+  letter-spacing: 0.02em;
+  color: var(--soft-quote-white);
+}
+
+.app--desktop .dial-below-ring-ayah {
+  margin-top: 1.5rem;
+  padding-bottom: 12px;
 }
 
 /* Dial + optional side footnotes (leader lines from ticks) */

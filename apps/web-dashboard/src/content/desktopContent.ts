@@ -31,6 +31,12 @@ export type TechnicalSection = {
 export const WEB_INSIGHT_AYAH_AR = 'إِنَّ عِدَّةَ الشُّهُورِ عِنْدَ اللَّهِ اثْنَا عَشَرَ شَهْرًا';
 export const WEB_INSIGHT_AYAH_EN = '"Indeed, the number of months ordained by Allah is twelve" [9:36]';
 
+/** Quran 4:103 — footer below the dial (web). */
+export const WEB_DIAL_FOOTER_AYAH_4_103_AR =
+  'إِنَّ ٱلصَّلَوٰةَ كَانَتْ عَلَى ٱلْمُؤْمِنِينَ كِتَـٰبًۭا مَّوْقُوتًۭا';
+export const WEB_DIAL_FOOTER_AYAH_4_103_EN =
+  '"Indeed, performing prayers is a duty on the believers at the appointed times." [4:103]';
+
 /** Eid (incl. Friday): Duha, Midday, Dhuhr — matches iOS `PHONE_CUE_EID_DAYTIME_TAQABBAL`. */
 const WEB_CUE_EID_DAYTIME_TAQABBAL = `تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
 Taqabbalallahu minna wa minkum!

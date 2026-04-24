@@ -14,6 +14,7 @@ import {
   shouldHidePhaseGuidanceObserveOverline,
   type ReadingKey,
 } from './content/desktopContent';
+import { DialBelowRingAyah } from './components/DialBelowRingAyah';
 import { PhaseGuidanceHeader } from './components/PhaseGuidanceHeader';
 import { trackVisit } from './lib/analytics';
 import './App.css';
@@ -111,43 +112,46 @@ export default function App() {
   };
 
   const renderDial = (dialSize: number, sidePad: number, interactive: boolean) => (
-    <div className="dial-footnotes-shell" style={{ ['--dial' as string]: `${dialSize}px`, ['--footnote-side' as string]: `${sidePad}px` }}>
-      <DialFootnotes
-        snapshot={snapshot}
-        dialSize={dialSize}
-        sidePad={sidePad}
-        activeLabelId={selectedReading?.emphasisId && selectedReading.emphasisId !== 'center' ? selectedReading.emphasisId : null}
-        onSelect={interactive ? openFootnoteReading : undefined}
-      />
-      <div className="dial-core">
-        <div
-          className={`dial-wrapper${interactive ? ' dial-wrapper--interactive' : ''}`}
-          onClick={interactive && selectedReading ? clearReading : undefined}
-          role={interactive && selectedReading ? 'button' : undefined}
-          tabIndex={interactive && selectedReading ? 0 : undefined}
-          onKeyDown={
-            interactive && selectedReading
-              ? (event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    clearReading();
+    <div className="dial-assembly">
+      <div className="dial-footnotes-shell" style={{ ['--dial' as string]: `${dialSize}px`, ['--footnote-side' as string]: `${sidePad}px` }}>
+        <DialFootnotes
+          snapshot={snapshot}
+          dialSize={dialSize}
+          sidePad={sidePad}
+          activeLabelId={selectedReading?.emphasisId && selectedReading.emphasisId !== 'center' ? selectedReading.emphasisId : null}
+          onSelect={interactive ? openFootnoteReading : undefined}
+        />
+        <div className="dial-core">
+          <div
+            className={`dial-wrapper${interactive ? ' dial-wrapper--interactive' : ''}`}
+            onClick={interactive && selectedReading ? clearReading : undefined}
+            role={interactive && selectedReading ? 'button' : undefined}
+            tabIndex={interactive && selectedReading ? 0 : undefined}
+            onKeyDown={
+              interactive && selectedReading
+                ? (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      clearReading();
+                    }
                   }
-                }
-              : undefined
-          }
-        >
-          <IslamicRing snapshot={snapshot} now={effectiveNow} size={dialSize} />
-          <div className={`center-overlay${interactive && currentReadableKey ? ' center-overlay--interactive' : ''}`}>
-            <CenterInfo
-              snapshot={snapshot}
-              now={effectiveNow}
-              timezone={timezone}
-              onPeriodSelect={interactive && currentReadableKey ? openCurrentReading : undefined}
-              isPeriodSelected={selectedReading?.emphasisId === 'center'}
-            />
+                : undefined
+            }
+          >
+            <IslamicRing snapshot={snapshot} now={effectiveNow} size={dialSize} />
+            <div className={`center-overlay${interactive && currentReadableKey ? ' center-overlay--interactive' : ''}`}>
+              <CenterInfo
+                snapshot={snapshot}
+                now={effectiveNow}
+                timezone={timezone}
+                onPeriodSelect={interactive && currentReadableKey ? openCurrentReading : undefined}
+                isPeriodSelected={selectedReading?.emphasisId === 'center'}
+              />
+            </div>
           </div>
         </div>
       </div>
+      <DialBelowRingAyah />
     </div>
   );
 
