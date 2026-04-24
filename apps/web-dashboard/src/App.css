@@ -193,7 +193,6 @@ body {
   --desktop-reading-panel-height: 720px;
 }
 
-.desktop-months-rail,
 .desktop-reading-panel {
   border: 1px solid rgba(139, 132, 119, 0.28);
   background:
@@ -205,13 +204,15 @@ body {
     0 24px 60px rgba(0, 0, 0, 0.28);
 }
 
+/* Manuscript-style months column: flat black void, typography-first (matches iOS Hijri sheet). */
 .desktop-months-rail {
   align-self: start;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 28px 24px 20px;
+  background: #030303;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 28px 22px 32px;
 }
 
 .desktop-reading-panel--empty {
@@ -234,63 +235,132 @@ body {
   letter-spacing: 0.01em;
 }
 
-.desktop-months-ayah-block {
+.desktop-months-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  max-width: 22rem;
+  margin: 0 auto;
+  gap: 0;
 }
 
 .desktop-months-ayah {
-  color: var(--warm-sacred-white);
+  color: #ede8df;
   font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
-  font-size: 1.85rem;
-  line-height: 1.5;
-  text-align: right;
+  font-size: clamp(1.45rem, 2.6vw, 1.85rem);
+  line-height: 1.55;
+  text-align: center;
+  width: 100%;
+  margin: 0;
+  padding-bottom: 1.75rem;
 }
 
 .desktop-months-translation {
-  color: var(--soft-quote-white);
+  color: rgba(200, 194, 184, 0.92);
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  text-align: center;
+  width: 100%;
+  max-width: 20.5rem;
+  margin: 0;
+  padding-bottom: 2.5rem;
+}
+
+.desktop-months-ornament {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  max-width: 17.5rem;
+  gap: 0.45rem;
+  color: rgba(184, 152, 110, 0.88);
+  margin: 0 0 1.15rem;
+}
+
+.desktop-months-ornament-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(184, 152, 110, 0.42);
+  min-width: 1.5rem;
+}
+
+.desktop-months-ornament-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(184, 152, 110, 0.72);
+  flex-shrink: 0;
+}
+
+.desktop-months-ornament-rosette {
+  flex-shrink: 0;
+  display: block;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.92;
+}
+
+.desktop-months-section-label {
+  margin: 0 0 1.65rem;
   font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 1rem;
-  line-height: 1.4;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(200, 155, 90, 0.9);
+  text-align: center;
 }
 
 .desktop-months-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.85rem;
   padding: 0;
   margin: 0;
+  width: 100%;
 }
 
 .desktop-month-item {
   display: grid;
-  grid-template-columns: 24px 1fr;
-  align-items: center;
-  gap: 12px;
-  color: rgba(221, 214, 202, 0.76);
-  font-size: 0.95rem;
-  letter-spacing: 0.03em;
-  padding: 6px 10px;
-  border-radius: 12px;
-  transition: background 0.24s ease, color 0.24s ease, transform 0.24s ease;
+  grid-template-columns: 2.25rem 1fr;
+  align-items: baseline;
+  gap: 0.65rem 0.85rem;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
 }
 
 .desktop-month-item.is-active {
-  background: rgba(199, 155, 59, 0.1);
-  color: var(--warm-sacred-white);
-  transform: translateX(4px);
+  background: transparent;
+  transform: none;
 }
 
 .desktop-month-index {
-  color: var(--cool-muted-subtitle);
-  font-size: 0.82rem;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgba(168, 162, 152, 0.55);
   text-align: right;
 }
 
 .desktop-month-item.is-active .desktop-month-index {
-  color: var(--primary-gold);
+  color: rgba(200, 155, 90, 0.88);
+}
+
+.desktop-month-name {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Georgia', serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #e8e3d9;
+}
+
+.desktop-month-item.is-active .desktop-month-name {
+  color: rgba(212, 175, 115, 0.95);
 }
 
 .desktop-stage {
@@ -357,7 +427,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
+  gap: 0.45rem;
   width: 100%;
   max-width: min(22rem, 88vw);
   margin: 1.15rem auto 0;
@@ -371,20 +441,28 @@ body {
   border-radius: 1px;
 }
 
+.phase-guidance-divider-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(184, 152, 110, 0.72);
+  flex-shrink: 0;
+}
+
 .phase-guidance-divider-ornament {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(184, 145, 97, 0.55);
 }
 
-/* Critical: unstyled SVG defaults to ~300×150 and can cover the dial */
-.phase-guidance-ornament-svg {
-  width: 12px;
-  height: 12px;
+.phase-guidance-ornament-img {
+  width: 28px;
+  height: 28px;
   display: block;
   flex-shrink: 0;
+  object-fit: contain;
+  opacity: 0.92;
 }
 
 .phase-guidance-header--desktop {

@@ -27,18 +27,18 @@ export function PhaseGuidanceHeader({
       </p>
       <div className="phase-guidance-divider" aria-hidden>
         <span className="phase-guidance-divider-line" />
+        <span className="phase-guidance-divider-dot" />
         <span className="phase-guidance-divider-ornament">
-          <svg
-            className="phase-guidance-ornament-svg"
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            focusable="false"
-          >
-            <circle cx="6" cy="6" r="3.6" fill="none" stroke="currentColor" strokeWidth="0.45" />
-            <path d="M6 3.3 L8.7 6 6 8.7 3.3 6Z" fill="currentColor" />
-          </svg>
+          <img
+            className="phase-guidance-ornament-img"
+            src={`${import.meta.env.BASE_URL}hijri-ornament-divider.png`}
+            alt=""
+            width={28}
+            height={28}
+            decoding="async"
+          />
         </span>
+        <span className="phase-guidance-divider-dot" />
         <span className="phase-guidance-divider-line" />
       </div>
     </div>

@@ -1083,92 +1083,157 @@ private struct PhoneOverlaySheet<Content: View>: View {
     }
 }
 
+/// Deep black manuscript backdrop (matches home dial void; no brown “reading” gradient).
+private let PHONE_HIJRI_MONTHS_PAGE_BG = Color(red: 0.018, green: 0.018, blue: 0.019)
+
+private let PHONE_HIJRI_MONTHS_IVORY = Color(red: 0.93, green: 0.91, blue: 0.86)
+
+private let PHONE_HIJRI_MONTHS_IVORY_DIM = Color(red: 0.70, green: 0.67, blue: 0.62)
+
+private let PHONE_HIJRI_MONTHS_GOLD_RULE = Color(red: 0.58, green: 0.48, blue: 0.36)
+
+private struct HijriManuscriptRosetteGlyph: View {
+    var body: some View {
+        Image("HijriOrnamentDivider")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 26, height: 26)
+            .accessibilityHidden(true)
+    }
+}
+
+private struct HijriManuscriptRule: View {
+    let maxWidth: CGFloat
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Rectangle()
+                .fill(PHONE_HIJRI_MONTHS_GOLD_RULE.opacity(0.38))
+                .frame(height: 0.5)
+                .frame(maxWidth: .infinity)
+            Circle()
+                .fill(PHONE_HIJRI_MONTHS_GOLD_RULE.opacity(0.72))
+                .frame(width: 2.5, height: 2.5)
+            HijriManuscriptRosetteGlyph()
+            Circle()
+                .fill(PHONE_HIJRI_MONTHS_GOLD_RULE.opacity(0.72))
+                .frame(width: 2.5, height: 2.5)
+            Rectangle()
+                .fill(PHONE_HIJRI_MONTHS_GOLD_RULE.opacity(0.38))
+                .frame(height: 0.5)
+                .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: maxWidth)
+        .accessibilityHidden(true)
+    }
+}
+
 private struct PhoneHijriMonthsSheetView: View {
     let snapshot: ComputedIslamicDay
     let containerSize: CGSize
     let onDismiss: () -> Void
 
-    private var translationFont: Font {
-        phoneTranslationFont(containerSize: containerSize)
-    }
-
-    private var ayahFont: Font {
-        phoneArabicFont(size: min(containerSize.width * 0.062, 23.5), weight: .medium)
-    }
-
     var body: some View {
-        PhoneOverlaySheet(
-            containerSize: containerSize,
-            maxHeightRatio: 1,
-            isCentered: true,
-            tone: .reading,
-            style: .fullScreen,
-            onTapDismiss: onDismiss
-        ) {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 26) {
-                    VStack(spacing: 18) {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let safeTop = geo.safeAreaInsets.top
+            let safeBottom = geo.safeAreaInsets.bottom
+            let ayahSize = min(w * 0.078, 29)
+            let englishSize = min(w * 0.041, 17)
+            let monthNameSize = min(w * 0.043, 16.5)
+            let monthNumSize = min(w * 0.034, 12.5)
+            let ruleWidth = min(w - 56, 300)
+
+            ZStack {
+                PHONE_HIJRI_MONTHS_PAGE_BG
+                    .ignoresSafeArea()
+
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .center, spacing: 0) {
                         Text(PHONE_INSIGHT_AYAH_AR)
-                            .font(ayahFont)
-                            .foregroundColor(PHONE_SACRED_WHITE.opacity(0.95))
+                            .font(phoneArabicFont(size: ayahSize, weight: .medium))
+                            .foregroundColor(PHONE_HIJRI_MONTHS_IVORY)
                             .multilineTextAlignment(.center)
-                            .lineSpacing(min(containerSize.width * 0.037, 14.5))
+                            .lineSpacing(10)
                             .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: min(containerSize.width - 54, 352))
+                            .frame(maxWidth: min(w - 44, 382))
+                            .padding(.top, safeTop + 18)
+                            .padding(.bottom, 34)
 
                         Text(PHONE_INSIGHT_AYAH_EN)
-                            .font(translationFont)
-                            .foregroundColor(PHONE_SOFT_WHITE.opacity(0.93))
+                            .font(.system(size: englishSize, weight: .regular, design: .serif))
+                            .foregroundColor(PHONE_HIJRI_MONTHS_IVORY_DIM)
                             .multilineTextAlignment(.center)
-                            .lineSpacing(min(containerSize.width * 0.022, 8))
+                            .lineSpacing(6)
                             .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: min(containerSize.width - 66, 336))
-                    }
+                            .frame(maxWidth: min(w - 52, 348))
+                            .padding(.bottom, 42)
 
-                    Rectangle()
-                        .fill(PHONE_PANEL_STROKE.opacity(0.4))
-                        .frame(height: 1)
-                        .frame(maxWidth: min(containerSize.width - 112, 222))
+                        HijriManuscriptRule(maxWidth: ruleWidth)
+                            .padding(.horizontal, 28)
+                            .padding(.bottom, 20)
 
-                    HStack(alignment: .top, spacing: 18) {
-                        VStack(alignment: .leading, spacing: 15) {
-                            ForEach(0..<6, id: \.self) { index in
-                                monthRow(index: index)
+                        Text("HIJRI MONTHS")
+                            .font(.system(size: min(w * 0.032, 12.5), weight: .medium, design: .default))
+                            .tracking(3.4)
+                            .textCase(.uppercase)
+                            .foregroundColor(PHONE_ANTIQUE_GOLD.opacity(0.9))
+                            .padding(.bottom, 30)
+
+                        HStack(alignment: .top, spacing: max(22, w * 0.055)) {
+                            VStack(alignment: .leading, spacing: 16) {
+                                ForEach(0..<6, id: \.self) { index in
+                                    monthRow(index: index, w: w, monthNameSize: monthNameSize, monthNumSize: monthNumSize)
+                                }
                             }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                        VStack(alignment: .leading, spacing: 15) {
-                            ForEach(6..<12, id: \.self) { index in
-                                monthRow(index: index)
+                            VStack(alignment: .leading, spacing: 16) {
+                                ForEach(6..<12, id: \.self) { index in
+                                    monthRow(index: index, w: w, monthNameSize: monthNameSize, monthNumSize: monthNumSize)
+                                }
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: min(w - 40, 420))
+                        .padding(.bottom, max(40, safeBottom + 28))
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, PHONE_PANEL_HORIZONTAL_PADDING)
-                .padding(.vertical, PHONE_PANEL_VERTICAL_PADDING)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    onDismiss()
+                }
+            )
         }
+        .frame(width: containerSize.width, height: containerSize.height)
     }
 
     @ViewBuilder
-    private func monthRow(index: Int) -> some View {
+    private func monthRow(index: Int, w: CGFloat, monthNameSize: CGFloat, monthNumSize: CGFloat) -> some View {
         let monthName = PHONE_HIJRI_MONTH_NAMES[index]
         let isCurrentMonth = snapshot.hijriDate.monthNumber == index + 1
+        let num = String(format: "%02d", index + 1)
 
-        HStack(alignment: .top, spacing: 10) {
-            Text("\(index + 1)")
-                .font(phoneTextFont(size: min(containerSize.width * 0.034, 13), weight: .medium))
-                .foregroundColor(PHONE_MUTED_META.opacity(0.62))
-                .frame(width: 18, alignment: .trailing)
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text(num)
+                .font(.system(size: monthNumSize, weight: .medium, design: .default))
+                .foregroundColor(
+                    isCurrentMonth
+                        ? PHONE_ANTIQUE_GOLD.opacity(0.88)
+                        : PHONE_HIJRI_MONTHS_IVORY_DIM.opacity(0.52)
+                )
+                .monospacedDigit()
+                .frame(width: max(26, w * 0.07), alignment: .trailing)
 
             Text(phoneSentenceCaseMonth(monthName))
-                .font(phoneTextFont(size: min(containerSize.width * 0.041, 15), weight: .regular))
-                .foregroundColor(isCurrentMonth ? PHONE_ANTIQUE_GOLD : PHONE_SOFT_WHITE.opacity(0.94))
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                .font(.system(size: monthNameSize, weight: .regular, design: .serif))
+                .foregroundColor(isCurrentMonth ? PHONE_ANTIQUE_GOLD : PHONE_HIJRI_MONTHS_IVORY)
+                .lineLimit(2)
+                .minimumScaleFactor(0.78)
                 .multilineTextAlignment(.leading)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1856,7 +1921,6 @@ private enum PhaseGuidancePalette {
 
 private struct PhaseGuidanceDivider: View {
     let lineColor: Color
-    let ornamentColor: Color
     let layoutWidth: CGFloat
 
     private var contentWidth: CGFloat {
@@ -1864,14 +1928,18 @@ private struct PhaseGuidanceDivider: View {
     }
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 7) {
             Rectangle()
                 .fill(lineColor)
                 .frame(height: 0.5)
                 .frame(maxWidth: .infinity)
-
-            PhaseGuidanceRosette(color: ornamentColor)
-
+            Circle()
+                .fill(PHONE_HIJRI_MONTHS_GOLD_RULE.opacity(0.72))
+                .frame(width: 2.5, height: 2.5)
+            PhaseGuidanceRosette()
+            Circle()
+                .fill(PHONE_HIJRI_MONTHS_GOLD_RULE.opacity(0.72))
+                .frame(width: 2.5, height: 2.5)
             Rectangle()
                 .fill(lineColor)
                 .frame(height: 0.5)
@@ -1881,34 +1949,14 @@ private struct PhaseGuidanceDivider: View {
     }
 }
 
-private struct TinyDiamond: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        let c = CGPoint(x: rect.midX, y: rect.midY)
-        let r = min(rect.width, rect.height) / 2
-        p.move(to: CGPoint(x: c.x, y: c.y - r))
-        p.addLine(to: CGPoint(x: c.x + r, y: c.y))
-        p.addLine(to: CGPoint(x: c.x, y: c.y + r))
-        p.addLine(to: CGPoint(x: c.x - r, y: c.y))
-        p.closeSubpath()
-        return p
-    }
-}
-
 private struct PhaseGuidanceRosette: View {
-    let color: Color
-
     var body: some View {
-        ZStack {
-            Circle()
-                .strokeBorder(color.opacity(0.9), lineWidth: 0.45)
-                .frame(width: 9, height: 9)
-            TinyDiamond()
-                .fill(color.opacity(0.9))
-                .frame(width: 3.4, height: 3.4)
-        }
-        .frame(width: 12, height: 12)
-        .accessibilityHidden(true)
+        Image("HijriOrnamentDivider")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 26, height: 26)
+            .opacity(0.92)
+            .accessibilityHidden(true)
     }
 }
 
@@ -1940,10 +1988,6 @@ private struct PhaseGuidanceHeader: View {
         PhaseGuidancePalette.sandPrimary.opacity(0.28)
     }
 
-    private var dividerOrnament: Color {
-        PhaseGuidancePalette.sandSoft.opacity(0.55)
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             if !modeLabel.isEmpty {
@@ -1973,7 +2017,6 @@ private struct PhaseGuidanceHeader: View {
 
             PhaseGuidanceDivider(
                 lineColor: dividerLine,
-                ornamentColor: dividerOrnament,
                 layoutWidth: layoutWidth
             )
         }
