@@ -1,5 +1,5 @@
 type PhaseGuidanceHeaderProps = {
-  /** Quiet rubric above the guidance line (e.g. OBSERVE). Empty string hides it (e.g. Jumu’ah). */
+  /** Quiet rubric above the guidance line (e.g. OBSERVE, or Prepare for Jumu'ah). Empty hides it (e.g. Eid Taqabbal). */
   modeLabel?: string;
   /** Observational phrase for the current sector; keep sentence case. */
   guidanceText: string;
@@ -47,22 +47,6 @@ export function PhaseGuidanceHeader({
           guidanceText
         )}
       </p>
-      <div className="phase-guidance-divider" aria-hidden>
-        <span className="phase-guidance-divider-line" />
-        <span className="phase-guidance-divider-dot" />
-        <span className="phase-guidance-divider-ornament">
-          <img
-            className="phase-guidance-ornament-img"
-            src={`${import.meta.env.BASE_URL}hijri-ornament-divider.png`}
-            alt=""
-            width={28}
-            height={28}
-            decoding="async"
-          />
-        </span>
-        <span className="phase-guidance-divider-dot" />
-        <span className="phase-guidance-divider-line" />
-      </div>
     </div>
   );
 }

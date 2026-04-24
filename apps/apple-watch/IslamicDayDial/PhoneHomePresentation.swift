@@ -50,7 +50,9 @@ let PHONE_CUE_ASR = "Asr starts when the shadow length equals the object's heigh
 let PHONE_CUE_MAGHRIB = "If the sun has gone down, Maghrib time has begun."
 let PHONE_CUE_ISHA = "Isha starts when the last twilight has disappeared."
 let PHONE_CUE_LAST_THIRD = "The last third of the night is here. Isha lasts from Maghrib to Fajr."
-let PHONE_CUE_JUMUAH = "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutbah."
+/// Same typographic slot as `OBSERVE` on other days (matches web `WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE`).
+let PHONE_PHASE_GUIDANCE_JUMUAH_OVERLINE = "Prepare for Jumu'ah"
+let PHONE_CUE_JUMUAH = "Take a bath, use perfume, dress well, and remain silent during the khutbah."
 /// Eid (incl. Friday): Duha, Midday, and Dhuhr sectors — replaces Jumu'ah prep / short Eid noon copy.
 let PHONE_CUE_EID_DAYTIME_TAQABBAL = """
 تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
@@ -118,9 +120,9 @@ func phoneObservationalCueText(for title: String) -> String {
     }
 }
 
-/// Overline above phase guidance: empty during Jumu'ah or Eid Taqabbal (like web `shouldHidePhaseGuidanceObserveOverline`).
+/// Overline above phase guidance: `Prepare for Jumu'ah` on Friday noon window; empty for Eid Taqabbal; else `OBSERVE`.
 func phonePhaseGuidanceModeLabel(displayTitle: String, cueText: String) -> String {
-    if displayTitle == "Jumu'ah" { return "" }
+    if displayTitle == "Jumu'ah" { return PHONE_PHASE_GUIDANCE_JUMUAH_OVERLINE }
     if cueText == PHONE_CUE_EID_DAYTIME_TAQABBAL { return "" }
     return "OBSERVE"
 }

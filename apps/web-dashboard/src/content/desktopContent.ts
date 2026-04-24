@@ -42,6 +42,12 @@ const WEB_CUE_EID_DAYTIME_TAQABBAL = `تَقَبَّلَ اللهُ مِنَّا
 Taqabbalallahu minna wa minkum!
 May Allah accept [this worship] from you and us!`;
 
+/** Same slot as "OBSERVE" on non-Friday; pairs with {@link WEB_CUE_JUMUAH_BODY}. */
+export const WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE = "Prepare for Jumu'ah";
+
+const WEB_CUE_JUMUAH_BODY =
+  'Take a bath, use perfume, dress well, and remain silent during the khutbah.';
+
 function webObservationalCueForSectorTitle(sectorTitle: string): string {
   switch (sectorTitle) {
     case 'Fajr':
@@ -63,7 +69,7 @@ function webObservationalCueForSectorTitle(sectorTitle: string): string {
     case 'Last 3rd':
       return 'The last third of the night is here. Isha lasts from Maghrib to Fajr.';
     case "Jumu'ah":
-      return "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutbah.";
+      return WEB_CUE_JUMUAH_BODY;
     case 'EID AL-FITR':
       return 'Eid al-Fitr prayer time has started.';
     case 'EID AL-ADHA':

@@ -5,8 +5,6 @@ private let DIAL_VERTICAL_GAP: CGFloat = 18
 private let DIAL_SECTION_HEIGHT: CGFloat = 436
 /// Horizontal inset on the home `ZStack` (must match `.padding(.horizontal, …)` on that stack).
 private let PHONE_HOME_EDGE_INSET: CGFloat = 20
-/// Push phase guidance (OBSERVE block) slightly lower inside the cue band above the ring.
-private let PHONE_PHASE_GUIDANCE_VERTICAL_NUDGE: CGFloat = 16
 
 private func phoneHomeDialOuterDiameter(contentWidth: CGFloat) -> CGFloat {
     min(max(contentWidth - 8, 0), DIAL_SECTION_HEIGHT) * 1.28
@@ -436,9 +434,7 @@ struct ContentView: View {
                 let contentWidth = max(0, containerSize.width - PHONE_HOME_EDGE_INSET * 2)
                 let dialSize = phoneHomeDialOuterDiameter(contentWidth: contentWidth)
                 let h = containerSize.height
-                // Outer top of ring: same geometry as PhonePreStillsDialView (ring centered in full height).
                 let ringOuterTop = h * 0.5 - dialSize * 0.5
-                let cueBandHeight = max(0, ringOuterTop)
 
                 ZStack(alignment: .top) {
                     PhonePreStillsDialView(
@@ -451,37 +447,38 @@ struct ContentView: View {
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    Color.clear
-                        .frame(height: cueBandHeight)
-                        .frame(maxWidth: .infinity)
-                        .overlay {
-                            GeometryReader { bandGeo in
-                                PhaseGuidanceHeader(
-                                    modeLabel: phonePhaseGuidanceModeLabel(
-                                        displayTitle: homePresentation.displayTitle,
-                                        cueText: homePresentation.currentCueText
-                                    ),
-                                    guidanceText: homePresentation.currentCueText,
-                                    layoutWidth: bandGeo.size.width,
-                                    layoutHeight: containerSize.height
-                                )
-                                .fixedSize(horizontal: false, vertical: true)
-                                .position(
-                                    x: bandGeo.size.width * 0.5,
-                                    y: bandGeo.size.height * 0.5 + PHONE_PHASE_GUIDANCE_VERTICAL_NUDGE
-                                )
-                            }
-                        }
-                        .allowsHitTesting(false)
-
-                    // Quran 4:103 — directly under ring (matches web `DialBelowRingAyah`).
+                    // Quran 4:103 above the ring (matches web header ayah block).
                     VStack(spacing: 0) {
-                        Spacer()
-                            .frame(height: ringOuterTop + dialSize + 12)
                         PhoneDialBelowRingAyah(layoutWidth: containerSize.width)
                         Spacer(minLength: 0)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 8)
+                    .allowsHitTesting(false)
+
+                    // Below ring: ornament divider → OBSERVE + cue (matches web `DialPostRingGuidance`).
+                    VStack(spacing: 0) {
+                        Spacer()
+                            .frame(height: ringOuterTop + dialSize + 12)
+                        PhaseGuidanceDivider(
+                            lineColor: PhaseGuidancePalette.sandPrimary.opacity(0.28),
+                            layoutWidth: containerSize.width
+                        )
+                        Spacer()
+                            .frame(height: 12)
+                        PhaseGuidanceHeader(
+                            modeLabel: phonePhaseGuidanceModeLabel(
+                                displayTitle: homePresentation.displayTitle,
+                                cueText: homePresentation.currentCueText
+                            ),
+                            guidanceText: homePresentation.currentCueText,
+                            layoutWidth: containerSize.width,
+                            layoutHeight: containerSize.height
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     .allowsHitTesting(false)
                 }
                 .opacity(startupDialOpacity)
@@ -2211,10 +2208,6 @@ private struct PhaseGuidanceHeader: View {
         max(2.5, min(4.5, layoutHeight * 0.0038))
     }
 
-    private var dividerLine: Color {
-        PhaseGuidancePalette.sandPrimary.opacity(0.28)
-    }
-
     private var arabicLeadSplit: (arabic: String, latin: String)? {
         let lines = guidanceText.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
         guard lines.count >= 2, let first = lines.first else { return nil }
@@ -2270,14 +2263,6 @@ private struct PhaseGuidanceHeader: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: contentWidth)
             }
-
-            Spacer()
-                .frame(height: 20)
-
-            PhaseGuidanceDivider(
-                lineColor: dividerLine,
-                layoutWidth: layoutWidth
-            )
         }
         .frame(maxWidth: layoutWidth)
         .animation(.easeInOut(duration: 0.42), value: guidanceText)

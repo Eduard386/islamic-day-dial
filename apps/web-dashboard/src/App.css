@@ -385,12 +385,60 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 12px;
-  /* Dial + footnotes + 4:103 block below ring */
-  min-height: 860px;
+  /* Space under 4:103 — dial sits a touch lower than before */
+  padding-top: 26px;
+  min-height: 720px;
 }
 
-/* ---------- Phase guidance (OBSERVE + cue + divider) ---------- */
+/* Ayah 4:103 above the dial (ornament + OBSERVE are below the ring). */
+.dial-ceremony-block {
+  width: 100%;
+  max-width: min(32rem, 94vw);
+  margin-inline: auto;
+  padding-inline: 12px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.dial-ceremony-block--mobile {
+  margin-top: 8px;
+}
+
+.dial-ceremony-block--desktop {
+  margin-top: 10px;
+}
+
+.dial-ceremony-block--ayah-only {
+  margin-bottom: 0;
+}
+
+.dial-post-ring-guidance {
+  width: 100%;
+  max-width: min(32rem, 94vw);
+  margin-inline: auto;
+  padding-inline: 12px;
+  box-sizing: border-box;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.dial-post-ring-guidance--desktop {
+  /* Pull ornament + OBSERVE toward the dial (column still uses 720px ring min-height). */
+  margin-top: -188px;
+  padding-bottom: 8px;
+}
+
+.dial-post-ring-guidance--mobile {
+  margin-top: 10px;
+  padding-bottom: 12px;
+}
+
+/* Ornament under the ring, above OBSERVE */
+.phase-guidance-divider--post-ring {
+  margin: 0.35rem auto 0.85rem;
+}
+
+/* ---------- Phase guidance (OBSERVE + cue; ornament divider in DialPostRingGuidance) ---------- */
 .phase-guidance-header {
   width: 100%;
   max-width: min(28rem, 92vw);
@@ -487,12 +535,12 @@ body {
 }
 
 .phase-guidance-header--desktop {
-  margin-top: 16px;
+  margin-top: 0;
   margin-bottom: 0;
 }
 
 .phase-guidance-header--mobile {
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 @media (max-width: 1179px) {
@@ -566,21 +614,12 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* Dial column: ring + Quran line below */
-.dial-assembly {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  flex: 0 0 auto;
-}
-
+/* Quran 4:103 (top rubric; lives inside .dial-ceremony-block) */
 .dial-below-ring-ayah {
   margin: 0;
-  padding: 0 18px 8px;
-  margin-top: 1.35rem;
+  padding: 0 6px 0;
   width: 100%;
-  max-width: min(32rem, 94vw);
+  max-width: min(32rem, 100%);
   box-sizing: border-box;
   text-align: center;
 }
@@ -592,10 +631,8 @@ body {
   font-weight: 400;
   line-height: 1.72;
   letter-spacing: 0.02em;
-  color: var(--primary-gold);
-  text-shadow:
-    0 -0.5px 0 rgba(255, 255, 255, 0.1),
-    0 1px 0 rgba(0, 0, 0, 0.38);
+  /* Same as Taqabbal Latin line in `.phase-guidance-main` (e.g. “Taqabbalallahu…”) */
+  color: var(--phase-sand-primary);
 }
 
 .dial-below-ring-ayah__english {
@@ -605,12 +642,8 @@ body {
   font-weight: 400;
   line-height: 1.48;
   letter-spacing: 0.02em;
-  color: var(--soft-quote-white);
-}
-
-.app--desktop .dial-below-ring-ayah {
-  margin-top: 1.5rem;
-  padding-bottom: 12px;
+  /* Same as 9:36 English in `.desktop-months-translation` */
+  color: rgba(200, 194, 184, 0.92);
 }
 
 /* Dial + optional side footnotes (leader lines from ticks) */

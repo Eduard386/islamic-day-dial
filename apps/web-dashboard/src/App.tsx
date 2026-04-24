@@ -12,10 +12,11 @@ import {
   getReadingKeyForSectorDisplayName,
   getWebObservationalCue,
   shouldHidePhaseGuidanceObserveOverline,
+  WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE,
   type ReadingKey,
 } from './content/desktopContent';
 import { DialBelowRingAyah } from './components/DialBelowRingAyah';
-import { PhaseGuidanceHeader } from './components/PhaseGuidanceHeader';
+import { DialPostRingGuidance } from './components/DialPostRingGuidance';
 import { trackVisit } from './lib/analytics';
 import './App.css';
 
@@ -89,9 +90,10 @@ export default function App() {
     [snapshot, effectiveNow],
   );
 
-  const phaseGuidanceOverline =
-    currentPeriodLabel === "Jumu'ah" || shouldHidePhaseGuidanceObserveOverline(observationalCue)
-      ? ''
+  const phaseGuidanceOverline = shouldHidePhaseGuidanceObserveOverline(observationalCue)
+    ? ''
+    : currentPeriodLabel === "Jumu'ah"
+      ? WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE
       : 'OBSERVE';
 
   const openCurrentReading = () => {
@@ -112,46 +114,43 @@ export default function App() {
   };
 
   const renderDial = (dialSize: number, sidePad: number, interactive: boolean) => (
-    <div className="dial-assembly">
-      <div className="dial-footnotes-shell" style={{ ['--dial' as string]: `${dialSize}px`, ['--footnote-side' as string]: `${sidePad}px` }}>
-        <DialFootnotes
-          snapshot={snapshot}
-          dialSize={dialSize}
-          sidePad={sidePad}
-          activeLabelId={selectedReading?.emphasisId && selectedReading.emphasisId !== 'center' ? selectedReading.emphasisId : null}
-          onSelect={interactive ? openFootnoteReading : undefined}
-        />
-        <div className="dial-core">
-          <div
-            className={`dial-wrapper${interactive ? ' dial-wrapper--interactive' : ''}`}
-            onClick={interactive && selectedReading ? clearReading : undefined}
-            role={interactive && selectedReading ? 'button' : undefined}
-            tabIndex={interactive && selectedReading ? 0 : undefined}
-            onKeyDown={
-              interactive && selectedReading
-                ? (event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      clearReading();
-                    }
+    <div className="dial-footnotes-shell" style={{ ['--dial' as string]: `${dialSize}px`, ['--footnote-side' as string]: `${sidePad}px` }}>
+      <DialFootnotes
+        snapshot={snapshot}
+        dialSize={dialSize}
+        sidePad={sidePad}
+        activeLabelId={selectedReading?.emphasisId && selectedReading.emphasisId !== 'center' ? selectedReading.emphasisId : null}
+        onSelect={interactive ? openFootnoteReading : undefined}
+      />
+      <div className="dial-core">
+        <div
+          className={`dial-wrapper${interactive ? ' dial-wrapper--interactive' : ''}`}
+          onClick={interactive && selectedReading ? clearReading : undefined}
+          role={interactive && selectedReading ? 'button' : undefined}
+          tabIndex={interactive && selectedReading ? 0 : undefined}
+          onKeyDown={
+            interactive && selectedReading
+              ? (event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    clearReading();
                   }
-                : undefined
-            }
-          >
-            <IslamicRing snapshot={snapshot} now={effectiveNow} size={dialSize} />
-            <div className={`center-overlay${interactive && currentReadableKey ? ' center-overlay--interactive' : ''}`}>
-              <CenterInfo
-                snapshot={snapshot}
-                now={effectiveNow}
-                timezone={timezone}
-                onPeriodSelect={interactive && currentReadableKey ? openCurrentReading : undefined}
-                isPeriodSelected={selectedReading?.emphasisId === 'center'}
-              />
-            </div>
+                }
+              : undefined
+          }
+        >
+          <IslamicRing snapshot={snapshot} now={effectiveNow} size={dialSize} />
+          <div className={`center-overlay${interactive && currentReadableKey ? ' center-overlay--interactive' : ''}`}>
+            <CenterInfo
+              snapshot={snapshot}
+              now={effectiveNow}
+              timezone={timezone}
+              onPeriodSelect={interactive && currentReadableKey ? openCurrentReading : undefined}
+              isPeriodSelected={selectedReading?.emphasisId === 'center'}
+            />
           </div>
         </div>
       </div>
-      <DialBelowRingAyah />
     </div>
   );
 
@@ -159,11 +158,9 @@ export default function App() {
     <div className={`app${isDesktop ? ' app--desktop' : ''}`}>
       {!isDesktop && (
         <header className="app-header">
-          <PhaseGuidanceHeader
-            modeLabel={phaseGuidanceOverline}
-            guidanceText={observationalCue}
-            className="phase-guidance-header--mobile"
-          />
+          <div className="dial-ceremony-block dial-ceremony-block--mobile dial-ceremony-block--ayah-only">
+            <DialBelowRingAyah />
+          </div>
         </header>
       )}
 
@@ -180,14 +177,17 @@ export default function App() {
             <DesktopMonthsRail ref={monthsRailRef} snapshot={snapshot} />
 
             <section className="desktop-stage">
-              <PhaseGuidanceHeader
-                modeLabel={phaseGuidanceOverline}
-                guidanceText={observationalCue}
-                className="phase-guidance-header--desktop"
-              />
+              <div className="dial-ceremony-block dial-ceremony-block--desktop dial-ceremony-block--ayah-only">
+                <DialBelowRingAyah />
+              </div>
               <div className="desktop-stage-ring">
                 {renderDial(420, 132, true)}
               </div>
+              <DialPostRingGuidance
+                modeLabel={phaseGuidanceOverline}
+                guidanceText={observationalCue}
+                variant="desktop"
+              />
             </section>
 
             <DesktopReadingPanel
@@ -203,6 +203,11 @@ export default function App() {
               <div className="dial-stack-middle">
                 <div className="dial-stack-spring" aria-hidden />
                 {renderDial(420, 92, false)}
+                <DialPostRingGuidance
+                  modeLabel={phaseGuidanceOverline}
+                  guidanceText={observationalCue}
+                  variant="mobile"
+                />
                 <div className="dial-stack-spring" aria-hidden />
               </div>
             </div>
