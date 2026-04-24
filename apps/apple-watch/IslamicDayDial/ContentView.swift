@@ -457,7 +457,10 @@ struct ContentView: View {
                         .overlay {
                             GeometryReader { bandGeo in
                                 PhaseGuidanceHeader(
-                                    modeLabel: homePresentation.displayTitle == "Jumu'ah" ? "" : "OBSERVE",
+                                    modeLabel: phonePhaseGuidanceModeLabel(
+                                        displayTitle: homePresentation.displayTitle,
+                                        cueText: homePresentation.currentCueText
+                                    ),
                                     guidanceText: homePresentation.currentCueText,
                                     layoutWidth: bandGeo.size.width,
                                     layoutHeight: containerSize.height
@@ -2117,6 +2120,17 @@ private struct PhaseGuidanceRosette: View {
     }
 }
 
+private func phaseGuidanceContainsArabicScript(_ string: String) -> Bool {
+        string.unicodeScalars.contains { scalar in
+            let v = scalar.value
+            return (0x0600 ... 0x06FF).contains(v)
+                || (0x0750 ... 0x077F).contains(v)
+                || (0x08A0 ... 0x08FF).contains(v)
+                || (0xFB50 ... 0xFDFF).contains(v)
+                || (0xFE70 ... 0xFEFF).contains(v)
+        }
+    }
+
 private struct PhaseGuidanceHeader: View {
     var modeLabel: String = "OBSERVE"
     var guidanceText: String
@@ -2135,6 +2149,11 @@ private struct PhaseGuidanceHeader: View {
         min(layoutWidth * 0.052, 21)
     }
 
+    /// Slightly larger serif for Arabic lead line (e.g. Taqabbal).
+    private var arabicLeadSize: CGFloat {
+        min(mainSize * 1.12, mainSize + 2.5)
+    }
+
     private var overlineTracking: CGFloat { 3.8 }
 
     private var mainLineSpacing: CGFloat {
@@ -2143,6 +2162,14 @@ private struct PhaseGuidanceHeader: View {
 
     private var dividerLine: Color {
         PhaseGuidancePalette.sandPrimary.opacity(0.28)
+    }
+
+    private var arabicLeadSplit: (arabic: String, latin: String)? {
+        let lines = guidanceText.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        guard lines.count >= 2, let first = lines.first else { return nil }
+        guard phaseGuidanceContainsArabicScript(first) else { return nil }
+        let rest = lines.dropFirst().joined(separator: "\n")
+        return (first, rest)
     }
 
     var body: some View {
@@ -2159,15 +2186,39 @@ private struct PhaseGuidanceHeader: View {
                     .frame(height: 12)
             }
 
-            Text(guidanceText)
-                .font(.system(size: mainSize, weight: .regular, design: .serif))
-                .foregroundStyle(PhaseGuidancePalette.sandPrimary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(mainLineSpacing)
-                .lineLimit(4)
-                .minimumScaleFactor(0.86)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: contentWidth)
+            if let split = arabicLeadSplit {
+                VStack(alignment: .center, spacing: mainLineSpacing) {
+                    Text(split.arabic)
+                        .font(.system(size: arabicLeadSize, weight: .regular, design: .serif))
+                        .foregroundStyle(PhaseGuidancePalette.sandPrimary)
+                        .multilineTextAlignment(.center)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.86)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: contentWidth)
+
+                    Text(split.latin)
+                        .font(.system(size: mainSize, weight: .regular, design: .serif))
+                        .foregroundStyle(PhaseGuidancePalette.sandPrimary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(mainLineSpacing)
+                        .lineLimit(8)
+                        .minimumScaleFactor(0.86)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: contentWidth)
+                }
+            } else {
+                Text(guidanceText)
+                    .font(.system(size: mainSize, weight: .regular, design: .serif))
+                    .foregroundStyle(PhaseGuidancePalette.sandPrimary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(mainLineSpacing)
+                    .lineLimit(8)
+                    .minimumScaleFactor(0.86)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: contentWidth)
+            }
 
             Spacer()
                 .frame(height: 20)

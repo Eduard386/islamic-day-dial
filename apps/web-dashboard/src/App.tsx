@@ -10,7 +10,8 @@ import { DesktopReadingPanel } from './components/DesktopReadingPanel';
 import {
   getReadingKeyForFootnoteId,
   getReadingKeyForSectorDisplayName,
-  getWebObservationalCueForSector,
+  getWebObservationalCue,
+  shouldHidePhaseGuidanceObserveOverline,
   type ReadingKey,
 } from './content/desktopContent';
 import { PhaseGuidanceHeader } from './components/PhaseGuidanceHeader';
@@ -83,11 +84,14 @@ export default function App() {
   const currentReadableKey = getReadingKeyForSectorDisplayName(currentPeriodLabel);
 
   const observationalCue = useMemo(
-    () => getWebObservationalCueForSector(currentPeriodLabel),
-    [currentPeriodLabel],
+    () => getWebObservationalCue(snapshot, effectiveNow),
+    [snapshot, effectiveNow],
   );
 
-  const phaseGuidanceOverline = currentPeriodLabel === "Jumu'ah" ? '' : 'OBSERVE';
+  const phaseGuidanceOverline =
+    currentPeriodLabel === "Jumu'ah" || shouldHidePhaseGuidanceObserveOverline(observationalCue)
+      ? ''
+      : 'OBSERVE';
 
   const openCurrentReading = () => {
     if (!isDesktop || !currentReadableKey) return;

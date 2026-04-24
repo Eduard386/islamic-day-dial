@@ -41,16 +41,22 @@ struct PhoneHomePresentation: Equatable {
     let isEidDay: Bool
 }
 
-let PHONE_CUE_FAJR = "The sky is brightening, look to the east."
+let PHONE_CUE_FAJR = "If the sky is brightening, it is Fajr time."
 let PHONE_CUE_SUNRISE = "Watch the horizon. Has the sun begun to rise?"
-let PHONE_CUE_DUHA = "Look at the sun and the shadow. Has the morning opened?"
-let PHONE_CUE_MIDDAY = "Check the shadow. Is it nearing its shortest point?"
-let PHONE_CUE_DHUHR = "Is your shadow lengthening again?"
-let PHONE_CUE_ASR = "Compare the object and its shadow after the noon minimum."
-let PHONE_CUE_MAGHRIB = "Look west. Has the sun gone down?"
-let PHONE_CUE_ISHA = "Check the sky to see if the last twilight has disappeared."
-let PHONE_CUE_LAST_THIRD = "Check the night sky. The last third of the night is here."
-let PHONE_CUE_JUMUAH = "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutba."
+let PHONE_CUE_DUHA = "Look at the sun. Has the morning light clearly spread?"
+let PHONE_CUE_MIDDAY = "The sun is at its highest point, and shadows are at their shortest. It is Midday."
+let PHONE_CUE_DHUHR = "If the sun has passed the zenith and shadows have started to grow again, it is Dhuhr time."
+let PHONE_CUE_ASR = "Asr starts when the shadow length equals the object's height plus its noon shadow."
+let PHONE_CUE_MAGHRIB = "If the sun has gone down, Maghrib time has begun."
+let PHONE_CUE_ISHA = "Isha starts when the last twilight has disappeared."
+let PHONE_CUE_LAST_THIRD = "The last third of the night is here. Isha lasts from Maghrib to Fajr."
+let PHONE_CUE_JUMUAH = "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutbah."
+/// Eid (incl. Friday): Duha, Midday, and Dhuhr sectors — replaces Jumu'ah prep / short Eid noon copy.
+let PHONE_CUE_EID_DAYTIME_TAQABBAL = """
+تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
+Taqabbalallahu minna wa minkum!
+May Allah accept [this worship] from you and us!
+"""
 let PHONE_CUE_EID_AL_FITR = "Eid al-Fitr prayer time has started."
 let PHONE_CUE_EID_AL_ADHA = "Eid al-Adha prayer time has started."
 
@@ -108,6 +114,13 @@ func phoneObservationalCueText(for title: String) -> String {
     }
 }
 
+/// Overline above phase guidance: empty during Jumu'ah or Eid Taqabbal (like web `shouldHidePhaseGuidanceObserveOverline`).
+func phonePhaseGuidanceModeLabel(displayTitle: String, cueText: String) -> String {
+    if displayTitle == "Jumu'ah" { return "" }
+    if cueText == PHONE_CUE_EID_DAYTIME_TAQABBAL { return "" }
+    return "OBSERVE"
+}
+
 func phoneReadingTitle(for presentation: PhoneHomePresentation) -> String? {
     if PHONE_SUPPORTED_READING_TITLES.contains(presentation.displayTitle) {
         return presentation.displayTitle
@@ -116,16 +129,6 @@ func phoneReadingTitle(for presentation: PhoneHomePresentation) -> String? {
         return presentation.rawSectorTitle
     }
     return nil
-}
-
-private func phoneEidObservationalCue(for hijriDate: HijriDate) -> String {
-    if hijriDate.monthNumber == 10 && hijriDate.day == 1 {
-        return PHONE_CUE_EID_AL_FITR
-    }
-    if hijriDate.monthNumber == 12 && hijriDate.day == 10 {
-        return PHONE_CUE_EID_AL_ADHA
-    }
-    return ""
 }
 
 private func phoneEidHeadingTitle(hijriDate: HijriDate) -> String {
@@ -157,10 +160,10 @@ private func phoneHomeCurrentCueText(
             dhuhr: snapshot.timeline.dhuhr
         )
         if sub == .duha || sub == .midday {
-            return phoneEidObservationalCue(for: snapshot.hijriDate)
+            return PHONE_CUE_EID_DAYTIME_TAQABBAL
         }
     case .dhuhr_to_asr:
-        return phoneEidObservationalCue(for: snapshot.hijriDate)
+        return PHONE_CUE_EID_DAYTIME_TAQABBAL
     default:
         break
     }

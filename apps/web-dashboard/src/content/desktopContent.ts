@@ -1,3 +1,10 @@
+import type { ComputedIslamicDay } from '@islamic-day-dial/core';
+import {
+  formatHijriDateParts,
+  getSectorDisplayName,
+  getSunriseToDhuhrSubPeriod,
+} from '@islamic-day-dial/core';
+
 export type ReadingKey = 'prayerTimings' | 'sunDay' | 'lastThird' | 'jumuah';
 
 export type ReadingBlock =
@@ -24,29 +31,33 @@ export type TechnicalSection = {
 export const WEB_INSIGHT_AYAH_AR = 'إِنَّ عِدَّةَ الشُّهُورِ عِنْدَ اللَّهِ اثْنَا عَشَرَ شَهْرًا';
 export const WEB_INSIGHT_AYAH_EN = '"Indeed, the number of months ordained by Allah is twelve" [9:36]';
 
-/** Observational cues above the dial — aligned with iOS `phoneObservationalCueText`. */
-export function getWebObservationalCueForSector(sectorTitle: string): string {
+/** Eid (incl. Friday): Duha, Midday, Dhuhr — matches iOS `PHONE_CUE_EID_DAYTIME_TAQABBAL`. */
+const WEB_CUE_EID_DAYTIME_TAQABBAL = `تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
+Taqabbalallahu minna wa minkum!
+May Allah accept [this worship] from you and us!`;
+
+function webObservationalCueForSectorTitle(sectorTitle: string): string {
   switch (sectorTitle) {
     case 'Fajr':
-      return 'The sky is brightening, look to the east.';
+      return 'If the sky is brightening, it is Fajr time.';
     case 'Sunrise':
       return 'Watch the horizon. Has the sun begun to rise?';
     case 'Duha':
-      return 'Look at the sun and the shadow. Has the morning opened?';
+      return 'Look at the sun. Has the morning light clearly spread?';
     case 'Midday':
-      return 'Check the shadow. Is it nearing its shortest point?';
+      return 'The sun is at its highest point, and shadows are at their shortest. It is Midday.';
     case 'Dhuhr':
-      return 'Is your shadow lengthening again?';
+      return 'If the sun has passed the zenith and shadows have started to grow again, it is Dhuhr time.';
     case 'Asr':
-      return 'Compare the object and its shadow after the noon minimum.';
+      return "Asr starts when the shadow length equals the object's height plus its noon shadow.";
     case 'Maghrib':
-      return 'Look west. Has the sun gone down?';
+      return 'If the sun has gone down, Maghrib time has begun.';
     case 'Isha':
-      return 'Check the sky to see if the last twilight has disappeared.';
+      return 'Isha starts when the last twilight has disappeared.';
     case 'Last 3rd':
-      return 'Check the night sky. The last third of the night is here.';
+      return 'The last third of the night is here. Isha lasts from Maghrib to Fajr.';
     case "Jumu'ah":
-      return 'Prepare for Jumu’ah: take a bath, use perfume, dress well, and remain silent during the khutba.';
+      return "Prepare for Jumu'ah: take a bath, use perfume, dress well, and remain silent during the khutbah.";
     case 'EID AL-FITR':
       return 'Eid al-Fitr prayer time has started.';
     case 'EID AL-ADHA':
@@ -54,6 +65,42 @@ export function getWebObservationalCueForSector(sectorTitle: string): string {
     default:
       return sectorTitle;
   }
+}
+
+/** Observational cue above the dial — mirrors iOS `phoneHomeCurrentCueText` (Eid Duha/Midday/Dhuhr → Taqabbal). */
+export function getWebObservationalCue(snapshot: ComputedIslamicDay, now: Date): string {
+  const hijriParts = formatHijriDateParts(snapshot.hijriDate);
+  const rawSectorTitle = getSectorDisplayName(now, snapshot.currentPhase, {
+    duhaStart: snapshot.timeline.duhaStart,
+    dhuhr: snapshot.timeline.dhuhr,
+  });
+
+  if (!hijriParts.isEid) {
+    return webObservationalCueForSectorTitle(rawSectorTitle);
+  }
+
+  switch (snapshot.currentPhase) {
+    case 'sunrise_to_dhuhr': {
+      const sub = getSunriseToDhuhrSubPeriod(now, snapshot.timeline.duhaStart, snapshot.timeline.dhuhr);
+      if (sub === 'duha' || sub === 'midday') return WEB_CUE_EID_DAYTIME_TAQABBAL;
+      break;
+    }
+    case 'dhuhr_to_asr':
+      return WEB_CUE_EID_DAYTIME_TAQABBAL;
+    default:
+      break;
+  }
+  return webObservationalCueForSectorTitle(rawSectorTitle);
+}
+
+/** Hide the "OBSERVE" overline (same as Jumu'ah) when the Eid Taqabbal block is shown. */
+export function shouldHidePhaseGuidanceObserveOverline(guidanceText: string): boolean {
+  return guidanceText === WEB_CUE_EID_DAYTIME_TAQABBAL;
+}
+
+/** Sector-only cue (no Eid window); prefer {@link getWebObservationalCue} for the live dial. */
+export function getWebObservationalCueForSector(sectorTitle: string): string {
+  return webObservationalCueForSectorTitle(sectorTitle);
 }
 
 export const WEB_HIJRI_MONTH_NAMES = [

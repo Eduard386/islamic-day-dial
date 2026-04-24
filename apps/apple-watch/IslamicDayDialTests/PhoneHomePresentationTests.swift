@@ -116,7 +116,7 @@ final class PhoneHomePresentationTests: XCTestCase {
         XCTAssertEqual(presentation.backgroundKey, .duha)
         XCTAssertEqual(presentation.rawSectorTitle, "Jumu'ah")
         XCTAssertEqual(presentation.displayTitle, "EID AL-FITR")
-        XCTAssertEqual(presentation.currentCueText, PHONE_CUE_EID_AL_FITR)
+        XCTAssertEqual(presentation.currentCueText, PHONE_CUE_EID_DAYTIME_TAQABBAL)
         XCTAssertNil(presentation.highlightedRingTitle)
         XCTAssertTrue(presentation.isEidDay)
     }
@@ -191,7 +191,7 @@ final class PhoneHomePresentationTests: XCTestCase {
             backgroundKey: .duha,
             rawSectorTitle: "Duha",
             displayTitle: "EID AL-FITR",
-            currentCueText: PHONE_CUE_EID_AL_FITR,
+            currentCueText: PHONE_CUE_EID_DAYTIME_TAQABBAL,
             ringLegendItems: [],
             highlightedRingTitle: nil,
             isEidDay: true
