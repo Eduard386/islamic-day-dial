@@ -187,7 +187,7 @@ const READING_CONTENT: Record<ReadingKey, ReadingPanelContent> = {
       {
         heading: 'Dhuhr calculation',
         lines: [
-          { label: 'Start', detail: 'calculated according to Umm al-Qura, 18.5° (at the user’s coordinates).' },
+          { label: 'Start', detail: 'at solar noon (zawal), calculated by the Adhan library at the user’s coordinates.' },
           { label: 'End', detail: 'at the start of Asr.' },
         ],
       },
