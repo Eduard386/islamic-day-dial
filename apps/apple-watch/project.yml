@@ -43,7 +43,7 @@ targets:
       - package: Adhan
     settings:
       base:
-        DEVELOPMENT_TEAM: FB736M6KFV
+        DEVELOPMENT_TEAM: WAP4UB72P8
         CODE_SIGN_STYLE: Automatic
         # Swift iOS widget + embedded watch bundle: helps Xcode embed stdlib / avoid flaky companion install.
         EMBEDDED_CONTENT_CONTAINS_SWIFT: YES
@@ -77,7 +77,7 @@ targets:
       - path: IslamicDayDialWatchAssets
     settings:
       base:
-        DEVELOPMENT_TEAM: FB736M6KFV
+        DEVELOPMENT_TEAM: WAP4UB72P8
         CODE_SIGN_STYLE: Automatic
         ENABLE_DEBUG_DYLIB: NO
         GENERATE_INFOPLIST_FILE: YES
@@ -99,7 +99,7 @@ targets:
       - package: Adhan
     settings:
       base:
-        DEVELOPMENT_TEAM: FB736M6KFV
+        DEVELOPMENT_TEAM: WAP4UB72P8
         CODE_SIGN_STYLE: Automatic
         PRODUCT_BUNDLE_IDENTIFIER: com.islamicdaydial.ios.widget
         TARGETED_DEVICE_FAMILY: "1"
@@ -123,7 +123,7 @@ targets:
       - package: Adhan
     settings:
       base:
-        DEVELOPMENT_TEAM: FB736M6KFV
+        DEVELOPMENT_TEAM: WAP4UB72P8
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.islamicdaydial.ios.IslamicDayDialTests

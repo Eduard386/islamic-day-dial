@@ -62,6 +62,7 @@
 		9ECE1DB1B53DDBFC55C2BFE3 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A616ADCAF43A68D76AB049 /* Geometry.swift */; };
 		9F6CD7B9F1158E06ACC28681 /* HijriCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C6817D41E8725809AC8530 /* HijriCalendar.swift */; };
 		A1032BBF36E430E8C22E2387 /* CountdownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338B2525DABD91818C833DF3 /* CountdownTests.swift */; };
+		A203B4C55D6E78901F2A3B4C /* ScheherazadeNew-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */; };
 		A37A0F2DC3A393428A86D9A3 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A05BB742B7F16B0D76D011D /* Types.swift */; };
 		A805CECBE45AE626229FEB0A /* DayBounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E0B39151593CFF06BB2B90 /* DayBounds.swift */; };
 		AB078424346E9E6115E31A10 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62613E106128F27FFA2118A /* Formatting.swift */; };
@@ -99,7 +100,6 @@
 		FCF1651DCC07EE4821CF4145 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A616ADCAF43A68D76AB049 /* Geometry.swift */; };
 		FECE7BB77A83000ED472BA60 /* RingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684C8B93B4B6CAD8AC39EEC1 /* RingView.swift */; };
 		FFE4EB7ADDCEECC9061DC718 /* Ring.swift in Sources */ = {isa = PBXBuildFile; fileRef = B760D9D0257F4809C03962AA /* Ring.swift */; };
-		A203B4C55D6E78901F2A3B4C /* ScheherazadeNew-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,7 +155,7 @@
 		06322A748CFC2A9CF44046DB /* IslamicDayDialWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IslamicDayDialWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		063F224900F9D839207C2427 /* Snapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snapshot.swift; sourceTree = "<group>"; };
 		104FF42BB05556065331C6FD /* WidgetPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPresentation.swift; sourceTree = "<group>"; };
-		198C5249B9FCCCFE7493AC60 /* IslamicDayDialWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = IslamicDayDialWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		198C5249B9FCCCFE7493AC60 /* IslamicDayDialWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = IslamicDayDialWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		20A616ADCAF43A68D76AB049 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		20E5CDD64C5094219F566110 /* PhoneHomePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneHomePresentationTests.swift; sourceTree = "<group>"; };
 		2291BF8B68D8440214262E1A /* NightMarkers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightMarkers.swift; sourceTree = "<group>"; };
@@ -164,7 +164,7 @@
 		31CDE66D7D65BB546EBCE261 /* GeoResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoResolverTests.swift; sourceTree = "<group>"; };
 		338B2525DABD91818C833DF3 /* CountdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownTests.swift; sourceTree = "<group>"; };
 		33EA8F92F7D8C05232ABA035 /* GlowWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlowWindow.swift; sourceTree = "<group>"; };
-		388E2C9F52BF2B1B0CF87B22 /* IslamicDayDialTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = IslamicDayDialTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		388E2C9F52BF2B1B0CF87B22 /* IslamicDayDialTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IslamicDayDialTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE8FFC8BD4ED0CB041267D3 /* WidgetPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPresentationTests.swift; sourceTree = "<group>"; };
 		4067560A35492BC7F967A38F /* WatchMirrorSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMirrorSyncService.swift; sourceTree = "<group>"; };
 		466CE54DF39550277030A5D7 /* PhoneHomePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneHomePresentation.swift; sourceTree = "<group>"; };
@@ -177,7 +177,7 @@
 		684C8B93B4B6CAD8AC39EEC1 /* RingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingView.swift; sourceTree = "<group>"; };
 		687447C6CC7C0318D1414504 /* WatchRenderSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRenderSnapshotTests.swift; sourceTree = "<group>"; };
 		6B8ED73ED962032E2BDD3BEA /* PrayerNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerNotificationTests.swift; sourceTree = "<group>"; };
-		6BADD107DFD9B46327A36775 /* Config.xcconfig.example */ = {isa = PBXFileReference; path = Config.xcconfig.example; sourceTree = "<group>"; };
+		6BADD107DFD9B46327A36775 /* Config.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text; path = Config.xcconfig.example; sourceTree = "<group>"; };
 		71F2B1CD213BCAEFC16835A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		79AE0006DD081FDDF9E25299 /* SegmentGradients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentGradients.swift; sourceTree = "<group>"; };
 		7EEC3B1FDAE79A2CA8FD05F4 /* IslamicDayDialWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWidget.swift; sourceTree = "<group>"; };
@@ -194,12 +194,12 @@
 		D2F2AE2F12AA9DD0FA1E0DB7 /* Phases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phases.swift; sourceTree = "<group>"; };
 		D3715B31AE84BE3336BA0F3D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DD29CDA7D639629AC0DDFBBD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E227165691AC83CDEE71442D /* IslamicDayDial.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IslamicDayDial.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E227165691AC83CDEE71442D /* IslamicDayDial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IslamicDayDial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5E1358BCAB9F46EF20E0204 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E62613E106128F27FFA2118A /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
+		F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ScheherazadeNew-Regular.ttf"; sourceTree = "<group>"; };
 		F5FC7B4E3A74A600017506DB /* IslamicDayDialWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IslamicDayDialWatchApp.swift; sourceTree = "<group>"; };
 		F618B8CDAF9F87887992E08F /* DuhaStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuhaStartTests.swift; sourceTree = "<group>"; };
-		F102A3B44C5D67890E1F2A3B /* ScheherazadeNew-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ScheherazadeNew-Regular.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -443,19 +443,15 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					41A754A24988CF1466BAD77D = {
-						DevelopmentTeam = FB736M6KFV;
 						ProvisioningStyle = Automatic;
 					};
 					7C9B98C9CD992966F3C237BC = {
-						DevelopmentTeam = FB736M6KFV;
 						ProvisioningStyle = Automatic;
 					};
 					7E88FAF3E6FF7619F73AD82F = {
-						DevelopmentTeam = FB736M6KFV;
 						ProvisioningStyle = Automatic;
 					};
 					A5AD7DBE20441AE9D098AE3D = {
-						DevelopmentTeam = FB736M6KFV;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -654,7 +650,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -738,7 +734,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -759,7 +755,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -843,7 +839,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Islamic Day Dial";
@@ -862,7 +858,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				INFOPLIST_FILE = IslamicDayDialWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -883,7 +879,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Islamic Day Dial";
@@ -902,7 +898,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				INFOPLIST_FILE = IslamicDayDialWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -924,7 +920,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = FB736M6KFV;
+				DEVELOPMENT_TEAM = WAP4UB72P8;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_DEBUG_DYLIB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
