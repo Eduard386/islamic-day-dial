@@ -223,11 +223,13 @@ struct ContentView: View {
     @State private var snapshot: ComputedIslamicDay?
     @State private var now = Date()
     
-    // Debug Time Travel (shake to reveal)
+    // Debug Time Travel (shake to reveal). Release builds leave the offset at zero.
+    #if DEBUG
     @State private var showTimeTravel = false
     @State private var monthOffset = 0
     @State private var dayOffset = 0
     @State private var hourOffset: Double = 0
+    #endif
     @State private var timeOffsetMs: Int64 = 0
     @State private var secondaryScreen: PhoneSecondaryScreen?
     @State private var isInteractionLocked = false
@@ -240,13 +242,11 @@ struct ContentView: View {
         return now.addingTimeInterval(Double(timeOffsetMs) / 1000)
     }
 
+    #if DEBUG
     private var debugPushHandler: (() -> Void)? {
-        #if DEBUG
-        return sendNextDebugNotification
-        #else
-        return nil
-        #endif
+        sendNextDebugNotification
     }
+    #endif
     
     var body: some View {
         NavigationStack {
@@ -278,9 +278,11 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.horizontal, PHONE_HOME_EDGE_INSET)
                         .overlay {
+                            #if DEBUG
                             ShakeDetectorView { showTimeTravel = true }
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .allowsHitTesting(false)
+                            #endif
                         }
                         .overlay {
                             if secondaryScreen != nil {
@@ -384,6 +386,7 @@ struct ContentView: View {
                 Task { await refreshSnapshot(forceResolveLocation: true) }
             }
         }
+        #if DEBUG
         .sheet(isPresented: $showTimeTravel) {
             TimeTravelSheet(
                 monthOffset: $monthOffset,
@@ -394,6 +397,7 @@ struct ContentView: View {
                 onDebugPush: debugPushHandler
             )
         }
+        #endif
         .onDisappear {
             interactionLockTask?.cancel()
         }
@@ -580,7 +584,9 @@ struct ContentView: View {
 
     private func returnToMainScreenForNotification() {
         interactionLockTask?.cancel()
+        #if DEBUG
         showTimeTravel = false
+        #endif
         let needsAnimatedReturn = secondaryScreen != nil
 
         guard needsAnimatedReturn else {
@@ -2009,6 +2015,7 @@ private struct PhoneSectorTitleSpotlightView: View {
     }
 }
 
+#if DEBUG
 // MARK: - Shake detector (debug Time Travel)
 
 private struct ShakeDetectorView: UIViewRepresentable {
@@ -2132,6 +2139,7 @@ private struct TimeTravelSheet: View {
         }
     }
 }
+#endif
 
 // MARK: - Phase guidance header (above dial)
 
