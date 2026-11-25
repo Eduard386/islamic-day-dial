@@ -63,5 +63,5 @@ export function textWithPublished(fallback: string, id: string): string {
   if (language === 'en') return fallback;
   const passage = SCRIPTURE[language]?.[id];
   if (!passage?.text) return fallback;
-  return [passage.text, passage.notes, passage.credit].filter((part) => part.length > 0).join('\n\n');
+  return [passage.text, passage.notes].filter((part) => part.length > 0).join('\n\n');
 }

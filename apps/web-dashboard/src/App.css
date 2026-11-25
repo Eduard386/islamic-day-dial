@@ -645,6 +645,7 @@ body {
   line-height: 1.48;
   letter-spacing: 0.02em;
   color: var(--verse-translation-tone);
+  white-space: pre-line;
 }
 
 /* Dial + optional side footnotes (leader lines from ticks) */

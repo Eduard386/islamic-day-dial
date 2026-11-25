@@ -49,7 +49,7 @@ enum Scripture {
 
     static func display(id: String, fallback: String) -> String {
         guard AppLanguage.code != "en", let passage = passage(id) else { return fallback }
-        return [passage.text, passage.notes, passage.credit]
+        return [passage.text, passage.notes]
             .filter { !$0.isEmpty }
             .joined(separator: "\n\n")
     }
