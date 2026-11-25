@@ -1651,7 +1651,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                         TechnicalLine(
                             id: "dhuhr_start",
                             label: "Start",
-                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
+                            detail: "at solar noon (zawal), calculated by the Adhan library at the user’s coordinates."
                         ),
                         TechnicalLine(
                             id: "dhuhr_end",
