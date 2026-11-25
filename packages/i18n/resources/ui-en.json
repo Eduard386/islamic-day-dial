@@ -3,6 +3,7 @@
   "prepareJumuah": "Prepare for Jumu'ah",
   "hijriMonths": "Hijri months",
   "dalil": "Dalil",
+  "selectSectorPrompt": "Select a sector label or the title inside the ring to read the related texts.",
   "technicalDetails": "Technical details",
   "start": "Start",
   "end": "End",

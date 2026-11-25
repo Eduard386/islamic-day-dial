@@ -3,6 +3,7 @@
   "prepareJumuah": "Jumu'ah-এর প্রস্তুতি নিন",
   "hijriMonths": "হিজরি মাস",
   "dalil": "দলিল",
+  "selectSectorPrompt": "Select a sector label or the title inside the ring to read the related texts.",
   "technicalDetails": "কারিগরি বিবরণ",
   "start": "শুরু",
   "end": "শেষ",

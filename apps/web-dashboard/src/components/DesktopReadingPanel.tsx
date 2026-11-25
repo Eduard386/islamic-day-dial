@@ -55,7 +55,7 @@ export function DesktopReadingPanel({ snapshot, now, selectedKey, onClear }: Pro
         <div className="desktop-still-caption">
           <h2 className="desktop-panel-title">{sectorProse(currentLabel)}</h2>
           <p className="desktop-panel-empty-copy">
-            Select a sector label or the title inside the ring to read the related texts.
+            {t('selectSectorPrompt')}
           </p>
         </div>
       </div>
