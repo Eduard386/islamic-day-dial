@@ -6,7 +6,7 @@ import uiId from '../../../../../packages/i18n/resources/ui-id.json';
 import uiRu from '../../../../../packages/i18n/resources/ui-ru.json';
 import uiTr from '../../../../../packages/i18n/resources/ui-tr.json';
 import uiUr from '../../../../../packages/i18n/resources/ui-ur.json';
-import { resolveLanguage, translate } from '../locale';
+import { resolveLanguage, sectorProse, sectorRing, translate } from '../locale';
 
 const catalogs = { tr: uiTr, id: uiId, ur: uiUr, bn: uiBn, fr: uiFr, ru: uiRu };
 
@@ -31,8 +31,15 @@ describe('locale catalogs', () => {
     expect(resolveLanguage(['de-DE'])).toBe('en');
   });
 
-  it('leaves prayer names in the translated cue', () => {
+  it('uses Turkish vakit names and keeps the other languages transliterated', () => {
     expect(translate('ru', 'cue.fajr')).toContain('Fajr');
-    expect(translate('tr', 'cue.dhuhr')).toContain('Dhuhr');
+    expect(translate('tr', 'cue.dhuhr')).toContain('Öğle');
+    expect(translate('tr', 'cue.asr')).toContain('İkindi');
+    expect(sectorProse('Asr', 'tr')).toBe('İkindi');
+    expect(sectorRing('Asr', 'tr')).toBe('İKİNDİ');
+    expect(sectorRing('Dhuhr', 'tr')).toBe('ÖĞLE');
+    expect(sectorRing('Isha', 'tr')).toBe('YATSI');
+    expect(sectorProse('Asr', 'en')).toBe('Asr');
+    expect(sectorRing('Asr', 'ru')).toBe('ASR');
   });
 });

@@ -246,7 +246,7 @@ export default function App() {
           />
           <section className="site-meta-card" id="app" aria-labelledby="app-title">
             <h2 id="app-title">{t('theApp')}</h2>
-            <p dir="auto" lang={currentLanguage()}>{t('appBody')}</p>
+            <p className="site-meta-card__body" dir="auto" lang={currentLanguage()}>{t('appBody')}</p>
             <p>
               <a href="https://apps.apple.com/app/islamic-day-dial/id6836356917">{t('download')}</a>
             </p>

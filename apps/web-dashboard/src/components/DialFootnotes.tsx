@@ -1,4 +1,5 @@
 import { formatHijriDateParts, type ComputedIslamicDay } from '@islamic-day-dial/core';
+import { sectorRing } from '../lib/locale';
 import { polarToXY } from '../lib/geometry';
 import { getDialFootnoteAnchorAngleDeg, getExplodedRingArcSpecs, type ExplodedArcId } from '../lib/explodedRing';
 
@@ -138,10 +139,10 @@ export function DialFootnotes({ snapshot, dialSize = 420, sidePad = 92, activeLa
         >
           {onSelect ? (
             <button type="button" className="footnote-label-button" onClick={() => onSelect(it.key)}>
-              {it.label}
+              {sectorRing(it.label)}
             </button>
           ) : (
-            it.label
+            sectorRing(it.label)
           )}
         </div>
       ))}

@@ -1,3 +1,4 @@
+import CoreText
 import SwiftUI
 import UIKit
 
@@ -93,18 +94,20 @@ private func phoneTextFont(size: CGFloat, weight: Font.Weight = .regular) -> Fon
     .system(size: size, weight: weight, design: .default)
 }
 
-/// Arabic UI text uses **Scheherazade New** only. Add `ScheherazadeNew-Regular.ttf` (or variable font) to the app target
-/// and list it under “Fonts provided by application” in Info.plist so these names resolve.
-private func phoneArabicUIFont(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
-    let preferredNames: [String] = [
-        "ScheherazadeNew-Regular",
-        "ScheherazadeNew",
-        "Scheherazade New",
-    ]
-    for name in preferredNames {
-        if let font = UIFont(name: name, size: size) {
-            return font
+/// Same Amiri face as the production site, for every UI language.
+/// A Turkish locale otherwise substitutes a different system Arabic font.
+private enum BundledArabicFont {
+    static let postScriptName: String = {
+        if let url = Bundle.main.url(forResource: "Amiri-Regular", withExtension: "ttf") {
+            CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         }
+        return "Amiri-Regular"
+    }()
+}
+
+private func phoneArabicUIFont(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
+    if let font = UIFont(name: BundledArabicFont.postScriptName, size: size) {
+        return font
     }
     return UIFont.systemFont(ofSize: size, weight: weight)
 }
@@ -930,9 +933,9 @@ private struct PhonePreStillsDialView: View {
             if raw == "Duha" || raw == "Midday" || raw == "Dhuhr" || raw == "Jumu'ah" {
                 return nil
             }
-            return raw.uppercased()
+            return L10n.sectorRing(raw)
         }
-        return presentation.displayTitle.uppercased()
+        return L10n.sectorRing(presentation.displayTitle)
     }
 
     private var sectorTitleColor: Color {
@@ -1575,19 +1578,19 @@ private struct PhoneSectorTitleSpotlightView: View {
                 ReadingPassage(
                     id: "jumuah_one",
                     arabic: PHONE_JUMUAH_HADITH_ONE_AR,
-                    english: PHONE_JUMUAH_HADITH_ONE_EN,
+                    english: Scripture.display(id: "hadith.abudawud.1067", fallback: PHONE_JUMUAH_HADITH_ONE_EN),
                     source: "Sunan Abi Dawud 1067"
                 ),
                 ReadingPassage(
                     id: "jumuah_two",
                     arabic: PHONE_JUMUAH_HADITH_TWO_AR,
-                    english: PHONE_JUMUAH_HADITH_TWO_EN,
+                    english: Scripture.display(id: "hadith.muslim.857", fallback: PHONE_JUMUAH_HADITH_TWO_EN),
                     source: "Sahih Muslim 857"
                 ),
                 ReadingPassage(
                     id: "jumuah_three",
                     arabic: PHONE_JUMUAH_HADITH_THREE_AR,
-                    english: PHONE_JUMUAH_HADITH_THREE_EN,
+                    english: Scripture.display(id: "hadith.bukhari.937", fallback: PHONE_JUMUAH_HADITH_THREE_EN),
                     source: "Sahih al-Bukhari 937"
                 )
             ]
@@ -1598,7 +1601,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                 ReadingPassage(
                     id: "jibril",
                     arabic: PHONE_JIBRIL_HADITH_AR,
-                    english: PHONE_JIBRIL_HADITH_EN,
+                    english: Scripture.display(id: "hadith.abudawud.393", fallback: PHONE_JIBRIL_HADITH_EN),
                     source: "Sunan Abi Dawud 393"
                 )
             ]
@@ -1609,19 +1612,19 @@ private struct PhoneSectorTitleSpotlightView: View {
                 ReadingPassage(
                     id: "duha_one",
                     arabic: PHONE_DUHA_HADITH_ONE_AR,
-                    english: PHONE_DUHA_HADITH_ONE_EN,
+                    english: Scripture.display(id: "hadith.tirmidhi.475", fallback: PHONE_DUHA_HADITH_ONE_EN),
                     source: "Jami` at-Tirmidhi 475"
                 ),
                 ReadingPassage(
                     id: "duha_two",
                     arabic: PHONE_DUHA_HADITH_TWO_AR,
-                    english: PHONE_DUHA_HADITH_TWO_EN,
+                    english: Scripture.display(id: "hadith.muslim.720", fallback: PHONE_DUHA_HADITH_TWO_EN),
                     source: "Sahih Muslim 720"
                 ),
                 ReadingPassage(
                     id: "duha_three",
                     arabic: PHONE_DUHA_HADITH_THREE_AR,
-                    english: PHONE_DUHA_HADITH_THREE_EN,
+                    english: Scripture.display(id: "hadith.muslim.832", fallback: PHONE_DUHA_HADITH_THREE_EN),
                     source: "Sahih Muslim 832"
                 )
             ]
@@ -1655,24 +1658,24 @@ private struct PhoneSectorTitleSpotlightView: View {
     private var technicalSections: [TechnicalSectionEntry] {
         if isPrayerTimingGroup {
             return [
-                technicalSection(id: "dhuhr", heading: "Dhuhr", key: "dhuhr"),
-                technicalSection(id: "asr", heading: "Asr", key: "asr"),
-                technicalSection(id: "maghrib", heading: "Maghrib", key: "maghrib"),
-                technicalSection(id: "isha", heading: "Isha", key: "isha"),
-                technicalSection(id: "fajr", heading: "Fajr", key: "fajr"),
+                technicalSection(id: "dhuhr", heading: L10n.sectorProse("Dhuhr"), key: "dhuhr"),
+                technicalSection(id: "asr", heading: L10n.sectorProse("Asr"), key: "asr"),
+                technicalSection(id: "maghrib", heading: L10n.sectorProse("Maghrib"), key: "maghrib"),
+                technicalSection(id: "isha", heading: L10n.sectorProse("Isha"), key: "isha"),
+                technicalSection(id: "fajr", heading: L10n.sectorProse("Fajr"), key: "fajr"),
             ]
         }
 
         if isSunDayGroup {
             return [
-                technicalSection(id: "sunrise", heading: "Sunrise", key: "sunrise"),
-                technicalSection(id: "duha", heading: "Duha", key: "duha"),
-                technicalSection(id: "midday", heading: "Midday", key: "midday"),
+                technicalSection(id: "sunrise", heading: L10n.sectorProse("Sunrise"), key: "sunrise"),
+                technicalSection(id: "duha", heading: L10n.sectorProse("Duha"), key: "duha"),
+                technicalSection(id: "midday", heading: L10n.sectorProse("Midday"), key: "midday"),
             ]
         }
 
         if isLastThird {
-            return [technicalSection(id: "last_third", heading: "Last 3rd", key: "lastThird")]
+            return [technicalSection(id: "last_third", heading: L10n.sectorProse("Last 3rd"), key: "lastThird")]
         }
 
         return []
@@ -2128,7 +2131,7 @@ private struct PhaseGuidanceHeader: View {
             if let split = arabicLeadSplit {
                 VStack(alignment: .center, spacing: mainLineSpacing) {
                     Text(split.arabic)
-                        .font(.system(size: arabicLeadSize, weight: .regular, design: .serif))
+                        .font(phoneArabicFont(size: arabicLeadSize))
                         .foregroundStyle(PhaseGuidancePalette.sandPrimary)
                         .multilineTextAlignment(.center)
                         .environment(\.layoutDirection, .rightToLeft)

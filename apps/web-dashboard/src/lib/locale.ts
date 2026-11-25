@@ -58,6 +58,31 @@ export function t(key: string): string {
   return translate(currentLanguage(), key);
 }
 
+/** Turkish vakit names. Keys stay the English sector titles used by the dial logic. */
+const TURKISH_SECTORS: Record<string, string> = {
+  Fajr: 'İmsak',
+  Sunrise: 'Güneş',
+  Duha: 'Kuşluk',
+  Midday: 'Zeval',
+  Dhuhr: 'Öğle',
+  Asr: 'İkindi',
+  Maghrib: 'Akşam',
+  Isha: 'Yatsı',
+  'Last 3rd': 'Son üçte bir',
+  "Jumu'ah": 'Cuma',
+};
+
+export function sectorProse(name: string, language = currentLanguage()): string {
+  if (language !== 'tr') return name;
+  return TURKISH_SECTORS[name] ?? name;
+}
+
+/** Ring and footnote labels are shown in capitals. Turkish İ/ı must be uppercased with a Turkish locale. */
+export function sectorRing(name: string, language = currentLanguage()): string {
+  const prose = sectorProse(name, language);
+  return prose.toLocaleUpperCase(language === 'tr' ? 'tr' : 'en');
+}
+
 export function textWithPublished(fallback: string, id: string): string {
   const language = currentLanguage();
   if (language === 'en') return fallback;

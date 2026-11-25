@@ -3,6 +3,7 @@ import {
   getSectorDisplayName,
   type ComputedIslamicDay,
 } from '@islamic-day-dial/core';
+import { sectorRing } from '../lib/locale';
 
 type Props = {
   snapshot: ComputedIslamicDay;
@@ -35,7 +36,7 @@ export function CenterInfo({ snapshot, now, timezone, onPeriodSelect, isPeriodSe
   const showSectorRow = !suppressSectorOnEid;
 
   const periodContent = showSectorRow && periodLabel ? (
-    <span className="current-period-subsectors">{periodLabel}</span>
+    <span className="current-period-subsectors">{sectorRing(periodLabel)}</span>
   ) : null;
 
   const dayMonthDisplay = dateParts.dayMonth.toUpperCase();

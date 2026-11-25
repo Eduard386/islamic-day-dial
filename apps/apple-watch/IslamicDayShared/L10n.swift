@@ -20,6 +20,34 @@ enum L10n {
         localized[key] ?? english[key] ?? key
     }
 
+    /// Sentence-case Turkish vakit name. Other languages keep the English sector title.
+    static func sectorProse(_ name: String) -> String {
+        guard AppLanguage.code == "tr", let mapped = turkishSectors[name] else { return name }
+        return mapped
+    }
+
+    /// Capital form for the ring. Turkish dotted İ is uppercased with a Turkish locale.
+    static func sectorRing(_ name: String) -> String {
+        let prose = sectorProse(name)
+        if AppLanguage.code == "tr", turkishSectors[name] != nil {
+            return prose.uppercased(with: Locale(identifier: "tr"))
+        }
+        return prose.uppercased()
+    }
+
+    private static let turkishSectors = [
+        "Fajr": "İmsak",
+        "Sunrise": "Güneş",
+        "Duha": "Kuşluk",
+        "Midday": "Zeval",
+        "Dhuhr": "Öğle",
+        "Asr": "İkindi",
+        "Maghrib": "Akşam",
+        "Isha": "Yatsı",
+        "Last 3rd": "Son üçte bir",
+        "Jumu'ah": "Cuma",
+    ]
+
     private static let english = load("ui-en")
     private static let localized: [String: String] = {
         let code = AppLanguage.code

@@ -132,7 +132,7 @@ struct ContentView: View {
                 .allowsHitTesting(false)
         } else {
             let phase = currentPhase(snapshot: snap, now: now)
-            Text(periodLabel(snapshot: snap, now: now).uppercased())
+            Text(L10n.sectorRing(periodLabel(snapshot: snap, now: now)))
                 .font(.system(size: dialSize * WATCH_CURRENT_PERIOD_FONT_RATIO, weight: .regular))
                 .foregroundColor(periodColor(snapshot: snap, now: now))
                 .modifier(IshaShadowModifier(phase: phase))

@@ -35,6 +35,8 @@ targets:
     platform: iOS
     sources:
       - path: IslamicDayDial
+        excludes:
+          - AppInfoAdditions.plist
       - path: IslamicDayShared
       - path: ../../packages/i18n/resources
         buildPhase: resources
@@ -52,6 +54,7 @@ targets:
         # Match watch app; debug dylib in host can confuse some device install paths.
         ENABLE_DEBUG_DYLIB: NO
         GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: IslamicDayDial/AppInfoAdditions.plist
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "3"
         PRODUCT_BUNDLE_IDENTIFIER: com.islamicdaydial.ios

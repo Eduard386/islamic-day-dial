@@ -15,7 +15,7 @@ import {
   formatDalilSourceLine,
   groupReadingBlocksIntoDalilEntries,
 } from '../lib/groupDalilEntries';
-import { currentLanguage, t } from '../lib/locale';
+import { currentLanguage, sectorProse, t } from '../lib/locale';
 
 type Props = {
   snapshot: ComputedIslamicDay;
@@ -53,7 +53,7 @@ export function DesktopReadingPanel({ snapshot, now, selectedKey, onClear }: Pro
         />
         <div className="desktop-still-scrim" aria-hidden />
         <div className="desktop-still-caption">
-          <h2 className="desktop-panel-title">{currentLabel}</h2>
+          <h2 className="desktop-panel-title">{sectorProse(currentLabel)}</h2>
           <p className="desktop-panel-empty-copy">
             Select a sector label or the title inside the ring to read the related texts.
           </p>

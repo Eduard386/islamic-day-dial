@@ -478,10 +478,16 @@ body {
 
 .phase-guidance-arabic-line {
   display: block;
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
   font-size: 1.14em;
   line-height: 1.45;
   letter-spacing: 0.02em;
   margin-bottom: 0.35em;
+}
+
+/* Arabic keeps the production face even when the page language is Turkish or another UI language. */
+:lang(ar) {
+  font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
 }
 
 .phase-guidance-latin-lines {
@@ -1105,6 +1111,10 @@ button.center-date.center-date-clickable {
   color: var(--soft-quote-white);
   font-size: 0.84rem;
   line-height: 1.55;
+}
+
+.site-meta-card__body {
+  white-space: pre-line;
 }
 
 .site-meta-card a {

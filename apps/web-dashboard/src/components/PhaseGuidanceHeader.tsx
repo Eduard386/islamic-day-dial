@@ -38,7 +38,7 @@ export function PhaseGuidanceHeader({
       >
         {arabicLead ? (
           <>
-            <span className="phase-guidance-arabic-line" dir="rtl">
+            <span className="phase-guidance-arabic-line" dir="rtl" lang="ar">
               {arabicLead.arabic}
             </span>
             <span className="phase-guidance-latin-lines">{arabicLead.latin}</span>
