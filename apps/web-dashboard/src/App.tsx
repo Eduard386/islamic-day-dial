@@ -225,6 +225,17 @@ export default function App() {
             onPresetSelect={state.setSelectedPreset}
             onCurrentCity={state.applyCurrentCity}
           />
+          <section className="site-meta-card" id="app" aria-labelledby="app-title">
+            <h2 id="app-title">The app</h2>
+            <p>
+              Islamic Day Dial is on the App Store for iPhone, with an Apple Watch companion and an iPhone
+              Home Screen widget. The dial follows the Islamic day from Maghrib to Maghrib and shows the
+              current phase together with the sign to look for.
+            </p>
+            <p>
+              <a href="https://apps.apple.com/app/islamic-day-dial/id6836356917">Download on the App Store</a>
+            </p>
+          </section>
           <section className="site-meta-card" id="support" aria-labelledby="support-title">
             <h2 id="support-title">Support</h2>
             <p>
