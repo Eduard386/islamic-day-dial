@@ -200,6 +200,11 @@ final class PhoneHomePresentationTests: XCTestCase {
         XCTAssertEqual(phoneReadingTitle(for: presentation), "Duha")
     }
 
+    func testEnglishLanguageKeepsTheFajrCue() {
+        XCTAssertEqual(PHONE_CUE_FAJR, "If the sky is brightening, it is Fajr time.")
+        XCTAssertEqual(L10n.t("technical.dhuhr.start"), "at solar noon (zawal), calculated by the Adhan library at the user’s coordinates.")
+    }
+
     private func makeTimeline(
         sunrise: String,
         duhaStart: String,

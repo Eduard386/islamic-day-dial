@@ -32,12 +32,6 @@ enum PrayerNotificationScheduler {
     }
 
     /// Short reminder line (text after the em dash in product copy).
-    private static let fajrTitle = "Fajr. Check the horizon"
-    private static let dhuhrTitle = "Dhuhr. Check the shadow"
-    private static let asrTitle = "Asr. Check the shadow"
-    private static let maghribTitle = "Maghrib. Watch for sunset"
-    private static let ishaTitle = "Isha. Check the sky"
-    private static let jumuahTitle = "Prepare for Jumu'ah"
     private static let eidAlFitrTitle = "Eid al-Fitr"
     private static let eidAlAdhaTitle = "Eid al-Adha"
 
@@ -131,17 +125,17 @@ enum PrayerNotificationScheduler {
     private static func title(for kind: NotificationKind, prayerName: String) -> String {
         switch kind {
         case .fajr:
-            return fajrTitle
+            return L10n.t("notification.fajr")
         case .dhuhr:
-            return dhuhrTitle
+            return L10n.t("notification.dhuhr")
         case .asr:
-            return asrTitle
+            return L10n.t("notification.asr")
         case .maghrib:
-            return maghribTitle
+            return L10n.t("notification.maghrib")
         case .isha:
-            return ishaTitle
+            return L10n.t("notification.isha")
         case .jumuah:
-            return jumuahTitle
+            return L10n.t("notification.jumuah")
         case .eid:
             switch prayerName {
             case "EID AL-FITR":

@@ -4,6 +4,7 @@ import {
   getSectorDisplayName,
   getSunriseToDhuhrSubPeriod,
 } from '@islamic-day-dial/core';
+import { t, textWithPublished } from '../lib/locale';
 
 export type ReadingKey = 'prayerTimings' | 'sunDay' | 'lastThird' | 'jumuah';
 
@@ -38,42 +39,43 @@ export const WEB_DIAL_FOOTER_AYAH_4_103_EN =
   '"Indeed, performing prayers is a duty on the believers at the appointed times." [4:103]';
 
 /** Eid (incl. Friday): Duha, Midday, Dhuhr — matches iOS `PHONE_CUE_EID_DAYTIME_TAQABBAL`. */
-const WEB_CUE_EID_DAYTIME_TAQABBAL = `تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
+function webCueEidDaytimeTaqabbal(): string {
+  return `تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
 Taqabbalallahu minna wa minkum!
-May Allah accept [this worship] from you and us!`;
+${t('cue.eidAccept')}`;
+}
 
-/** Same slot as "OBSERVE" on non-Friday; pairs with {@link WEB_CUE_JUMUAH_BODY}. */
-export const WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE = "Prepare for Jumu'ah";
-
-const WEB_CUE_JUMUAH_BODY =
-  'Take a bath, use perfume, dress well, and remain silent during the khutbah.';
+/** Same slot as "OBSERVE" on non-Friday; pairs with the Jumu'ah cue. */
+export function webPhaseGuidanceJumuahOverline(): string {
+  return t('prepareJumuah');
+}
 
 function webObservationalCueForSectorTitle(sectorTitle: string): string {
   switch (sectorTitle) {
     case 'Fajr':
-      return 'If the sky is brightening, it is Fajr time.';
+      return t('cue.fajr');
     case 'Sunrise':
-      return 'Watch the horizon. Has the sun begun to rise?';
+      return t('cue.sunrise');
     case 'Duha':
-      return 'Look at the sun. Has the morning light clearly spread?';
+      return t('cue.duha');
     case 'Midday':
-      return 'The sun is at its highest point, and shadows are at their shortest. It is Midday.';
+      return t('cue.midday');
     case 'Dhuhr':
-      return 'If the sun has passed the zenith and shadows have started to grow again, it is Dhuhr time.';
+      return t('cue.dhuhr');
     case 'Asr':
-      return "Asr starts when the shadow length equals the object's height plus its noon shadow.";
+      return t('cue.asr');
     case 'Maghrib':
-      return 'If the sun has gone down, Maghrib time has begun.';
+      return t('cue.maghrib');
     case 'Isha':
-      return 'Isha starts when the last twilight has disappeared.';
+      return t('cue.isha');
     case 'Last 3rd':
-      return 'The last third of the night is here. Isha lasts from Maghrib to Fajr.';
+      return t('cue.lastThird');
     case "Jumu'ah":
-      return WEB_CUE_JUMUAH_BODY;
+      return t('cue.jumuah');
     case 'EID AL-FITR':
-      return 'Eid al-Fitr prayer time has started.';
+      return t('cue.eidFitr');
     case 'EID AL-ADHA':
-      return 'Eid al-Adha prayer time has started.';
+      return t('cue.eidAdha');
     default:
       return sectorTitle;
   }
@@ -94,11 +96,11 @@ export function getWebObservationalCue(snapshot: ComputedIslamicDay, now: Date):
   switch (snapshot.currentPhase) {
     case 'sunrise_to_dhuhr': {
       const sub = getSunriseToDhuhrSubPeriod(now, snapshot.timeline.duhaStart, snapshot.timeline.dhuhr);
-      if (sub === 'duha' || sub === 'midday') return WEB_CUE_EID_DAYTIME_TAQABBAL;
+      if (sub === 'duha' || sub === 'midday') return webCueEidDaytimeTaqabbal();
       break;
     }
     case 'dhuhr_to_asr':
-      return WEB_CUE_EID_DAYTIME_TAQABBAL;
+      return webCueEidDaytimeTaqabbal();
     default:
       break;
   }
@@ -107,7 +109,7 @@ export function getWebObservationalCue(snapshot: ComputedIslamicDay, now: Date):
 
 /** Hide the "OBSERVE" overline (same as Jumu'ah) when the Eid Taqabbal block is shown. */
 export function shouldHidePhaseGuidanceObserveOverline(guidanceText: string): boolean {
-  return guidanceText === WEB_CUE_EID_DAYTIME_TAQABBAL;
+  return guidanceText === webCueEidDaytimeTaqabbal();
 }
 
 /** Sector-only cue (no Eid window); prefer {@link getWebObservationalCue} for the live dial. */
@@ -175,124 +177,70 @@ export function getReadingKeyForFootnoteId(id: string): ReadingKey | null {
   return null;
 }
 
-const READING_CONTENT: Record<ReadingKey, ReadingPanelContent> = {
-  prayerTimings: {
-    title: 'Dhuhr, Asr, Maghrib, Isha, Fajr',
-    blocks: [
-      { kind: 'arabic', text: PHONE_JIBRIL_HADITH_AR },
-      { kind: 'english', text: PHONE_JIBRIL_HADITH_EN },
-      { kind: 'source', text: 'Sunan Abi Dawud, Hadith 393' },
+function technicalSection(id: string): TechnicalSection {
+  return {
+    heading: t(`technical.${id}.heading`),
+    lines: [
+      { label: t('start'), detail: t(`technical.${id}.start`) },
+      { label: t('end'), detail: t(`technical.${id}.end`) },
     ],
-    technicalSections: [
-      {
-        heading: 'Dhuhr calculation',
-        lines: [
-          { label: 'Start', detail: 'at solar noon (zawal), calculated by the Adhan library at the user’s coordinates.' },
-          { label: 'End', detail: 'at the start of Asr.' },
-        ],
-      },
-      {
-        heading: 'Asr calculation',
-        lines: [
-          { label: 'Start', detail: 'when shadow length = object height + noon shadow (at the user’s coordinates).' },
-          { label: 'End', detail: 'at the start of Maghrib.' },
-        ],
-      },
-      {
-        heading: 'Maghrib calculation',
-        lines: [
-          { label: 'Start', detail: 'at sunset, when the sun disappears below the horizon (at the user’s coordinates).' },
-          { label: 'End', detail: 'at the start of Isha.' },
-        ],
-      },
-      {
-        heading: 'Isha calculation',
-        lines: [
-          { label: 'Start', detail: 'when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates).' },
-          { label: 'End', detail: 'at the start of Fajr.' },
-        ],
-      },
-      {
-        heading: 'Fajr calculation',
-        lines: [
-          { label: 'Start', detail: 'calculated according to Umm al-Qura, 18.5° (at the user’s coordinates).' },
-          { label: 'End', detail: 'at the start of Sunrise.' },
-        ],
-      },
-    ],
-  },
-  sunDay: {
-    title: 'Sunrise, Duha, Midday',
-    blocks: [
-      { kind: 'arabic', text: PHONE_DUHA_HADITH_ONE_AR },
-      { kind: 'english', text: PHONE_DUHA_HADITH_ONE_EN },
-      { kind: 'source', text: 'Jami` at-Tirmidhi, Hadith 475' },
-      { kind: 'arabic', text: PHONE_DUHA_HADITH_TWO_AR },
-      { kind: 'english', text: PHONE_DUHA_HADITH_TWO_EN },
-      { kind: 'source', text: 'Sahih Muslim, Hadith 720' },
-      { kind: 'arabic', text: PHONE_DUHA_HADITH_THREE_AR },
-      { kind: 'english', text: PHONE_DUHA_HADITH_THREE_EN },
-      { kind: 'source', text: 'Sahih Muslim, Hadith 832' },
-    ],
-    technicalSections: [
-      {
-        heading: 'Sunrise calculation',
-        lines: [
-          { label: 'Start', detail: 'calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°).' },
-          { label: 'End', detail: 'at the start of Duha.' },
-        ],
-      },
-      {
-        heading: 'Duha calculation',
-        lines: [
-          { label: 'Start', detail: 'when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise.' },
-          { label: 'End', detail: 'at the start of Midday.' },
-        ],
-      },
-      {
-        heading: 'Midday calculation',
-        lines: [
-          { label: 'Start', detail: '5 minutes before Dhuhr.' },
-          { label: 'End', detail: 'at Dhuhr.' },
-        ],
-      },
-    ],
-  },
-  lastThird: {
-    title: 'Last 3rd',
-    blocks: [
-      { kind: 'arabic', text: PHONE_LAST_THIRD_HADITH_AR },
-      { kind: 'english', text: PHONE_LAST_THIRD_HADITH_EN },
-      { kind: 'source', text: 'Sahih Muslim, Hadith 758' },
-    ],
-    technicalSections: [
-      {
-        heading: 'Last 3rd calculation',
-        lines: [
-          { label: 'Start', detail: 'time between last Maghrib and Fajr divided by 3.' },
-          { label: 'End', detail: 'at the start of Fajr.' },
-        ],
-      },
-    ],
-  },
-  jumuah: {
-    title: "Jumu'ah",
-    blocks: [
-      { kind: 'arabic', text: PHONE_JUMUAH_AYAH_AR },
-      { kind: 'english', text: PHONE_JUMUAH_AYAH_EN },
-      { kind: 'arabic', text: PHONE_JUMUAH_HADITH_ONE_AR },
-      { kind: 'english', text: PHONE_JUMUAH_HADITH_ONE_EN },
-      { kind: 'source', text: 'Sunan Abi Dawud 1067' },
-      { kind: 'arabic', text: PHONE_JUMUAH_HADITH_TWO_AR },
-      { kind: 'english', text: PHONE_JUMUAH_HADITH_TWO_EN },
-      { kind: 'source', text: 'Sahih Muslim 857' },
-      { kind: 'arabic', text: PHONE_JUMUAH_HADITH_THREE_AR },
-      { kind: 'english', text: PHONE_JUMUAH_HADITH_THREE_EN },
-      { kind: 'source', text: 'Sahih al-Bukhari 937' },
-    ],
-  },
-};
+  };
+}
+
+function readingContent(): Record<ReadingKey, ReadingPanelContent> {
+  return {
+    prayerTimings: {
+      title: 'Dhuhr, Asr, Maghrib, Isha, Fajr',
+      blocks: [
+        { kind: 'arabic', text: PHONE_JIBRIL_HADITH_AR },
+        { kind: 'english', text: PHONE_JIBRIL_HADITH_EN },
+        { kind: 'source', text: 'Sunan Abi Dawud, Hadith 393' },
+      ],
+      technicalSections: ['dhuhr', 'asr', 'maghrib', 'isha', 'fajr'].map(technicalSection),
+    },
+    sunDay: {
+      title: 'Sunrise, Duha, Midday',
+      blocks: [
+        { kind: 'arabic', text: PHONE_DUHA_HADITH_ONE_AR },
+        { kind: 'english', text: PHONE_DUHA_HADITH_ONE_EN },
+        { kind: 'source', text: 'Jami` at-Tirmidhi, Hadith 475' },
+        { kind: 'arabic', text: PHONE_DUHA_HADITH_TWO_AR },
+        { kind: 'english', text: PHONE_DUHA_HADITH_TWO_EN },
+        { kind: 'source', text: 'Sahih Muslim, Hadith 720' },
+        { kind: 'arabic', text: PHONE_DUHA_HADITH_THREE_AR },
+        { kind: 'english', text: PHONE_DUHA_HADITH_THREE_EN },
+        { kind: 'source', text: 'Sahih Muslim, Hadith 832' },
+      ],
+      technicalSections: ['sunrise', 'duha', 'midday'].map(technicalSection),
+    },
+    lastThird: {
+      title: 'Last 3rd',
+      blocks: [
+        { kind: 'arabic', text: PHONE_LAST_THIRD_HADITH_AR },
+        { kind: 'english', text: textWithPublished(PHONE_LAST_THIRD_HADITH_EN, 'hadith.muslim.758') },
+        { kind: 'source', text: 'Sahih Muslim, Hadith 758' },
+      ],
+      technicalSections: [technicalSection('lastThird')],
+    },
+    jumuah: {
+      title: "Jumu'ah",
+      blocks: [
+        { kind: 'arabic', text: PHONE_JUMUAH_AYAH_AR },
+        { kind: 'english', text: textWithPublished(PHONE_JUMUAH_AYAH_EN, 'quran.62.9') },
+        { kind: 'arabic', text: PHONE_JUMUAH_HADITH_ONE_AR },
+        { kind: 'english', text: PHONE_JUMUAH_HADITH_ONE_EN },
+        { kind: 'source', text: 'Sunan Abi Dawud 1067' },
+        { kind: 'arabic', text: PHONE_JUMUAH_HADITH_TWO_AR },
+        { kind: 'english', text: PHONE_JUMUAH_HADITH_TWO_EN },
+        { kind: 'source', text: 'Sahih Muslim 857' },
+        { kind: 'arabic', text: PHONE_JUMUAH_HADITH_THREE_AR },
+        { kind: 'english', text: PHONE_JUMUAH_HADITH_THREE_EN },
+        { kind: 'source', text: 'Sahih al-Bukhari 937' },
+      ],
+    },
+  };
+}
 
 export function getReadingPanelContent(key: ReadingKey): ReadingPanelContent {
-  return READING_CONTENT[key];
+  return readingContent()[key];
 }

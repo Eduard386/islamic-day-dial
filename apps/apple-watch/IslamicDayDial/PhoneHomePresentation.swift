@@ -41,26 +41,28 @@ struct PhoneHomePresentation: Equatable {
     let isEidDay: Bool
 }
 
-let PHONE_CUE_FAJR = "If the sky is brightening, it is Fajr time."
-let PHONE_CUE_SUNRISE = "Watch the horizon. Has the sun begun to rise?"
-let PHONE_CUE_DUHA = "Look at the sun. Has the morning light clearly spread?"
-let PHONE_CUE_MIDDAY = "The sun is at its highest point, and shadows are at their shortest. It is Midday."
-let PHONE_CUE_DHUHR = "If the sun has passed the zenith and shadows have started to grow again, it is Dhuhr time."
-let PHONE_CUE_ASR = "Asr starts when the shadow length equals the object's height plus its noon shadow."
-let PHONE_CUE_MAGHRIB = "If the sun has gone down, Maghrib time has begun."
-let PHONE_CUE_ISHA = "Isha starts when the last twilight has disappeared."
-let PHONE_CUE_LAST_THIRD = "The last third of the night is here. Isha lasts from Maghrib to Fajr."
-/// Same typographic slot as `OBSERVE` on other days (matches web `WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE`).
-let PHONE_PHASE_GUIDANCE_JUMUAH_OVERLINE = "Prepare for Jumu'ah"
-let PHONE_CUE_JUMUAH = "Take a bath, use perfume, dress well, and remain silent during the khutbah."
+var PHONE_CUE_FAJR: String { L10n.t("cue.fajr") }
+var PHONE_CUE_SUNRISE: String { L10n.t("cue.sunrise") }
+var PHONE_CUE_DUHA: String { L10n.t("cue.duha") }
+var PHONE_CUE_MIDDAY: String { L10n.t("cue.midday") }
+var PHONE_CUE_DHUHR: String { L10n.t("cue.dhuhr") }
+var PHONE_CUE_ASR: String { L10n.t("cue.asr") }
+var PHONE_CUE_MAGHRIB: String { L10n.t("cue.maghrib") }
+var PHONE_CUE_ISHA: String { L10n.t("cue.isha") }
+var PHONE_CUE_LAST_THIRD: String { L10n.t("cue.lastThird") }
+/// Same typographic slot as `OBSERVE` on other days (matches web `webPhaseGuidanceJumuahOverline`).
+var PHONE_PHASE_GUIDANCE_JUMUAH_OVERLINE: String { L10n.t("prepareJumuah") }
+var PHONE_CUE_JUMUAH: String { L10n.t("cue.jumuah") }
 /// Eid (incl. Friday): Duha, Midday, and Dhuhr sectors — replaces Jumu'ah prep / short Eid noon copy.
-let PHONE_CUE_EID_DAYTIME_TAQABBAL = """
-تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
-Taqabbalallahu minna wa minkum!
-May Allah accept [this worship] from you and us!
-"""
-let PHONE_CUE_EID_AL_FITR = "Eid al-Fitr prayer time has started."
-let PHONE_CUE_EID_AL_ADHA = "Eid al-Adha prayer time has started."
+var PHONE_CUE_EID_DAYTIME_TAQABBAL: String {
+    """
+    تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
+    Taqabbalallahu minna wa minkum!
+    \(L10n.t("cue.eidAccept"))
+    """
+}
+var PHONE_CUE_EID_AL_FITR: String { L10n.t("cue.eidFitr") }
+var PHONE_CUE_EID_AL_ADHA: String { L10n.t("cue.eidAdha") }
 
 /// Quran 4:103 — below the dial on home (matches web `DialBelowRingAyah`).
 let PHONE_DIAL_FOOTER_AYAH_4_103_AR = "إِنَّ ٱلصَّلَوٰةَ كَانَتْ عَلَى ٱلْمُؤْمِنِينَ كِتَـٰبًۭا مَّوْقُوتًۭا"
@@ -124,7 +126,7 @@ func phoneObservationalCueText(for title: String) -> String {
 func phonePhaseGuidanceModeLabel(displayTitle: String, cueText: String) -> String {
     if displayTitle == "Jumu'ah" { return PHONE_PHASE_GUIDANCE_JUMUAH_OVERLINE }
     if cueText == PHONE_CUE_EID_DAYTIME_TAQABBAL { return "" }
-    return "OBSERVE"
+    return L10n.t("observe")
 }
 
 func phoneReadingTitle(for presentation: PhoneHomePresentation) -> String? {

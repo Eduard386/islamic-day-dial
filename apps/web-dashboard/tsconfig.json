@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
     "noEmit": true
   },
   "include": ["src"]

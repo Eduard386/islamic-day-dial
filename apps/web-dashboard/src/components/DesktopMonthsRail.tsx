@@ -5,6 +5,7 @@ import {
   WEB_INSIGHT_AYAH_AR,
   WEB_INSIGHT_AYAH_EN,
 } from '../content/desktopContent';
+import { currentLanguage, t, textWithPublished } from '../lib/locale';
 
 type Props = {
   snapshot: ComputedIslamicDay;
@@ -41,11 +42,11 @@ export const DesktopMonthsRail = forwardRef<HTMLElement, Props>(function Desktop
         <p className="desktop-months-ayah" dir="rtl" lang="ar">
           {WEB_INSIGHT_AYAH_AR}
         </p>
-        <p className="desktop-months-translation" lang="en">
-          {WEB_INSIGHT_AYAH_EN}
+        <p className="desktop-months-translation" dir="auto" lang={currentLanguage()}>
+          {textWithPublished(WEB_INSIGHT_AYAH_EN, 'quran.9.36')}
         </p>
         <DesktopMonthsOrnament />
-        <p className="desktop-months-section-label">HIJRI MONTHS</p>
+        <p className="desktop-months-section-label">{t('hijriMonths')}</p>
         <ol className="desktop-months-list">
           {WEB_HIJRI_MONTH_NAMES.map((month, index) => (
             <li

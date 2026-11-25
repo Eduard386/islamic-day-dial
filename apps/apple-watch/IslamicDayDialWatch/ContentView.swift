@@ -107,7 +107,7 @@ struct ContentView: View {
             } else {
                 VStack(spacing: 10) {
                     ProgressView()
-                    Text("Waiting for iPhone snapshot…")
+                    Text(L10n.t("waitingSnapshot"))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.76))
                 }

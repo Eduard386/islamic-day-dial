@@ -7,6 +7,7 @@ import {
   MY_LOCATION_TITLE,
   MY_LOCATION_INSERT_INDEX,
 } from '../data/locationPresets';
+import { t } from '../lib/locale';
 
 const IS_DEMO = import.meta.env.VITE_DEMO_MODE === 'true';
 
@@ -153,7 +154,7 @@ export function Controls({
       </section>
       )}
       <section>
-        <h4>Location</h4>
+        <h4>{t('location')}</h4>
         <div className="preset-buttons">
           {presetsLeft.map((p) => (
             <button
@@ -169,7 +170,7 @@ export function Controls({
             className={selectedPreset === CURRENT_CITY ? 'active' : ''}
             onClick={() => applyPreset(CURRENT_CITY)}
           >
-            {CURRENT_CITY}
+            {t('myLocation')}
           </button>
           {presetsRight.map((p) => (
             <button

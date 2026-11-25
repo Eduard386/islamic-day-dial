@@ -1042,7 +1042,7 @@ private struct PhoneDialBelowRingAyah: View {
                 .environment(\.layoutDirection, .rightToLeft)
                 .frame(maxWidth: contentWidth)
 
-            Text(PHONE_DIAL_FOOTER_AYAH_4_103_EN)
+            Text(Scripture.display(id: "quran.4.103", fallback: PHONE_DIAL_FOOTER_AYAH_4_103_EN))
                 .font(.system(size: englishSize, weight: .regular, design: .serif))
                 .foregroundStyle(Colors.softQuoteWhite)
                 .multilineTextAlignment(.center)
@@ -1241,7 +1241,7 @@ private struct PhoneHijriMonthsSheetView: View {
                             .padding(.top, safeTop + 18)
                             .padding(.bottom, 34)
 
-                        Text(PHONE_INSIGHT_AYAH_EN)
+                        Text(Scripture.display(id: "quran.9.36", fallback: PHONE_INSIGHT_AYAH_EN))
                             .font(.system(size: englishSize, weight: .regular, design: .serif))
                             .foregroundColor(PHONE_HIJRI_MONTHS_IVORY_DIM)
                             .multilineTextAlignment(.center)
@@ -1254,7 +1254,7 @@ private struct PhoneHijriMonthsSheetView: View {
                             .padding(.horizontal, 28)
                             .padding(.bottom, 20)
 
-                        Text("HIJRI MONTHS")
+                        Text(L10n.t("hijriMonths"))
                             .font(.system(size: min(w * 0.032, 12.5), weight: .medium, design: .default))
                             .tracking(3.4)
                             .textCase(.uppercase)
@@ -1569,7 +1569,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                 ReadingPassage(
                     id: "jumuah_ayah",
                     arabic: PHONE_JUMUAH_AYAH_AR,
-                    english: PHONE_JUMUAH_AYAH_EN,
+                    english: Scripture.display(id: "quran.62.9", fallback: PHONE_JUMUAH_AYAH_EN),
                     source: nil
                 ),
                 ReadingPassage(
@@ -1632,7 +1632,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                 ReadingPassage(
                     id: "last_third",
                     arabic: PHONE_LAST_THIRD_HADITH_AR,
-                    english: PHONE_LAST_THIRD_HADITH_EN,
+                    english: Scripture.display(id: "hadith.muslim.758", fallback: PHONE_LAST_THIRD_HADITH_EN),
                     source: "Sahih Muslim 758"
                 )
             ]
@@ -1641,164 +1641,38 @@ private struct PhoneSectorTitleSpotlightView: View {
         return []
     }
 
+    private func technicalSection(id: String, heading: String, key: String) -> TechnicalSectionEntry {
+        TechnicalSectionEntry(
+            id: id,
+            heading: heading,
+            lines: [
+                TechnicalLine(id: "\(id)_start", label: L10n.t("start"), detail: L10n.t("technical.\(key).start")),
+                TechnicalLine(id: "\(id)_end", label: L10n.t("end"), detail: L10n.t("technical.\(key).end")),
+            ]
+        )
+    }
+
     private var technicalSections: [TechnicalSectionEntry] {
         if isPrayerTimingGroup {
             return [
-                TechnicalSectionEntry(
-                    id: "dhuhr",
-                    heading: "Dhuhr",
-                    lines: [
-                        TechnicalLine(
-                            id: "dhuhr_start",
-                            label: "Start",
-                            detail: "at solar noon (zawal), calculated by the Adhan library at the user’s coordinates."
-                        ),
-                        TechnicalLine(
-                            id: "dhuhr_end",
-                            label: "End",
-                            detail: "at the start of Asr."
-                        )
-                    ]
-                ),
-                TechnicalSectionEntry(
-                    id: "asr",
-                    heading: "Asr",
-                    lines: [
-                        TechnicalLine(
-                            id: "asr_start",
-                            label: "Start",
-                            detail: "when shadow length = object height + noon shadow (at the user’s coordinates)."
-                        ),
-                        TechnicalLine(
-                            id: "asr_end",
-                            label: "End",
-                            detail: "at the start of Maghrib."
-                        )
-                    ]
-                ),
-                TechnicalSectionEntry(
-                    id: "maghrib",
-                    heading: "Maghrib",
-                    lines: [
-                        TechnicalLine(
-                            id: "maghrib_start",
-                            label: "Start",
-                            detail: "at sunset, when the sun disappears below the horizon (at the user’s coordinates)."
-                        ),
-                        TechnicalLine(
-                            id: "maghrib_end",
-                            label: "End",
-                            detail: "at the start of Isha."
-                        )
-                    ]
-                ),
-                TechnicalSectionEntry(
-                    id: "isha",
-                    heading: "Isha",
-                    lines: [
-                        TechnicalLine(
-                            id: "isha_start",
-                            label: "Start",
-                            detail: "when the evening twilight disappears, using the Adhan model with Shafaq Ahmer and a 15° sun angle (at the user’s coordinates)."
-                        ),
-                        TechnicalLine(
-                            id: "isha_end",
-                            label: "End",
-                            detail: "at the start of Fajr."
-                        )
-                    ]
-                ),
-                TechnicalSectionEntry(
-                    id: "fajr",
-                    heading: "Fajr",
-                    lines: [
-                        TechnicalLine(
-                            id: "fajr_start",
-                            label: "Start",
-                            detail: "calculated according to Umm al-Qura, 18.5° (at the user’s coordinates)."
-                        ),
-                        TechnicalLine(
-                            id: "fajr_end",
-                            label: "End",
-                            detail: "at the start of Sunrise."
-                        )
-                    ]
-                )
+                technicalSection(id: "dhuhr", heading: "Dhuhr", key: "dhuhr"),
+                technicalSection(id: "asr", heading: "Asr", key: "asr"),
+                technicalSection(id: "maghrib", heading: "Maghrib", key: "maghrib"),
+                technicalSection(id: "isha", heading: "Isha", key: "isha"),
+                technicalSection(id: "fajr", heading: "Fajr", key: "fajr"),
             ]
         }
 
         if isSunDayGroup {
             return [
-                TechnicalSectionEntry(
-                    id: "sunrise",
-                    heading: "Sunrise",
-                    lines: [
-                        TechnicalLine(
-                            id: "sunrise_start",
-                            label: "Start",
-                            detail: "calculated with the Adhan library (at the user’s coordinates), using the standard apparent solar altitude of −50 arcminutes (≈ −0.83°)."
-                        ),
-                        TechnicalLine(
-                            id: "sunrise_end",
-                            label: "End",
-                            detail: "at the start of Duha."
-                        )
-                    ]
-                ),
-                TechnicalSectionEntry(
-                    id: "duha",
-                    heading: "Duha",
-                    lines: [
-                        TechnicalLine(
-                            id: "duha_start",
-                            label: "Start",
-                            detail: "when the sun reaches 4° altitude above the horizon (at the user’s coordinates); if needed, fallback = 20 minutes after Sunrise."
-                        ),
-                        TechnicalLine(
-                            id: "duha_end",
-                            label: "End",
-                            detail: "at the start of Midday."
-                        )
-                    ]
-                ),
-                TechnicalSectionEntry(
-                    id: "midday",
-                    heading: "Midday",
-                    lines: [
-                        TechnicalLine(
-                            id: "midday_start",
-                            label: "Start",
-                            detail: "5 minutes before Dhuhr."
-                        ),
-                        TechnicalLine(
-                            id: "midday_end",
-                            label: "End",
-                            detail: "at Dhuhr."
-                        )
-                    ]
-                )
+                technicalSection(id: "sunrise", heading: "Sunrise", key: "sunrise"),
+                technicalSection(id: "duha", heading: "Duha", key: "duha"),
+                technicalSection(id: "midday", heading: "Midday", key: "midday"),
             ]
         }
 
         if isLastThird {
-            return [
-                TechnicalSectionEntry(
-                    id: "last_third",
-                    heading: "Last 3rd",
-                    lines: [
-                        TechnicalLine(
-                            id: "last_third_start",
-                            label: "Start",
-                            detail: "time between last Maghrib and Fajr divided by 3."
-                        ),
-                        TechnicalLine(
-                            id: "last_third_end",
-                            label: "End",
-                            detail: "at the start of Fajr."
-                        )
-                    ]
-                )
-            ]
+            return [technicalSection(id: "last_third", heading: "Last 3rd", key: "lastThird")]
         }
 
         return []
@@ -1853,7 +1727,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                 .buttonStyle(.plain)
                 Spacer()
             }
-            Text("Dalil")
+            Text(L10n.t("dalil"))
                 .font(.system(size: titleSize, weight: .regular, design: .serif))
                 .foregroundStyle(PhoneDalilChrome.arabicIvory.opacity(0.96))
         }
@@ -1934,7 +1808,7 @@ private struct PhoneSectorTitleSpotlightView: View {
     }
 
     private func technicalDetailsLink() -> some View {
-        sectionLink("Technical details") {
+        sectionLink(L10n.t("technicalDetails")) {
             phoneSelectionHaptic()
             onShowTechnical()
         }
@@ -1955,7 +1829,7 @@ private struct PhoneSectorTitleSpotlightView: View {
                 Spacer()
             }
 
-            Text("Technical details")
+            Text(L10n.t("technicalDetails"))
                 .font(phoneMetadataFont(containerSize: containerSize))
                 .foregroundColor(PHONE_MUTED_META.opacity(0.94))
                 .tracking(0.2)
@@ -2201,7 +2075,7 @@ private func phaseGuidanceContainsArabicScript(_ string: String) -> Bool {
     }
 
 private struct PhaseGuidanceHeader: View {
-    var modeLabel: String = "OBSERVE"
+    var modeLabel: String = L10n.t("observe")
     var guidanceText: String
     var layoutWidth: CGFloat
     var layoutHeight: CGFloat

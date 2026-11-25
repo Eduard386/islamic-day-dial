@@ -12,9 +12,10 @@ import {
   getReadingKeyForSectorDisplayName,
   getWebObservationalCue,
   shouldHidePhaseGuidanceObserveOverline,
-  WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE,
+  webPhaseGuidanceJumuahOverline,
   type ReadingKey,
 } from './content/desktopContent';
+import { currentLanguage, t } from './lib/locale';
 import { DialBelowRingAyah } from './components/DialBelowRingAyah';
 import { DialPostRingGuidance } from './components/DialPostRingGuidance';
 import { trackVisit } from './lib/analytics';
@@ -48,13 +49,22 @@ export default function App() {
   const [selectedReading, setSelectedReading] = useState<{ key: ReadingKey; emphasisId?: string } | null>(null);
 
   useEffect(() => {
+    document.documentElement.lang = currentLanguage();
     trackVisit();
   }, []);
 
   useEffect(() => {
-    if (!isDesktop && selectedReading) {
-      setSelectedReading(null);
-    }
+    if (isDesktop || !selectedReading) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedReading(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [isDesktop, selectedReading]);
 
   useLayoutEffect(() => {
@@ -93,11 +103,11 @@ export default function App() {
   const phaseGuidanceOverline = shouldHidePhaseGuidanceObserveOverline(observationalCue)
     ? ''
     : currentPeriodLabel === "Jumu'ah"
-      ? WEB_PHASE_GUIDANCE_JUMUAH_OVERLINE
-      : 'OBSERVE';
+      ? webPhaseGuidanceJumuahOverline()
+      : t('observe');
 
   const openCurrentReading = () => {
-    if (!isDesktop || !currentReadableKey) return;
+    if (!currentReadableKey) return;
     setSelectedReading({ key: currentReadableKey, emphasisId: 'center' });
   };
 
@@ -109,7 +119,6 @@ export default function App() {
   };
 
   const clearReading = () => {
-    if (!isDesktop) return;
     setSelectedReading(null);
   };
 
@@ -140,12 +149,12 @@ export default function App() {
           }
         >
           <IslamicRing snapshot={snapshot} now={effectiveNow} size={dialSize} />
-          <div className={`center-overlay${interactive && currentReadableKey ? ' center-overlay--interactive' : ''}`}>
+          <div className={`center-overlay${currentReadableKey ? ' center-overlay--interactive' : ''}`}>
             <CenterInfo
               snapshot={snapshot}
               now={effectiveNow}
               timezone={timezone}
-              onPeriodSelect={interactive && currentReadableKey ? openCurrentReading : undefined}
+              onPeriodSelect={currentReadableKey ? openCurrentReading : undefined}
               isPeriodSelected={selectedReading?.emphasisId === 'center'}
             />
           </div>
@@ -203,6 +212,16 @@ export default function App() {
               <div className="dial-stack-middle">
                 <div className="dial-stack-spring" aria-hidden />
                 {renderDial(420, 92, false)}
+                {selectedReading ? (
+                  <div className="mobile-dalil-sheet" role="dialog" aria-modal="true" aria-label={t('dalil')}>
+                    <DesktopReadingPanel
+                      snapshot={snapshot}
+                      now={effectiveNow}
+                      selectedKey={selectedReading.key}
+                      onClear={clearReading}
+                    />
+                  </div>
+                ) : null}
                 <DialPostRingGuidance
                   modeLabel={phaseGuidanceOverline}
                   guidanceText={observationalCue}
@@ -226,33 +245,23 @@ export default function App() {
             onCurrentCity={state.applyCurrentCity}
           />
           <section className="site-meta-card" id="app" aria-labelledby="app-title">
-            <h2 id="app-title">The app</h2>
+            <h2 id="app-title">{t('theApp')}</h2>
+            <p dir="auto" lang={currentLanguage()}>{t('appBody')}</p>
             <p>
-              Islamic Day Dial is on the App Store for iPhone, with an Apple Watch companion and an iPhone
-              Home Screen widget. The dial follows the Islamic day from Maghrib to Maghrib and shows the
-              current phase together with the sign to look for.
-            </p>
-            <p>
-              <a href="https://apps.apple.com/app/islamic-day-dial/id6836356917">Download on the App Store</a>
+              <a href="https://apps.apple.com/app/islamic-day-dial/id6836356917">{t('download')}</a>
             </p>
           </section>
           <section className="site-meta-card" id="support" aria-labelledby="support-title">
-            <h2 id="support-title">Support</h2>
-            <p>
-              Islamic Day Dial is designed for iPhone, Apple Watch companion use, and the iPhone widget.
-              If you need help, contact <a href="mailto:islamicdaydial@gmail.com">islamicdaydial@gmail.com</a>.
+            <h2 id="support-title">{t('support')}</h2>
+            <p dir="auto" lang={currentLanguage()}>
+              {t('supportBeforeEmail')}<a href="mailto:islamicdaydial@gmail.com">islamicdaydial@gmail.com</a>.
             </p>
           </section>
           <section className="site-meta-card" id="privacy" aria-labelledby="privacy-title">
-            <h2 id="privacy-title">Privacy</h2>
-            <p>
-              Location access is recommended for the most accurate prayer times and phase transitions.
-              On Apple platforms, analytics rely on App Store Connect / App Analytics rather than direct
-              third-party tracking from the app.
-            </p>
-            <p>
-              The public web dashboard may use separate website analytics. The Apple app does not require
-              account creation to work. For privacy questions, contact <a href="mailto:islamicdaydial@gmail.com">islamicdaydial@gmail.com</a>.
+            <h2 id="privacy-title">{t('privacy')}</h2>
+            <p dir="auto" lang={currentLanguage()}>{t('privacyBody')}</p>
+            <p dir="auto" lang={currentLanguage()}>
+              {t('privacyBeforeEmail')}<a href="mailto:islamicdaydial@gmail.com">islamicdaydial@gmail.com</a>.
             </p>
           </section>
         </div>

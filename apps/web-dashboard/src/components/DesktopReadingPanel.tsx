@@ -15,6 +15,7 @@ import {
   formatDalilSourceLine,
   groupReadingBlocksIntoDalilEntries,
 } from '../lib/groupDalilEntries';
+import { currentLanguage, t } from '../lib/locale';
 
 type Props = {
   snapshot: ComputedIslamicDay;
@@ -92,30 +93,30 @@ function DesktopReadingContent({
                 type="button"
                 className="desktop-dalil-back"
                 onClick={() => setShowTechnical(false)}
-                aria-label="Back to Dalil"
+                aria-label={t('backToDalil')}
               >
                 <span className="desktop-dalil-back-chevron" aria-hidden>
                   ‹
                 </span>
               </button>
-              <h1 className="desktop-dalil-title">Technical details</h1>
+              <h1 className="desktop-dalil-title">{t('technicalDetails')}</h1>
               <button
                 type="button"
                 className="desktop-dalil-back desktop-dalil-back--trailing"
                 onClick={onClear}
-                aria-label="Close panel"
+                aria-label={t('closePanel')}
               >
-                <span className="desktop-dalil-close-text">Close</span>
+                <span className="desktop-dalil-close-text">{t('close')}</span>
               </button>
             </>
           ) : (
             <>
-              <button type="button" className="desktop-dalil-back" onClick={onClear} aria-label="Close reading panel">
+              <button type="button" className="desktop-dalil-back" onClick={onClear} aria-label={t('closeReadingPanel')}>
                 <span className="desktop-dalil-back-chevron" aria-hidden>
                   ‹
                 </span>
               </button>
-              <h1 className="desktop-dalil-title">Dalil</h1>
+              <h1 className="desktop-dalil-title">{t('dalil')}</h1>
               <span className="desktop-dalil-top-spacer" aria-hidden />
             </>
           )}
@@ -138,7 +139,8 @@ function DesktopReadingContent({
                   </p>
                   <p
                     className={`desktop-dalil-english${entry.english.length >= 220 ? ' desktop-dalil-english--prose' : ''}`}
-                    lang="en"
+                    dir="auto"
+                    lang={currentLanguage()}
                   >
                     {entry.english}
                   </p>
@@ -160,7 +162,7 @@ function DesktopReadingContent({
                   className="desktop-dalil-technical-link"
                   onClick={() => setShowTechnical(true)}
                 >
-                  Technical details
+                  {t('technicalDetails')}
                 </button>
               ) : null}
             </div>

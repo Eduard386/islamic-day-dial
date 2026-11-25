@@ -36,6 +36,8 @@ targets:
     sources:
       - path: IslamicDayDial
       - path: IslamicDayShared
+      - path: ../../packages/i18n/resources
+        buildPhase: resources
     dependencies:
       - target: IslamicDayDialWatch
       - target: IslamicDayDialWidget
@@ -74,6 +76,8 @@ targets:
           - IslamicDayCore/GeoResolver.swift
           - IslamicDayCore/PrayerTimes.swift
           - IslamicDayCore/NightMarkers.swift
+      - path: ../../packages/i18n/resources
+        buildPhase: resources
       - path: IslamicDayDialWatchAssets
     settings:
       base:
@@ -84,7 +88,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.islamicdaydial.ios.watch
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "3"
-        SKIP_INSTALL: NO
+        SKIP_INSTALL: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Islamic Day Dial
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.islamicdaydial.ios
@@ -95,6 +99,8 @@ targets:
     sources:
       - path: IslamicDayDialWidget
       - path: IslamicDayShared
+      - path: ../../packages/i18n/resources
+        buildPhase: resources
     dependencies:
       - package: Adhan
     settings:
@@ -114,6 +120,8 @@ targets:
     sources:
       - path: IslamicDayDialTests
       - path: IslamicDayShared
+      - path: ../../packages/i18n/resources
+        buildPhase: resources
       - path: IslamicDayDial
         includes:
           - PrayerNotificationScheduler.swift

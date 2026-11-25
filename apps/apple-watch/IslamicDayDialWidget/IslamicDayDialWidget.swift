@@ -282,7 +282,7 @@ struct IslamicDayDialWidget: Widget {
             IslamicDayDialWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Islamic Day Dial")
-        .description("Show the current Hijri date.")
+        .description(L10n.t("widgetDescription"))
         .supportedFamilies([.systemSmall])
     }
 }
