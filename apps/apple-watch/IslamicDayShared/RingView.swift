@@ -876,7 +876,7 @@ private struct PhoneNightGlowOverlay: View {
                 } else if isInIsha || isInLastThird {
                     ForEach(nightSegments.filter { seg in
                         if isInIsha { return seg.id == .isha_to_last_third }
-                        return seg.id == .isha_to_last_third || seg.id == .last_third_to_fajr
+                        return seg.id == .last_third_to_fajr
                     }, id: \.id) { seg in
                         let path = arcPath(cx: Double(size / 2), cy: Double(size / 2), r: Double(ringRadius), startDeg: seg.startAngleDeg, endDeg: seg.endAngleDeg)
                         if seg.id == .last_third_to_fajr && isInLastThird {

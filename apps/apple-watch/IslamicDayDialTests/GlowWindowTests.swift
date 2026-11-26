@@ -164,7 +164,7 @@ final class GlowWindowTests: XCTestCase {
         XCTAssertEqual(IslamicPhaseId.last_third_to_fajr.rawValue, "last_third_to_fajr")
     }
 
-    // MARK: - Isha sector (both Isha and Last Third get glow when in either)
+    // MARK: - Isha sector (Isha glows only during Isha; last third glows only itself)
 
     func testNightSectorsGroup_ContainsIshaAndLastThird() {
         let nightGroup: Set<IslamicPhaseId> = [.isha_to_last_third, .last_third_to_fajr]
@@ -173,9 +173,9 @@ final class GlowWindowTests: XCTestCase {
     }
 
     func testIshaGlowDuringLastThird_BothSegmentsHighlighted() {
-        // When marker in last_third_to_fajr: Last Third pulsates, Isha gets weak glow
-        // When marker in isha_to_last_third: both get weak glow
-        // Logic is in RingView NIGHT_SECTORS_GROUP
+        // When marker in last_third_to_fajr: only the last third glows.
+        // When marker in isha_to_last_third: only the Isha arc glows.
+        // Logic is in RingView.
         let nightPhases: [IslamicPhaseId] = [.isha_to_last_third, .last_third_to_fajr]
         XCTAssertEqual(nightPhases.count, 2)
     }

@@ -292,7 +292,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
       {/* Isha glow only: keep ring bright, but add neon halo when marker is inside Isha sectors */}
       {inIshaSector &&
-        (currentPhase === 'isha_to_last_third' ? ['isha'] : ['isha', 'lastThird'])
+        (currentPhase === 'last_third_to_fajr' ? ['lastThird'] : ['isha'])
           .map((arcId) => explodedArcById.get(arcId as 'isha' | 'lastThird'))
           .filter(Boolean)
           .map((spec) => {
