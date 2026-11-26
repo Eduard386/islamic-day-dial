@@ -32,9 +32,9 @@ func getSectorDisplayName(now: Date, currentPhase: IslamicPhaseId, timeline: (du
     if currentPhase == .dhuhr_to_asr && isFriday { return "Jumu'ah" }
     if currentPhase != .sunrise_to_dhuhr { return formatCurrentPeriod(currentPhase) }
     let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: timeline.duhaStart, dhuhr: timeline.dhuhr)
-    if sub == .sunrise { return "Sunrise" }
+    if sub == .sunrise { return "Shuruq" }
     if isFriday && (sub == .duha || sub == .midday) { return "Jumu'ah" }
-    return sub == .duha ? "Duha" : "Midday"
+    return sub == .duha ? "Duha" : "Istiwa"
 }
 
 /// Sub-period within sunrise_to_dhuhr: SUNRISE (until Duha start), DUHA (until 5 min before Dhuhr), MIDDAY (last 5 min)

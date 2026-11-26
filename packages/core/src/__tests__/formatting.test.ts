@@ -67,7 +67,7 @@ describe('formatCountdown', () => {
 
 describe('formatPhase', () => {
   it('returns human-readable label', () => {
-    expect(formatPhase('fajr_to_sunrise')).toBe('Fajr → Sunrise');
+    expect(formatPhase('fajr_to_sunrise')).toBe('Fajr → Shuruq');
   });
 });
 
@@ -111,7 +111,7 @@ describe('getSectorDisplayName', () => {
 
   it('returns Sunrise in sunrise sub-period', () => {
     const friday = new Date('2025-03-21T04:20:00.000Z');
-    expect(getSectorDisplayName(friday, 'sunrise_to_dhuhr', timeline)).toBe('Sunrise');
+    expect(getSectorDisplayName(friday, 'sunrise_to_dhuhr', timeline)).toBe('Shuruq');
   });
 
   it('returns Jumu\'ah on Friday in duha', () => {

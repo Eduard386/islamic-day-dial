@@ -33,11 +33,11 @@ final class PhoneHomePresentationTests: XCTestCase {
         let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
         let titles = presentation.ringLegendItems.map(\.title)
 
-        XCTAssertEqual(presentation.rawSectorTitle, "Sunrise")
-        XCTAssertEqual(presentation.displayTitle, "Sunrise")
+        XCTAssertEqual(presentation.rawSectorTitle, "Shuruq")
+        XCTAssertEqual(presentation.displayTitle, "Shuruq")
         XCTAssertEqual(presentation.currentCueText, PHONE_CUE_SUNRISE)
-        XCTAssertFalse(titles.contains("Sunrise"))
-        XCTAssertFalse(titles.contains("Midday"))
+        XCTAssertFalse(titles.contains("Shuruq"))
+        XCTAssertFalse(titles.contains("Istiwa"))
         XCTAssertNil(presentation.highlightedRingTitle)
     }
 
@@ -60,8 +60,8 @@ final class PhoneHomePresentationTests: XCTestCase {
         let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
 
         XCTAssertEqual(presentation.backgroundKey, .midday)
-        XCTAssertEqual(presentation.rawSectorTitle, "Midday")
-        XCTAssertEqual(presentation.displayTitle, "Midday")
+        XCTAssertEqual(presentation.rawSectorTitle, "Istiwa")
+        XCTAssertEqual(presentation.displayTitle, "Istiwa")
         XCTAssertEqual(presentation.currentCueText, PHONE_CUE_MIDDAY)
         XCTAssertNil(presentation.highlightedRingTitle)
     }

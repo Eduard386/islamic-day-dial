@@ -32,9 +32,9 @@ type FootnoteItem = {
 const FOOTNOTE_DEFS: ReadonlyArray<FootnoteDef> = [
   { id: 'asr', label: 'Asr', arcId: 'asr', side: 'left', rowYRatio: 0.14 },
   { id: 'dhuhr', label: 'Dhuhr', arcId: 'dhuhr', side: 'left', rowYRatio: 0.28 },
-  { id: 'duha_end', label: 'Midday', arcId: 'midday', side: 'left', rowYRatio: 0.73 },
+  { id: 'duha_end', label: 'Istiwa', arcId: 'midday', side: 'left', rowYRatio: 0.73 },
   { id: 'duha_start', label: 'Duha', arcId: 'duha', side: 'left', rowYRatio: 0.85 },
-  { id: 'sunrise', label: 'Sunrise', arcId: 'sunrise', side: 'left', rowYRatio: 0.96 },
+  { id: 'sunrise', label: 'Shuruq', arcId: 'sunrise', side: 'left', rowYRatio: 0.96 },
   { id: 'maghrib', label: 'Maghrib', arcId: 'maghrib', side: 'right', rowYRatio: 0.14 },
   { id: 'isha', label: 'Isha', arcId: 'isha', side: 'right', rowYRatio: 0.28 },
   { id: 'last_third_start', label: 'Last 3rd', arcId: 'lastThird', side: 'right', rowYRatio: 0.85 },

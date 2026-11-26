@@ -168,7 +168,7 @@ struct ContentView: View {
     private func shouldSuppressWatchSectorOnEid(snapshot snap: ComputedIslamicDay, now: Date) -> Bool {
         guard formatHijriDateParts(snap.hijriDate).isEid else { return false }
         let pl = periodLabel(snapshot: snap, now: now)
-        return pl == "Duha" || pl == "Midday" || pl == "Dhuhr" || pl == "Jumu'ah"
+        return pl == "Duha" || pl == "Istiwa" || pl == "Dhuhr" || pl == "Jumu'ah"
     }
 }
 

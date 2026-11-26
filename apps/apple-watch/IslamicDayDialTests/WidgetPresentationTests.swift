@@ -186,6 +186,6 @@ final class WidgetPresentationTests: XCTestCase {
 
         let label = watchInlineLabel(snapshot: snapshot, now: Date(timeIntervalSince1970: 550))
 
-        XCTAssertEqual(label, "SUNRISE")
+        XCTAssertEqual(label, "SHURUQ")
     }
 }

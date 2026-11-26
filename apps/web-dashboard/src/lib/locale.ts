@@ -61,9 +61,9 @@ export function t(key: string): string {
 /** Turkish vakit names. Keys stay the English sector titles used by the dial logic. */
 const TURKISH_SECTORS: Record<string, string> = {
   Fajr: 'İmsak',
-  Sunrise: 'Güneş',
+  Shuruq: 'Güneş',
   Duha: 'Kuşluk',
-  Midday: 'Zeval',
+  Istiwa: 'İstiva',
   Dhuhr: 'Öğle',
   Asr: 'İkindi',
   Maghrib: 'Akşam',

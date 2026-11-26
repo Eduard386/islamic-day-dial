@@ -54,11 +54,11 @@ function webObservationalCueForSectorTitle(sectorTitle: string): string {
   switch (sectorTitle) {
     case 'Fajr':
       return t('cue.fajr');
-    case 'Sunrise':
+    case 'Shuruq':
       return t('cue.sunrise');
     case 'Duha':
       return t('cue.duha');
-    case 'Midday':
+    case 'Istiwa':
       return t('cue.midday');
     case 'Dhuhr':
       return t('cue.dhuhr');
@@ -133,7 +133,7 @@ export const WEB_HIJRI_MONTH_NAMES = [
 ] as const;
 
 const JIBRIL_GROUP = new Set(['Dhuhr', 'Asr', 'Maghrib', 'Isha', 'Fajr']);
-const SUN_DAY_GROUP = new Set(['Sunrise', 'Duha', 'Midday']);
+const SUN_DAY_GROUP = new Set(['Shuruq', 'Duha', 'Istiwa']);
 
 const PHONE_JIBRIL_HADITH_AR = 'قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ‏ "‏ أَمَّنِي جِبْرِيلُ عَلَيْهِ السَّلاَمُ عِنْدَ الْبَيْتِ مَرَّتَيْنِ فَصَلَّى بِيَ الظُّهْرَ حِينَ زَالَتِ الشَّمْسُ وَكَانَتْ قَدْرَ الشِّرَاكِ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ - يَعْنِي الْمَغْرِبَ - حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ حِينَ غَابَ الشَّفَقُ وَصَلَّى بِيَ الْفَجْرَ حِينَ حَرُمَ الطَّعَامُ وَالشَّرَابُ عَلَى الصَّائِمِ فَلَمَّا كَانَ الْغَدُ صَلَّى بِيَ الظُّهْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَيْهِ وَصَلَّى بِيَ الْمَغْرِبَ حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ إِلَى ثُلُثِ اللَّيْلِ وَصَلَّى بِيَ الْفَجْرَ فَأَسْفَرَ ثُمَّ الْتَفَتَ إِلَىَّ فَقَالَ يَا مُحَمَّدُ هَذَا وَقْتُ الأَنْبِيَاءِ مِنْ قَبْلِكَ وَالْوَقْتُ مَا بَيْنَ هَذَيْنِ الْوَقْتَيْنِ ‏"‏ ‏.';
 const PHONE_JIBRIL_HADITH_EN = `The Messenger of Allah (ﷺ) said: Gabriel (ﷺ) led me in prayer at the House (i.e. the Ka'bah). He prayed the noon prayer with me when the sun had passed the meridian to the extent of the thong of a sandal; he prayed the afternoon prayer with me when the shadow of everything was as long as itself; he prayed the sunset prayer with me when one who is fasting breaks the fast; he prayed the night prayer with me when the twilight had ended; and he prayed the dawn prayer with me when food and drink become forbidden to one who is keeping the fast.
@@ -205,7 +205,7 @@ function readingContent(): Record<ReadingKey, ReadingPanelContent> {
       technicalSections: ['dhuhr', 'asr', 'maghrib', 'isha', 'fajr'].map(technicalSection),
     },
     sunDay: {
-      title: 'Sunrise, Duha, Midday',
+      title: 'Shuruq, Duha, Istiwa',
       blocks: [
         { kind: 'arabic', text: PHONE_DUHA_HADITH_ONE_AR },
         { kind: 'english', text: textWithPublished(PHONE_DUHA_HADITH_ONE_EN, 'hadith.tirmidhi.475') },

@@ -20,9 +20,9 @@ private let footnoteTopDefs: [PhoneFootnoteDef] = [
 ]
 
 private let footnoteBottomDefs: [PhoneFootnoteDef] = [
-    .init(id: "duha_end", label: "Midday", start: \.duhaEnd, end: \.dhuhr),
+    .init(id: "duha_end", label: "Istiwa", start: \.duhaEnd, end: \.dhuhr),
     .init(id: "duha_start", label: "Duha", start: \.duhaStart, end: \.duhaEnd),
-    .init(id: "sunrise", label: "Sunrise", start: \.sunrise, end: \.duhaStart),
+    .init(id: "sunrise", label: "Shuruq", start: \.sunrise, end: \.duhaStart),
     .init(id: "fajr", label: "Fajr", start: \.fajr, end: \.sunrise),
     .init(id: "last_third_start", label: "Last 3rd", start: \.lastThirdStart, end: \.fajr),
 ]
@@ -119,11 +119,11 @@ struct PhoneDialFootnotesView: View {
         case .sunrise_to_dhuhr:
             switch getSunriseToDhuhrSubPeriod(now: now, duhaStart: snapshot.timeline.duhaStart, dhuhr: snapshot.timeline.dhuhr) {
             case .sunrise:
-                return "Sunrise"
+                return "Shuruq"
             case .duha:
                 return "Duha"
             case .midday:
-                return "Midday"
+                return "Istiwa"
             }
         case .dhuhr_to_asr:
             return "Dhuhr"

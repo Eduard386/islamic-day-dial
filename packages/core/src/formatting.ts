@@ -31,8 +31,8 @@ const PHASE_LABELS: Record<IslamicPhaseId, string> = {
   isha_to_last_third: 'Isha',
   midnight_to_last_third: '',
   last_third_to_fajr: 'Isha',
-  fajr_to_sunrise: 'Fajr → Sunrise',
-  sunrise_to_dhuhr: 'Sunrise → Dhuhr',
+  fajr_to_sunrise: 'Fajr → Shuruq',
+  sunrise_to_dhuhr: 'Shuruq → Dhuhr',
   dhuhr_to_asr: 'Dhuhr → Asr',
   asr_to_maghrib: 'Asr → Maghrib',
 };
@@ -66,9 +66,9 @@ export function getSectorDisplayName(
   if (currentPhase === 'dhuhr_to_asr' && isFriday) return "Jumu'ah";
   if (currentPhase !== 'sunrise_to_dhuhr') return formatCurrentPeriod(currentPhase);
   const sub = getSunriseToDhuhrSubPeriod(now, timeline.duhaStart, timeline.dhuhr);
-  if (sub === 'sunrise') return 'Sunrise';
+  if (sub === 'sunrise') return 'Shuruq';
   if (isFriday && (sub === 'duha' || sub === 'midday')) return "Jumu'ah";
-  return sub === 'duha' ? 'Duha' : 'Midday';
+  return sub === 'duha' ? 'Duha' : 'Istiwa';
 }
 
 export type SunriseToDhuhrSubPeriod = 'sunrise' | 'duha' | 'midday';
@@ -90,7 +90,7 @@ const TRANSITION_LABELS: Record<string, string> = {
   isha: 'Isha',
   last_third_start: '2/3',
   fajr: 'Fajr',
-  sunrise: 'Sunrise',
+  sunrise: 'Shuruq',
   dhuhr: 'Dhuhr',
   asr: 'Asr',
   maghrib: 'Maghrib',

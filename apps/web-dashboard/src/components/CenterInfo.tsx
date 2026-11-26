@@ -20,7 +20,7 @@ function eidHeadingFromHijri(hijri: { day: number; monthNumber: number }): strin
 }
 
 /** On Eid, sector title in the hole is hidden during this window (holiday uses the date line). */
-const EID_SUPPRESSED_SECTOR_LABELS = new Set(['Duha', 'Midday', 'Dhuhr', "Jumu'ah"]);
+const EID_SUPPRESSED_SECTOR_LABELS = new Set(['Duha', 'Istiwa', 'Dhuhr', "Jumu'ah"]);
 
 export function CenterInfo({ snapshot, now, timezone, onPeriodSelect, isPeriodSelected = false }: Props) {
   const periodLabel = getSectorDisplayName(

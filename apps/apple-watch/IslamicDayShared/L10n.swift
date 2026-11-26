@@ -37,9 +37,9 @@ enum L10n {
 
     private static let turkishSectors = [
         "Fajr": "İmsak",
-        "Sunrise": "Güneş",
+        "Shuruq": "Güneş",
         "Duha": "Kuşluk",
-        "Midday": "Zeval",
+        "Istiwa": "İstiva",
         "Dhuhr": "Öğle",
         "Asr": "İkindi",
         "Maghrib": "Akşam",

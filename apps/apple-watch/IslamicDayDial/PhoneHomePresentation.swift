@@ -80,9 +80,9 @@ private let PHONE_BASE_RING_LEGEND_TITLES = [
 
 private let PHONE_SUPPORTED_READING_TITLES: Set<String> = [
     "Fajr",
-    "Sunrise",
+    "Shuruq",
     "Duha",
-    "Midday",
+    "Istiwa",
     "Dhuhr",
     "Asr",
     "Maghrib",
@@ -95,11 +95,11 @@ func phoneObservationalCueText(for title: String) -> String {
     switch title {
     case "Fajr":
         return PHONE_CUE_FAJR
-    case "Sunrise":
+    case "Shuruq":
         return PHONE_CUE_SUNRISE
     case "Duha":
         return PHONE_CUE_DUHA
-    case "Midday":
+    case "Istiwa":
         return PHONE_CUE_MIDDAY
     case "Dhuhr":
         return PHONE_CUE_DHUHR

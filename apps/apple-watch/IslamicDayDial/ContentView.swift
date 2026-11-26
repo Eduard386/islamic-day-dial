@@ -40,7 +40,7 @@ private let PHONE_HIJRI_MONTH_NAMES = [
     "Ramadan", "Shawwal", "Dhul Qadah", "Dhul Hijjah"
 ]
 private let PHONE_JIBRIL_GROUP_ONE: Set<String> = ["Dhuhr", "Asr", "Maghrib", "Isha", "Fajr"]
-private let PHONE_JIBRIL_GROUP_TWO: Set<String> = ["Sunrise", "Duha", "Midday"]
+private let PHONE_JIBRIL_GROUP_TWO: Set<String> = ["Shuruq", "Duha", "Istiwa"]
 private let PHONE_JIBRIL_HADITH_AR = "قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ‏ \"‏ أَمَّنِي جِبْرِيلُ عَلَيْهِ السَّلاَمُ عِنْدَ الْبَيْتِ مَرَّتَيْنِ فَصَلَّى بِيَ الظُّهْرَ حِينَ زَالَتِ الشَّمْسُ وَكَانَتْ قَدْرَ الشِّرَاكِ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ - يَعْنِي الْمَغْرِبَ - حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ حِينَ غَابَ الشَّفَقُ وَصَلَّى بِيَ الْفَجْرَ حِينَ حَرُمَ الطَّعَامُ وَالشَّرَابُ عَلَى الصَّائِمِ فَلَمَّا كَانَ الْغَدُ صَلَّى بِيَ الظُّهْرَ حِينَ كَانَ ظِلُّهُ مِثْلَهُ وَصَلَّى بِيَ الْعَصْرَ حِينَ كَانَ ظِلُّهُ مِثْلَيْهِ وَصَلَّى بِيَ الْمَغْرِبَ حِينَ أَفْطَرَ الصَّائِمُ وَصَلَّى بِيَ الْعِشَاءَ إِلَى ثُلُثِ اللَّيْلِ وَصَلَّى بِيَ الْفَجْرَ فَأَسْفَرَ ثُمَّ الْتَفَتَ إِلَىَّ فَقَالَ يَا مُحَمَّدُ هَذَا وَقْتُ الأَنْبِيَاءِ مِنْ قَبْلِكَ وَالْوَقْتُ مَا بَيْنَ هَذَيْنِ الْوَقْتَيْنِ ‏\"‏ ‏."
 private let PHONE_JIBRIL_HADITH_EN = """
 The Messenger of Allah (ﷺ) said: Gabriel (ﷺ) led me in prayer at the House (i.e. the Ka'bah). He prayed the noon prayer with me when the sun had passed the meridian to the extent of the thong of a sandal; he prayed the afternoon prayer with me when the shadow of everything was as long as itself; he prayed the sunset prayer with me when one who is fasting breaks the fast; he prayed the night prayer with me when the twilight had ended; and he prayed the dawn prayer with me when food and drink become forbidden to one who is keeping the fast.
@@ -932,7 +932,7 @@ private struct PhonePreStillsDialView: View {
     private var centerHoleSectorUpper: String? {
         if presentation.isEidDay {
             let raw = presentation.rawSectorTitle
-            if raw == "Duha" || raw == "Midday" || raw == "Dhuhr" || raw == "Jumu'ah" {
+            if raw == "Duha" || raw == "Istiwa" || raw == "Dhuhr" || raw == "Jumu'ah" {
                 return nil
             }
             return L10n.sectorRing(raw)
@@ -1676,9 +1676,9 @@ private struct PhoneSectorTitleSpotlightView: View {
 
         if isSunDayGroup {
             return [
-                technicalSection(id: "sunrise", heading: L10n.sectorProse("Sunrise"), key: "sunrise"),
+                technicalSection(id: "sunrise", heading: L10n.sectorProse("Shuruq"), key: "sunrise"),
                 technicalSection(id: "duha", heading: L10n.sectorProse("Duha"), key: "duha"),
-                technicalSection(id: "midday", heading: L10n.sectorProse("Midday"), key: "midday"),
+                technicalSection(id: "midday", heading: L10n.sectorProse("Istiwa"), key: "midday"),
             ]
         }
 
