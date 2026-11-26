@@ -6,6 +6,7 @@ import Foundation
 private let MARKER_DEFS: [(String, KeyPath<ComputedTimeline, Date>, RingMarkerKind)] = [
     ("maghrib", \.lastMaghrib, .primary),
     ("isha", \.isha, .primary),
+    ("midnight", \.midnight, .secondary),
     ("last_third_start", \.lastThirdStart, .secondary),
     ("fajr", \.fajr, .primary),
     ("sunrise", \.sunrise, .primary),
@@ -17,7 +18,8 @@ private let MARKER_DEFS: [(String, KeyPath<ComputedTimeline, Date>, RingMarkerKi
 
 private let SEGMENT_BOUNDARIES: [(IslamicPhaseId, KeyPath<ComputedTimeline, Date>, KeyPath<ComputedTimeline, Date>)] = [
     (.maghrib_to_isha, \.lastMaghrib, \.isha),
-    (.isha_to_last_third, \.isha, \.lastThirdStart),
+    (.isha_to_last_third, \.isha, \.midnight),
+    (.midnight_to_last_third, \.midnight, \.lastThirdStart),
     (.last_third_to_fajr, \.lastThirdStart, \.fajr),
     (.fajr_to_sunrise, \.fajr, \.sunrise),
     (.sunrise_to_dhuhr, \.sunrise, \.dhuhr),

@@ -93,6 +93,7 @@ const SUN_NEON = {
 const MOON_ONLY_PHASES = new Set<IslamicPhaseId>([
   'maghrib_to_isha',
   'isha_to_last_third',
+  'midnight_to_last_third',
   'last_third_to_fajr',
   'fajr_to_sunrise',
 ]);

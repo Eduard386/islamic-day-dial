@@ -33,6 +33,7 @@ describe('getSegmentGradientStops', () => {
     const ids = [
       'maghrib_to_isha',
       'isha_to_last_third',
+      'midnight_to_last_third',
       'last_third_to_fajr',
       'fajr_to_sunrise',
       'sunrise_to_dhuhr',

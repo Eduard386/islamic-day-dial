@@ -73,7 +73,7 @@ describe('countdown targets next sector start (web)', () => {
       timezone: 'Asia/Riyadh',
     };
     const snapshot = computeIslamicDaySnapshot(ctx);
-    expect(['isha_to_last_third', 'last_third_to_fajr']).toContain(snapshot.currentPhase);
+    expect(['isha_to_last_third', 'midnight_to_last_third', 'last_third_to_fajr']).toContain(snapshot.currentPhase);
     const target = getCountdownTarget(ctx.now, snapshot.timeline);
     expect(target.getTime()).toBe(snapshot.timeline.fajr.getTime());
   });

@@ -5,7 +5,8 @@ import Foundation
 
 private let PHASE_BOUNDARIES: [(IslamicPhaseId, KeyPath<ComputedTimeline, Date>, KeyPath<ComputedTimeline, Date>)] = [
     (.maghrib_to_isha, \.lastMaghrib, \.isha),
-    (.isha_to_last_third, \.isha, \.lastThirdStart),
+    (.isha_to_last_third, \.isha, \.midnight),
+    (.midnight_to_last_third, \.midnight, \.lastThirdStart),
     (.last_third_to_fajr, \.lastThirdStart, \.fajr),
     (.fajr_to_sunrise, \.fajr, \.sunrise),
     (.sunrise_to_dhuhr, \.sunrise, \.dhuhr),
@@ -28,6 +29,7 @@ func getCurrentPhase(now: Date, timeline: ComputedTimeline) -> IslamicPhaseId {
 func getNextTransition(now: Date, timeline: ComputedTimeline) -> (id: String, at: Date) {
     let ordered: [(String, Date)] = [
         ("isha", timeline.isha),
+        ("midnight", timeline.midnight),
         ("last_third_start", timeline.lastThirdStart),
         ("fajr", timeline.fajr),
         ("sunrise", timeline.sunrise),
@@ -55,7 +57,7 @@ func getCountdownTarget(now: Date, timeline: ComputedTimeline) -> Date {
     switch phase {
     case .maghrib_to_isha:
         return timeline.isha
-    case .isha_to_last_third, .last_third_to_fajr:
+    case .isha_to_last_third, .midnight_to_last_third, .last_third_to_fajr:
         return timeline.fajr
     case .fajr_to_sunrise:
         return timeline.sunrise

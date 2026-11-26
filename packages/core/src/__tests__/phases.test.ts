@@ -5,6 +5,7 @@ import type { ComputedTimeline } from '../types.js';
 const timeline: ComputedTimeline = {
   lastMaghrib: new Date('2025-03-15T15:30:00.000Z'),
   isha: new Date('2025-03-15T17:00:00.000Z'),
+  midnight: new Date('2025-03-15T20:45:00.000Z'),
   lastThirdStart: new Date('2025-03-15T22:30:00.000Z'),
   fajr: new Date('2025-03-16T02:00:00.000Z'),
   sunrise: new Date('2025-03-16T03:15:00.000Z'),
@@ -26,9 +27,14 @@ describe('getCurrentPhase', () => {
     expect(getCurrentPhase(now, timeline)).toBe('isha_to_last_third');
   });
 
-  it('returns isha_to_last_third until last third start', () => {
-    const now = new Date('2025-03-15T21:00:00.000Z');
+  it('returns isha_to_last_third until the middle of the night', () => {
+    const now = new Date('2025-03-15T20:00:00.000Z');
     expect(getCurrentPhase(now, timeline)).toBe('isha_to_last_third');
+  });
+
+  it('returns midnight_to_last_third after the middle of the night', () => {
+    const now = new Date('2025-03-15T21:00:00.000Z');
+    expect(getCurrentPhase(now, timeline)).toBe('midnight_to_last_third');
   });
 
   it('returns last_third_to_fajr after last third start', () => {

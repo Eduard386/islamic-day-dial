@@ -24,8 +24,8 @@ function assertValidSnapshot(snapshot: ComputedIslamicDay) {
 
   expect(snapshot.ring.progress).toBeGreaterThanOrEqual(0);
   expect(snapshot.ring.progress).toBeLessThanOrEqual(1);
-  expect(snapshot.ring.markers).toHaveLength(9);
-  expect(snapshot.ring.segments).toHaveLength(7);
+  expect(snapshot.ring.markers).toHaveLength(10);
+  expect(snapshot.ring.segments).toHaveLength(8);
 
   expect(snapshot.countdownMs).toBeGreaterThanOrEqual(0);
   expect(snapshot.nextTransition.id.length).toBeGreaterThan(0);
@@ -33,7 +33,8 @@ function assertValidSnapshot(snapshot: ComputedIslamicDay) {
 
   const tl = snapshot.timeline;
   expect(tl.lastMaghrib.getTime()).toBeLessThan(tl.isha.getTime());
-  expect(tl.isha.getTime()).toBeLessThan(tl.lastThirdStart.getTime());
+  expect(tl.isha.getTime()).toBeLessThanOrEqual(tl.midnight.getTime());
+  expect(tl.midnight.getTime()).toBeLessThan(tl.lastThirdStart.getTime());
   expect(tl.lastThirdStart.getTime()).toBeLessThan(tl.fajr.getTime());
   expect(tl.fajr.getTime()).toBeLessThan(tl.sunrise.getTime());
   expect(tl.sunrise.getTime()).toBeLessThan(tl.duhaStart.getTime());
@@ -70,7 +71,7 @@ describe('computeIslamicDaySnapshot', () => {
     const snapshot = computeIslamicDaySnapshot(ISTANBUL);
     const tl = snapshot.timeline;
     const times = [
-      tl.lastMaghrib, tl.isha, tl.lastThirdStart,
+      tl.lastMaghrib, tl.isha, tl.midnight, tl.lastThirdStart,
       tl.fajr, tl.sunrise, tl.duhaStart, tl.duhaEnd, tl.dhuhr, tl.asr, tl.nextMaghrib,
     ];
     for (let i = 1; i < times.length; i++) {

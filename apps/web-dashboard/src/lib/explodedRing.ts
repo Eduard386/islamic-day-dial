@@ -7,6 +7,7 @@ import {
 export type ExplodedArcId =
   | 'maghrib'
   | 'isha'
+  | 'nightGap'
   | 'lastThird'
   | 'fajr'
   | 'sunrise'
@@ -91,7 +92,8 @@ export function getExplodedRingArcSpecs(snapshot: ComputedIslamicDay): ExplodedA
 
   return tightenedDuhaCluster([
     makeSpec('maghrib', angleFor(timeline.lastMaghrib), angleFor(timeline.isha)),
-    makeSpec('isha', angleFor(timeline.isha), angleFor(timeline.lastThirdStart)),
+    makeSpec('isha', angleFor(timeline.isha), angleFor(timeline.midnight)),
+    makeSpec('nightGap', angleFor(timeline.midnight), angleFor(timeline.lastThirdStart)),
     makeSpec('lastThird', angleFor(timeline.lastThirdStart), angleFor(timeline.fajr)),
     makeSpec('fajr', angleFor(timeline.fajr), angleFor(timeline.sunrise)),
     makeSpec('sunrise', angleFor(timeline.sunrise), angleFor(timeline.duhaStart)),
@@ -110,6 +112,7 @@ export function getExplodedArcMidAngle(spec: ExplodedArcSpec): number {
 export const MARKER_ID_TO_EXPLODED_ARC_START: Readonly<Partial<Record<string, ExplodedArcId>>> = {
   maghrib: 'maghrib',
   isha: 'isha',
+  midnight: 'nightGap',
   last_third_start: 'lastThird',
   fajr: 'fajr',
   sunrise: 'sunrise',
@@ -163,6 +166,8 @@ export function getCurrentExplodedArcId(snapshot: ComputedIslamicDay, now: Date)
       return 'maghrib';
     case 'isha_to_last_third':
       return 'isha';
+    case 'midnight_to_last_third':
+      return 'nightGap';
     case 'last_third_to_fajr':
       return 'lastThird';
     case 'fajr_to_sunrise':

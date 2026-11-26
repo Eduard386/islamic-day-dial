@@ -120,6 +120,7 @@ function getPaletteForSegment(id: IslamicPhaseId): string[] {
     case 'maghrib_to_isha':
       return MAGHRIB_PALETTE;
     case 'isha_to_last_third':
+    case 'midnight_to_last_third':
       return [NIGHT_BLACK];
     case 'last_third_to_fajr':
       return [NIGHT_BLACK];

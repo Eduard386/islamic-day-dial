@@ -4,11 +4,11 @@ private let ROLL_ZONE_DEG: Double = 10
 private let RED_SUN_ZONE_DEG: Double = 8
 private let MIN_REVEAL: Double = 0.12
 private let SUN_PHASES: Set<IslamicPhaseId> = [.sunrise_to_dhuhr, .dhuhr_to_asr, .asr_to_maghrib]
-private let MOON_ONLY_PHASES: Set<IslamicPhaseId> = [.maghrib_to_isha, .isha_to_last_third, .last_third_to_fajr, .fajr_to_sunrise]
+private let MOON_ONLY_PHASES: Set<IslamicPhaseId> = [.maghrib_to_isha, .isha_to_last_third, .midnight_to_last_third, .last_third_to_fajr, .fajr_to_sunrise]
 private let GAP_SEGMENT_IDS: Set<IslamicPhaseId> = [.last_third_to_fajr]
 private let NIGHT_SECTORS_GROUP: Set<IslamicPhaseId> = [.isha_to_last_third, .last_third_to_fajr]
 private let PRIMARY_MARKER_IDS: Set<String> = ["fajr", "dhuhr", "asr", "maghrib", "isha"]
-private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "last_third_start", "duha_start", "duha_end"]
+private let SECONDARY_MARKER_IDS: Set<String> = ["sunrise", "midnight", "last_third_start", "duha_start", "duha_end"]
 private let PHONE_HIDDEN_TICK_IDS: Set<String> = ["duha_start", "duha_end"]
 private let MOON_INNER_R: Double = 0.82
 private let GLOW_PULSE_DURATION: Double = 3.0  // Full cycle like web (base↔peak↔base)
@@ -201,6 +201,8 @@ private func explodedPhoneTickAngleDeg(marker: RingMarker, phoneArcSpecs: [Phone
         return spec(.maghribToIsha)?.startAngleDeg ?? CGFloat(marker.angleDeg)
     case "isha":
         return spec(.ishaGroup)?.startAngleDeg ?? CGFloat(marker.angleDeg)
+    case "midnight":
+        return CGFloat(adjustedPhoneMarkerAngle(phoneArcSpecs: phoneArcSpecs, originalAngle: marker.angleDeg))
     case "last_third_start":
         return CGFloat(adjustedPhoneMarkerAngle(phoneArcSpecs: phoneArcSpecs, originalAngle: marker.angleDeg))
     case "fajr":
@@ -710,7 +712,8 @@ struct RingView: View {
                         var linePath = Path()
                         linePath.move(to: innerPt)
                         linePath.addLine(to: outerPt)
-                        context.stroke(linePath, with: .color(MARKER_STROKE), style: tickStyle)
+                        let tickColor = m.id == "midnight" ? Color.white : MARKER_STROKE
+                        context.stroke(linePath, with: .color(tickColor), style: tickStyle)
                     }
                 }
                 .opacity(tickOpacity)
@@ -843,7 +846,10 @@ private struct PhoneNightGlowOverlay: View {
                     )
                     .blur(radius: size * (4 / 420))
                 } else if isInIsha || isInLastThird {
-                    ForEach(nightSegments.filter { isInIsha || $0.id == .isha_to_last_third || $0.id == .last_third_to_fajr }, id: \.id) { seg in
+                    ForEach(nightSegments.filter { seg in
+                        if isInIsha { return seg.id == .isha_to_last_third }
+                        return seg.id == .isha_to_last_third || seg.id == .last_third_to_fajr
+                    }, id: \.id) { seg in
                         let path = arcPath(cx: Double(size / 2), cy: Double(size / 2), r: Double(ringRadius), startDeg: seg.startAngleDeg, endDeg: seg.endAngleDeg)
                         if seg.id == .last_third_to_fajr && isInLastThird {
                             let lastThirdColor = Color(red: 0.231, green: 0.51, blue: 0.965)

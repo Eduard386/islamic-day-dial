@@ -25,6 +25,7 @@ final class GlowWindowTests: XCTestCase {
         return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: 1_742_508_000),
             isha: Date(timeIntervalSince1970: 1_742_544_000),
+            midnight: Date(timeIntervalSince1970: (1_742_508_000 + 1_742_760_000) / 2),
             lastThirdStart: Date(timeIntervalSince1970: 1_742_670_000),
             fajr: Date(timeIntervalSince1970: 1_742_760_000),
             sunrise: sunrise,
@@ -42,6 +43,7 @@ final class GlowWindowTests: XCTestCase {
         return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: 1_742_421_600),
             isha: Date(timeIntervalSince1970: 1_742_457_600),
+            midnight: Date(timeIntervalSince1970: (1_742_421_600 + 1_742_673_600) / 2),
             lastThirdStart: Date(timeIntervalSince1970: 1_742_583_600),
             fajr: Date(timeIntervalSince1970: 1_742_673_600),
             sunrise: sunrise,

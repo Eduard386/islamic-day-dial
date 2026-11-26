@@ -30,9 +30,12 @@ final class CountdownTests: XCTestCase {
     ) -> ComputedTimeline {
         let duhaStart = duhaStart ?? (sunrise + 20 * 60)
         let duhaEnd = dhuhr - 5 * 60
+        let rawMidnight = lastMaghrib + (fajr - lastMaghrib) / 2
+        let midnight = min(max(rawMidnight, isha), lastThirdStart)
         return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: lastMaghrib),
             isha: Date(timeIntervalSince1970: isha),
+            midnight: Date(timeIntervalSince1970: midnight),
             lastThirdStart: Date(timeIntervalSince1970: lastThirdStart),
             fajr: Date(timeIntervalSince1970: fajr),
             sunrise: Date(timeIntervalSince1970: sunrise),

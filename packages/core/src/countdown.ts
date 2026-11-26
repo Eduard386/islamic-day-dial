@@ -20,6 +20,7 @@ export function getCountdownTarget(now: Date, timeline: ComputedTimeline): Date 
     case 'maghrib_to_isha':
       return timeline.isha;
     case 'isha_to_last_third':
+    case 'midnight_to_last_third':
     case 'last_third_to_fajr':
       return timeline.fajr;
     case 'fajr_to_sunrise':

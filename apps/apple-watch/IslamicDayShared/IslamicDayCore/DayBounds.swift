@@ -111,10 +111,14 @@ func buildTimeline(
     
     let duhaEnd = Date(timeIntervalSince1970: dayPT.dhuhr.timeIntervalSince1970 - 5 * 60)
     let duhaStart = getDuhaStart(sunrise: dayPT.sunrise, dhuhr: dayPT.dhuhr, location: location, duhaEnd: duhaEnd)
+    let lastThirdStart = getLastThirdStart(lastMaghrib: nightPT.maghrib, fajr: dayPT.fajr)
+    let rawMidnight = getNightMidpoint(lastMaghrib: nightPT.maghrib, fajr: dayPT.fajr)
+    let midnight = Date(timeIntervalSince1970: min(max(rawMidnight.timeIntervalSince1970, nightPT.isha.timeIntervalSince1970), lastThirdStart.timeIntervalSince1970))
     return ComputedTimeline(
         lastMaghrib: nightPT.maghrib,
         isha: nightPT.isha,
-        lastThirdStart: getLastThirdStart(lastMaghrib: nightPT.maghrib, fajr: dayPT.fajr),
+        midnight: midnight,
+        lastThirdStart: lastThirdStart,
         fajr: dayPT.fajr,
         sunrise: dayPT.sunrise,
         duhaStart: duhaStart,

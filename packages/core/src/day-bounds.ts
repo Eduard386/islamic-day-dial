@@ -1,5 +1,5 @@
 import type { PrayerTimesData, ComputedTimeline, Location } from './types.js';
-import { getLastThirdStart } from './night-markers.js';
+import { getLastThirdStart, getNightMidpoint } from './night-markers.js';
 
 export type IslamicDayBounds = {
   lastMaghrib: Date;
@@ -56,11 +56,17 @@ export function buildTimeline(
   const dhuhr = dayPT.dhuhr;
   const duhaEnd = new Date(dhuhr.getTime() - 5 * 60 * 1000);
   const duhaStart = getDuhaStart(sunrise, dhuhr, location, duhaEnd);
+  const lastThirdStart = getLastThirdStart(lastMaghrib, fajr);
+  const midnightMs = Math.min(
+    Math.max(getNightMidpoint(lastMaghrib, fajr).getTime(), nightPT.isha.getTime()),
+    lastThirdStart.getTime(),
+  );
 
   return {
     lastMaghrib,
     isha: nightPT.isha,
-    lastThirdStart: getLastThirdStart(lastMaghrib, fajr),
+    midnight: new Date(midnightMs),
+    lastThirdStart,
     fajr,
     sunrise,
     duhaStart,

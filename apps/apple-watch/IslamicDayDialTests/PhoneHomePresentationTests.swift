@@ -217,11 +217,14 @@ final class PhoneHomePresentationTests: XCTestCase {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: sunriseDate)
         let previousDay = calendar.date(byAdding: .day, value: -1, to: startOfDay) ?? startOfDay
+        let lastMaghrib = date(atHour: 18, minute: 10, on: previousDay)
+        let fajr = date(atHour: 4, minute: 30, on: startOfDay)
         return ComputedTimeline(
-            lastMaghrib: date(atHour: 18, minute: 10, on: previousDay),
+            lastMaghrib: lastMaghrib,
             isha: date(atHour: 19, minute: 30, on: previousDay),
+            midnight: Date(timeIntervalSince1970: (lastMaghrib.timeIntervalSince1970 + fajr.timeIntervalSince1970) / 2),
             lastThirdStart: date(atHour: 2, minute: 0, on: startOfDay),
-            fajr: date(atHour: 4, minute: 30, on: startOfDay),
+            fajr: fajr,
             sunrise: sunriseDate,
             duhaStart: isoDate(duhaStart),
             duhaEnd: dhuhrDate.addingTimeInterval(-5 * 60),

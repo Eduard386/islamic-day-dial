@@ -16,7 +16,7 @@ private let footnoteTopDefs: [PhoneFootnoteDef] = [
     .init(id: "dhuhr", label: "Dhuhr", start: \.dhuhr, end: \.asr),
     .init(id: "asr", label: "Asr", start: \.asr, end: \.nextMaghrib),
     .init(id: "maghrib", label: "Maghrib", start: \.lastMaghrib, end: \.isha),
-    .init(id: "isha", label: "Isha", start: \.isha, end: \.lastThirdStart),
+    .init(id: "isha", label: "Isha", start: \.isha, end: \.midnight),
 ]
 
 private let footnoteBottomDefs: [PhoneFootnoteDef] = [
@@ -110,6 +110,8 @@ struct PhoneDialFootnotesView: View {
             return "Maghrib"
         case .isha_to_last_third:
             return "Isha"
+        case .midnight_to_last_third:
+            return nil
         case .last_third_to_fajr:
             return "Last 3rd"
         case .fajr_to_sunrise:

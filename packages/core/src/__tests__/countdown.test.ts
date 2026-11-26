@@ -7,10 +7,17 @@ function makeTimeline(entries: Record<string, number>): ComputedTimeline {
   const sunrise = entries.sunrise ?? 0;
   const dhuhr = entries.dhuhr ?? 0;
   const duhaStart = entries.duhaStart ?? sunrise + 20 * 60 * 1000;
+  const lastMaghrib = entries.lastMaghrib ?? 0;
+  const fajr = entries.fajr ?? 0;
+  const isha = entries.isha ?? 0;
+  const lastThirdStart = entries.lastThirdStart ?? 0;
+  const rawMid = lastMaghrib + (fajr - lastMaghrib) / 2;
+  const midnight = entries.midnight ?? Math.min(Math.max(rawMid, isha), lastThirdStart);
   return {
-    lastMaghrib: toDate(entries.lastMaghrib ?? 0),
-    isha: toDate(entries.isha ?? 0),
-    lastThirdStart: toDate(entries.lastThirdStart ?? 0),
+    lastMaghrib: toDate(lastMaghrib),
+    isha: toDate(isha),
+    midnight: toDate(midnight),
+    lastThirdStart: toDate(lastThirdStart),
     fajr: toDate(entries.fajr ?? 0),
     sunrise: toDate(sunrise),
     duhaStart: toDate(duhaStart),

@@ -219,7 +219,7 @@ private func phoneBackgroundKey(snapshot: ComputedIslamicDay, now: Date) -> Phon
     switch snapshot.currentPhase {
     case .maghrib_to_isha:
         return .maghrib
-    case .isha_to_last_third:
+    case .isha_to_last_third, .midnight_to_last_third:
         return .isha
     case .last_third_to_fajr:
         return .lastThird

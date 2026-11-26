@@ -49,6 +49,8 @@ On the following day he prayed the noon prayer with me when his shadow was as lo
 
 Then turning to me he said: Muhammad, this is the time observed by the prophets before you, and the time is anywhere between two times.
 """
+private let PHONE_ISHA_END_HADITH_AR = "عَنْ عَبْدِ اللَّهِ بْنِ عَمْرٍو، عَنِ النَّبِيِّ صلى الله عليه وسلم أَنَّهُ قَالَ ‏\"‏ وَقْتُ الظُّهْرِ مَا لَمْ تَحْضُرِ الْعَصْرُ وَوَقْتُ الْعَصْرِ مَا لَمْ تَصْفَرَّ الشَّمْسُ وَوَقْتُ الْمَغْرِبِ مَا لَمْ يَسْقُطْ فَوْرُ الشَّفَقِ وَوَقْتُ الْعِشَاءِ إِلَى نِصْفِ اللَّيْلِ وَوَقْتُ صَلاَةِ الْفَجْرِ مَا لَمْ تَطْلُعِ الشَّمْسُ ‏\"‏"
+private let PHONE_ISHA_END_HADITH_EN = "'Abd Allah b. 'Amr reported the Prophet (ﷺ) as saying: The time of the Zuhr prayer is as along as the time of the 'Asr prayer has not come; the time of the Asr prayer is as long as the sun has not become yellow; the time of the Maghrib prayer is as long as the twilight has not ended; the time of the Isha prayer is up to midnight; and the time of the Fajr prayer is as long as the sun has not risen."
 private let PHONE_DUHA_HADITH_ONE_AR = "حَدَّثَنَا أَبُو جَعْفَرٍ السِّمْنَانِيُّ، حَدَّثَنَا أَبُو مُسْهِرٍ، حَدَّثَنَا إِسْمَاعِيلُ بْنُ عَيَّاشٍ، عَنْ بَحِيرِ بْنِ سَعْدٍ، عَنْ خَالِدِ بْنِ مَعْدَانَ، عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، عَنْ أَبِي الدَّرْدَاءِ، وَأَبِي، ذَرٍّ عَنْ رَسُولِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ‏ \"‏ عَنِ اللَّهِ، عَزَّ وَجَلَّ أَنَّهُ قَالَ ابْنَ آدَمَ ارْكَعْ لِي مِنْ أَوَّلِ النَّهَارِ أَرْبَعَ رَكَعَاتٍ أَكْفِكَ آخِرَهُ ‏\"‏."
 private let PHONE_DUHA_HADITH_ONE_EN = "Allah's Messenger narrated that Allah, Blessed and Most High said: \"Son of Adam: Perform four Rak'ah for Me in the beginning of the day it will suffice you for the latter part of it\"."
 private let PHONE_DUHA_HADITH_TWO_AR = "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مُحَمَّدِ بْنِ أَسْمَاءَ الضُّبَعِيُّ، حَدَّثَنَا مَهْدِيٌّ، - وَهُوَ ابْنُ مَيْمُونٍ - حَدَّثَنَا وَاصِلٌ، مَوْلَى أَبِي عُيَيْنَةَ عَنْ يَحْيَى بْنِ عُقَيْلٍ، عَنْ يَحْيَى بْنِ يَعْمَرَ، عَنْ أَبِي الأَسْوَدِ الدُّؤَلِيِّ، عَنْ أَبِي ذَرٍّ، عَنِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ أَنَّهُ قَالَ ‏ \"‏ يُصْبِحُ عَلَى كُلِّ سُلاَمَى مِنْ أَحَدِكُمْ صَدَقَةٌ فَكُلُّ تَسْبِيحَةٍ صَدَقَةٌ وَكُلُّ تَحْمِيدَةٍ صَدَقَةٌ وَكُلُّ تَهْلِيلَةٍ صَدَقَةٌ وَكُلُّ تَكْبِيرَةٍ صَدَقَةٌ وَأَمْرٌ بِالْمَعْرُوفِ صَدَقَةٌ وَنَهْىٌ عَنِ الْمُنْكَرِ صَدَقَةٌ وَيُجْزِئُ مِنْ ذَلِكَ رَكْعَتَانِ يَرْكَعُهُمَا مِنَ الضُّحَى‏\"."
@@ -1603,6 +1605,12 @@ private struct PhoneSectorTitleSpotlightView: View {
                     arabic: PHONE_JIBRIL_HADITH_AR,
                     english: Scripture.display(id: "hadith.abudawud.393", fallback: PHONE_JIBRIL_HADITH_EN),
                     source: "Sunan Abi Dawud 393"
+                ),
+                ReadingPassage(
+                    id: "isha_end",
+                    arabic: PHONE_ISHA_END_HADITH_AR,
+                    english: Scripture.display(id: "hadith.abudawud.396", fallback: PHONE_ISHA_END_HADITH_EN),
+                    source: "Sunan Abi Dawud 396"
                 )
             ]
         }

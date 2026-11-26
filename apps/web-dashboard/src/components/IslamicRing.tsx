@@ -29,7 +29,7 @@ type Props = {
 const PRIMARY_MARKER_IDS = new Set<string>(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']);
 
 /** Secondary: Sunrise, Last 3rd, Duha boundaries — tick marks */
-const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'last_third_start', 'duha_start', 'duha_end']);
+const SECONDARY_MARKER_IDS = new Set<string>(['sunrise', 'midnight', 'last_third_start', 'duha_start', 'duha_end']);
 
 const MARKER_STROKE = '#fbeccb';
 
@@ -37,7 +37,7 @@ const MARKER_STROKE = '#fbeccb';
 const GAP_SEGMENT_IDS = new Set<string>(['last_third_to_fajr']);
 
 /** Both Isha arcs use same dark color (ringGap) */
-const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_last_third', 'last_third_to_fajr']);
+const ISHA_DARK_SEGMENT_IDS = new Set<string>(['isha_to_last_third', 'midnight_to_last_third', 'last_third_to_fajr']);
 
 const MARKER_R = 14;
 
@@ -291,7 +291,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
 
       {/* Isha glow only: keep ring bright, but add neon halo when marker is inside Isha sectors */}
       {inIshaSector &&
-        ['isha', 'lastThird']
+        (currentPhase === 'isha_to_last_third' ? ['isha'] : ['isha', 'lastThird'])
           .map((arcId) => explodedArcById.get(arcId as 'isha' | 'lastThird'))
           .filter(Boolean)
           .map((spec) => {
@@ -419,7 +419,7 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
               y1={inner.y}
               x2={outer.x}
               y2={outer.y}
-              stroke={MARKER_STROKE}
+              stroke={m.id === 'midnight' ? '#ffffff' : MARKER_STROKE}
               strokeWidth={tickStrokeWidth}
               strokeLinecap="butt"
             />

@@ -13,9 +13,12 @@ final class WidgetPresentationTests: XCTestCase {
         asr: TimeInterval,
         nextMaghrib: TimeInterval
     ) -> ComputedTimeline {
-        ComputedTimeline(
+        let rawMidnight = lastMaghrib + (fajr - lastMaghrib) / 2
+        let midnight = min(max(rawMidnight, isha), lastThirdStart)
+        return ComputedTimeline(
             lastMaghrib: Date(timeIntervalSince1970: lastMaghrib),
             isha: Date(timeIntervalSince1970: isha),
+            midnight: Date(timeIntervalSince1970: midnight),
             lastThirdStart: Date(timeIntervalSince1970: lastThirdStart),
             fajr: Date(timeIntervalSince1970: fajr),
             sunrise: Date(timeIntervalSince1970: sunrise),

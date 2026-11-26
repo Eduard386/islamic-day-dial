@@ -38,6 +38,7 @@ export function getLoadingStillKey(snapshot: ComputedIslamicDay, now: Date): Loa
     case 'maghrib_to_isha':
       return 'maghrib';
     case 'isha_to_last_third':
+    case 'midnight_to_last_third':
       return 'isha';
     case 'last_third_to_fajr':
       return 'lastThird';
