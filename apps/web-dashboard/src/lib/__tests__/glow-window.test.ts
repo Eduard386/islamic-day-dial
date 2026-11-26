@@ -10,11 +10,13 @@ import {
 describe('isJumuahGlowWindow', () => {
   const timeline = {
     duhaStart: new Date('2025-03-21T04:38:00.000Z'),
+    duhaEnd: new Date('2025-03-21T09:10:00.000Z'),
     dhuhr: new Date('2025-03-21T09:15:00.000Z'),
     asr: new Date('2025-03-21T12:30:00.000Z'),
   };
   const eidTimeline = {
     duhaStart: new Date('2025-03-20T04:38:00.000Z'),
+    duhaEnd: new Date('2025-03-20T09:10:00.000Z'),
     dhuhr: new Date('2025-03-20T09:15:00.000Z'),
     asr: new Date('2025-03-20T12:30:00.000Z'),
   };
@@ -58,9 +60,29 @@ describe('isJumuahGlowWindow', () => {
     expect(isJumuahGlowWindow(friday, timeline, 'asr_to_maghrib', regularDay)).toBe(false);
   });
 
-  it('returns true on Eid when not Friday', () => {
-    const thursday = new Date('2025-03-20T10:00:00.000Z');
-    expect(isJumuahGlowWindow(thursday, eidTimeline, 'dhuhr_to_asr', eidAlFitr)).toBe(true);
+  it('returns true on Eid during Duha when not Friday', () => {
+    const thursday = new Date('2025-03-20T06:00:00.000Z');
+    expect(isJumuahGlowWindow(thursday, eidTimeline, 'sunrise_to_dhuhr', eidAlFitr)).toBe(true);
+  });
+
+  it('returns false on Eid after Duha ends', () => {
+    const midday = new Date('2025-03-20T09:12:00.000Z');
+    const dhuhr = new Date('2025-03-20T10:00:00.000Z');
+    expect(isJumuahGlowWindow(midday, eidTimeline, 'sunrise_to_dhuhr', eidAlFitr)).toBe(false);
+    expect(isJumuahGlowWindow(dhuhr, eidTimeline, 'dhuhr_to_asr', eidAlFitr)).toBe(false);
+  });
+
+  it('reaches full strength at the end of Duha on Eid', () => {
+    const startStrength = getJumuahGlowStrength(eidTimeline.duhaStart, eidTimeline, 'sunrise_to_dhuhr', eidAlFitr);
+    const endStrength = getJumuahGlowStrength(
+      new Date(eidTimeline.duhaEnd.getTime() - 1000),
+      eidTimeline,
+      'sunrise_to_dhuhr',
+      eidAlFitr,
+    );
+    expect(startStrength).toBeGreaterThan(0);
+    expect(startStrength).toBeLessThan(0.5);
+    expect(endStrength).toBeGreaterThan(0.99);
   });
 
   it('starts weak at the beginning of duha and reaches full strength by end of dhuhr', () => {

@@ -1,7 +1,7 @@
 import type { HijriDate, IslamicPhaseId } from './types.js';
 
 /** Minimal timeline slice needed for glow decisions */
-export type GlowTimelineSlice = { duhaStart: Date; dhuhr: Date; asr: Date };
+export type GlowTimelineSlice = { duhaStart: Date; duhaEnd: Date; dhuhr: Date; asr: Date };
 
 const JUMUAH_GLOW_MIN_STRENGTH = 0.3;
 
@@ -12,8 +12,10 @@ function isEidDay(hijriDate?: HijriDate): boolean {
 }
 
 /**
- * Special noon glow (Jumu'ah / Eid): shown from the start of Duha until the end of Dhuhr.
- * It starts weak at Duha and reaches full strength by the end of Dhuhr.
+ * Special noon glow.
+ * Jumu'ah: from the start of Duha until the end of Dhuhr, full strength at Dhuhr's end.
+ * Eid al-Fitr and Eid al-Adha: from the start of Duha until the end of Duha.
+ * On an Eid that falls on Friday, the shorter Eid window is used.
  */
 export function isJumuahGlowWindow(
   now: Date,
@@ -31,11 +33,16 @@ export function getJumuahGlowStrength(
   hijriDate?: HijriDate,
 ): number {
   const isFriday = now.getDay() === 5;
-  if (!isFriday && !isEidDay(hijriDate)) return 0;
-  if (currentPhase !== 'sunrise_to_dhuhr' && currentPhase !== 'dhuhr_to_asr') return 0;
+  const eid = isEidDay(hijriDate);
+  if (!isFriday && !eid) return 0;
+  if (eid) {
+    if (currentPhase !== 'sunrise_to_dhuhr') return 0;
+  } else if (currentPhase !== 'sunrise_to_dhuhr' && currentPhase !== 'dhuhr_to_asr') {
+    return 0;
+  }
 
   const start = timeline.duhaStart.getTime();
-  const end = timeline.asr.getTime();
+  const end = eid ? timeline.duhaEnd.getTime() : timeline.asr.getTime();
   const current = now.getTime();
 
   if (current < start || current >= end) return 0;

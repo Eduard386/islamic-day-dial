@@ -102,9 +102,16 @@ final class GlowWindowTests: XCTestCase {
         XCTAssertFalse(isJumuahGlowWindow(now: friday, timeline: timeline, currentPhase: .asr_to_maghrib, hijriDate: regularHijriDate))
     }
 
-    func testJumuahGlow_ReturnsTrueOnEidWhenNotFriday() {
-        let thursday = Date(timeIntervalSince1970: 1_742_464_800) // Thu 2025-03-20 10:00 UTC
-        XCTAssertTrue(isJumuahGlowWindow(now: thursday, timeline: eidTimeline, currentPhase: .dhuhr_to_asr, hijriDate: eidAlFitrHijriDate))
+    func testJumuahGlow_ReturnsTrueOnEidDuringDuhaWhenNotFriday() {
+        let thursday = Date(timeIntervalSince1970: 1_742_464_800) // Thu 2025-03-20 10:00 UTC, inside Duha
+        XCTAssertTrue(isJumuahGlowWindow(now: thursday, timeline: eidTimeline, currentPhase: .sunrise_to_dhuhr, hijriDate: eidAlFitrHijriDate))
+    }
+
+    func testJumuahGlow_ReturnsFalseOnEidAfterDuha() {
+        let midday = eidTimeline.duhaEnd.addingTimeInterval(60)
+        let dhuhr = eidTimeline.dhuhr.addingTimeInterval(60)
+        XCTAssertFalse(isJumuahGlowWindow(now: midday, timeline: eidTimeline, currentPhase: .sunrise_to_dhuhr, hijriDate: eidAlFitrHijriDate))
+        XCTAssertFalse(isJumuahGlowWindow(now: dhuhr, timeline: eidTimeline, currentPhase: .dhuhr_to_asr, hijriDate: eidAlFitrHijriDate))
     }
 
     func testJumuahGlowStrength_StartsWeakAtDuhaAndReachesFullByEndOfDhuhr() {

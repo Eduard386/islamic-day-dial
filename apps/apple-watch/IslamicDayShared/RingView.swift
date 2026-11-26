@@ -781,14 +781,42 @@ private struct PhoneNightGlowOverlay: View {
             let showJumuahGlow = phoneInfoProgress <= 0.001
                 && jumuStrength > 0
             let duhaStartMarker = snapshot.ringMarkers.first { $0.id == "duha_start" }
+            let duhaEndMarker = snapshot.ringMarkers.first { $0.id == "duha_end" }
             let dhuhrMarker = snapshot.ringMarkers.first { $0.id == "dhuhr" }
             let asrMarker = snapshot.ringMarkers.first { $0.id == "asr" }
+            let eidGlow = isEidDay(snapshot.hijriDate)
             let showExpandedNightGroupGlow = phoneInfoProgress > 0.001
             let expandedNightGlowOpacity = 0.35 * CGFloat(phoneInfoProgress)
             let ishaGroupArc = phoneArcSpecs.first { $0.kind == .ishaGroup }
 
             ZStack {
                 if showJumuahGlow,
+                   eidGlow,
+                   let duhaStartMarker,
+                   let duhaEndMarker {
+                    let pathDuha = arcPath(
+                        cx: Double(size / 2),
+                        cy: Double(size / 2),
+                        r: Double(ringRadius),
+                        startDeg: duhaStartMarker.angleDeg,
+                        endDeg: duhaEndMarker.angleDeg
+                    )
+                    let jumuColor = Color(red: 0.486, green: 0.722, blue: 0.910)
+                    ZStack {
+                        pathDuha
+                            .stroke(
+                                jumuColor.opacity(jumuBaseOpacity),
+                                style: StrokeStyle(lineWidth: cStroke + size * (6 / 420), lineCap: .butt, lineJoin: .miter)
+                            )
+                            .blur(radius: size * (3 / 420))
+                        pathDuha
+                            .stroke(
+                                jumuColor.opacity(jumuPeakOpacity),
+                                style: StrokeStyle(lineWidth: cStroke + size * (7 / 420), lineCap: .butt, lineJoin: .miter)
+                            )
+                            .blur(radius: size * (5 / 420))
+                    }
+                } else if showJumuahGlow,
                    let duhaStartMarker,
                    let dhuhrMarker,
                    let asrMarker {

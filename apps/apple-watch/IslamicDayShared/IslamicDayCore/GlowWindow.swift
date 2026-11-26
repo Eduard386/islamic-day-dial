@@ -2,14 +2,15 @@ import Foundation
 
 private let jumuahGlowMinStrength = 0.3
 
-private func isEidDay(_ hijriDate: HijriDate?) -> Bool {
+func isEidDay(_ hijriDate: HijriDate?) -> Bool {
     guard let hijriDate else { return false }
     return (hijriDate.monthNumber == 10 && hijriDate.day == 1)
         || (hijriDate.monthNumber == 12 && hijriDate.day == 10)
 }
 
-/// Special noon glow (Jumu'ah / Eid): shown from the start of Duha until the end of Dhuhr.
-/// It starts weak at Duha and reaches full strength by the end of Dhuhr.
+/// Special noon glow. Jumu'ah runs from the start of Duha to the end of Dhuhr.
+/// Eid al-Fitr and Eid al-Adha run from the start of Duha to the end of Duha.
+/// An Eid on Friday uses the shorter Eid window.
 /// Mirrors packages/core/src/glow-window.ts (source of truth).
 func isJumuahGlowWindow(
     now: Date,
@@ -43,11 +44,16 @@ func getJumuahGlowProgress(
     hijriDate: HijriDate? = nil
 ) -> Double {
     let isFriday = Calendar.current.component(.weekday, from: now) == 6
-    if !isFriday && !isEidDay(hijriDate) { return 0 }
-    if currentPhase != .sunrise_to_dhuhr && currentPhase != .dhuhr_to_asr { return 0 }
+    let eid = isEidDay(hijriDate)
+    if !isFriday && !eid { return 0 }
+    if eid {
+        if currentPhase != .sunrise_to_dhuhr { return 0 }
+    } else if currentPhase != .sunrise_to_dhuhr && currentPhase != .dhuhr_to_asr {
+        return 0
+    }
 
     let start = timeline.duhaStart.timeIntervalSince1970
-    let end = timeline.asr.timeIntervalSince1970
+    let end = eid ? timeline.duhaEnd.timeIntervalSince1970 : timeline.asr.timeIntervalSince1970
     let current = now.timeIntervalSince1970
 
     if current < start || current >= end { return 0 }

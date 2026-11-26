@@ -1,4 +1,5 @@
 import {
+  formatHijriDateParts,
   getJumuahGlowStrength,
   getSunriseToDhuhrSubPeriod,
   isJumuahGlowWindow,
@@ -325,14 +326,17 @@ export function IslamicRing({ snapshot, now = new Date(), size = 420 }: Props) {
             );
           })}
 
-      {/* Jumu'ah: три дуги визуально — только пт. и маркер в DUHA / MIDDAY / DHUHR */}
+      {/* Jumu'ah lights Duha through Dhuhr. Eid lights only Duha. */}
       {showJumuahGlow &&
         explodedArcById.get('duha') &&
         explodedArcById.get('midday') &&
         explodedArcById.get('dhuhr') &&
         (() => {
-          const glowArcs = ['duha', 'midday', 'dhuhr']
-            .map((arcId) => explodedArcById.get(arcId as 'duha' | 'midday' | 'dhuhr'))
+          const glowArcIds = formatHijriDateParts(snapshot.hijriDate).isEid
+            ? (['duha'] as const)
+            : (['duha', 'midday', 'dhuhr'] as const);
+          const glowArcs = glowArcIds
+            .map((arcId) => explodedArcById.get(arcId))
             .filter(Boolean);
           const wBase = ringStroke + JUMU_GLOW.baseStrokeExtra;
           const wPeak = ringStroke + JUMU_GLOW.peakStrokeExtra;
