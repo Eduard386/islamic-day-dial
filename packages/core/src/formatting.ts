@@ -56,7 +56,7 @@ export function formatCurrentPeriod(phase: IslamicPhaseId): string {
   return PERIOD_NAMES[phase];
 }
 
-/** Display name for current sector: Jumu'ah on Fri (Duha/Midday/Dhuhr), Sunrise/Duha/Midday, or default phase label */
+/** Display name for current sector: Jumu'ah on Fri (Duha and Dhuhr). Istiwa stays Istiwa, including Friday. */
 export function getSectorDisplayName(
   now: Date,
   currentPhase: IslamicPhaseId,
@@ -67,7 +67,7 @@ export function getSectorDisplayName(
   if (currentPhase !== 'sunrise_to_dhuhr') return formatCurrentPeriod(currentPhase);
   const sub = getSunriseToDhuhrSubPeriod(now, timeline.duhaStart, timeline.dhuhr);
   if (sub === 'sunrise') return 'Shuruq';
-  if (isFriday && (sub === 'duha' || sub === 'midday')) return "Jumu'ah";
+  if (isFriday && sub === 'duha') return "Jumu'ah";
   return sub === 'duha' ? 'Duha' : 'Istiwa';
 }
 

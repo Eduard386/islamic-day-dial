@@ -25,7 +25,7 @@ func formatCurrentPeriod(_ phase: IslamicPhaseId) -> String {
     PERIOD_NAMES[phase] ?? "Unknown"
 }
 
-/// Display name for current sector: Jumu'ah on Fri (Duha/Midday/Dhuhr), Sunrise/Duha/Midday, or default phase label.
+/// Display name for current sector: Jumu'ah on Fri (Duha and Dhuhr). Istiwa stays Istiwa, including Friday.
 /// Mirrors packages/core getSectorDisplayName
 func getSectorDisplayName(now: Date, currentPhase: IslamicPhaseId, timeline: (duhaStart: Date, dhuhr: Date)) -> String {
     let isFriday = Calendar.current.component(.weekday, from: now) == 6
@@ -33,7 +33,7 @@ func getSectorDisplayName(now: Date, currentPhase: IslamicPhaseId, timeline: (du
     if currentPhase != .sunrise_to_dhuhr { return formatCurrentPeriod(currentPhase) }
     let sub = getSunriseToDhuhrSubPeriod(now: now, duhaStart: timeline.duhaStart, dhuhr: timeline.dhuhr)
     if sub == .sunrise { return "Shuruq" }
-    if isFriday && (sub == .duha || sub == .midday) { return "Jumu'ah" }
+    if isFriday && sub == .duha { return "Jumu'ah" }
     return sub == .duha ? "Duha" : "Istiwa"
 }
 

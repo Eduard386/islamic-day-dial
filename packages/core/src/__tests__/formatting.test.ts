@@ -119,6 +119,11 @@ describe('getSectorDisplayName', () => {
     expect(getSectorDisplayName(friday, 'sunrise_to_dhuhr', timeline)).toBe("Jumu'ah");
   });
 
+  it('returns Istiwa on Friday in the last 5 minutes before Dhuhr', () => {
+    const friday = new Date('2025-03-21T09:12:00.000Z');
+    expect(getSectorDisplayName(friday, 'sunrise_to_dhuhr', timeline)).toBe('Istiwa');
+  });
+
   it('returns Duha on Thursday in duha', () => {
     const thursdayTimeline = { duhaStart: new Date('2025-03-20T04:37:00.000Z'), dhuhr: new Date('2025-03-20T09:15:00.000Z') };
     const thursday = new Date('2025-03-20T06:00:00.000Z');

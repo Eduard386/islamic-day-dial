@@ -164,11 +164,11 @@ struct ContentView: View {
         return "\(phase.rawValue)-\(minuteBucket)-\(Int(dialSize.rounded()))"
     }
 
-    /// On Eid, hide the sector line during Duha / Midday / Dhuhr / Jumu'ah (holiday uses the Hijri row).
+    /// On Eid, hide the sector line during Duha and Dhuhr. Istiwa stays visible above the holiday name.
     private func shouldSuppressWatchSectorOnEid(snapshot snap: ComputedIslamicDay, now: Date) -> Bool {
         guard formatHijriDateParts(snap.hijriDate).isEid else { return false }
         let pl = periodLabel(snapshot: snap, now: now)
-        return pl == "Duha" || pl == "Istiwa" || pl == "Dhuhr" || pl == "Jumu'ah"
+        return pl == "Duha" || pl == "Dhuhr" || pl == "Jumu'ah"
     }
 }
 

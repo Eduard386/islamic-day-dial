@@ -928,11 +928,11 @@ private struct PhonePreStillsDialView: View {
     let onDateTap: () -> Void
     let onCurrentSectorTap: () -> Void
 
-    /// Sector line in the hole: always the observational sector (e.g. Isha). On Eid, hide during Duha / Midday / Dhuhr / Jumu'ah — holiday sits in the date row instead.
+    /// Sector line in the hole. On Eid, hide it during Duha and Dhuhr; Istiwa stays so the voluntary prayer is not read then.
     private var centerHoleSectorUpper: String? {
         if presentation.isEidDay {
             let raw = presentation.rawSectorTitle
-            if raw == "Duha" || raw == "Istiwa" || raw == "Dhuhr" || raw == "Jumu'ah" {
+            if raw == "Duha" || raw == "Dhuhr" || raw == "Jumu'ah" {
                 return nil
             }
             return L10n.sectorRing(raw)

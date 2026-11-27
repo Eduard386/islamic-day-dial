@@ -53,7 +53,7 @@ var PHONE_CUE_LAST_THIRD: String { L10n.t("cue.lastThird") }
 /// Same typographic slot as `OBSERVE` on other days (matches web `webPhaseGuidanceJumuahOverline`).
 var PHONE_PHASE_GUIDANCE_JUMUAH_OVERLINE: String { L10n.t("prepareJumuah") }
 var PHONE_CUE_JUMUAH: String { L10n.t("cue.jumuah") }
-/// Eid (incl. Friday): Duha, Midday, and Dhuhr sectors — replaces Jumu'ah prep / short Eid noon copy.
+/// Eid (incl. Friday): Duha and Dhuhr. Istiwa keeps its own sentence.
 var PHONE_CUE_EID_DAYTIME_TAQABBAL: String {
     """
     تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
@@ -167,7 +167,7 @@ private func phoneHomeCurrentCueText(
             duhaStart: snapshot.timeline.duhaStart,
             dhuhr: snapshot.timeline.dhuhr
         )
-        if sub == .duha || sub == .midday {
+        if sub == .duha {
             return PHONE_CUE_EID_DAYTIME_TAQABBAL
         }
     case .dhuhr_to_asr:

@@ -38,7 +38,7 @@ export const WEB_DIAL_FOOTER_AYAH_4_103_AR =
 export const WEB_DIAL_FOOTER_AYAH_4_103_EN =
   '"Indeed, performing prayers is a duty on the believers at the appointed times." [4:103]';
 
-/** Eid (incl. Friday): Duha, Midday, Dhuhr — matches iOS `PHONE_CUE_EID_DAYTIME_TAQABBAL`. */
+/** Eid (incl. Friday): Duha and Dhuhr. Istiwa keeps its own sentence. Matches iOS `PHONE_CUE_EID_DAYTIME_TAQABBAL`. */
 function webCueEidDaytimeTaqabbal(): string {
   return `تَقَبَّلَ اللهُ مِنَّا وَمِنكُم
 Taqabbalallahu minna wa minkum!
@@ -81,7 +81,7 @@ function webObservationalCueForSectorTitle(sectorTitle: string): string {
   }
 }
 
-/** Observational cue above the dial — mirrors iOS `phoneHomeCurrentCueText` (Eid Duha/Midday/Dhuhr → Taqabbal). */
+/** Observational cue above the dial — mirrors iOS `phoneHomeCurrentCueText` (Eid Duha and Dhuhr → Taqabbal; Istiwa keeps its own sentence). */
 export function getWebObservationalCue(snapshot: ComputedIslamicDay, now: Date): string {
   const hijriParts = formatHijriDateParts(snapshot.hijriDate);
   const rawSectorTitle = getSectorDisplayName(now, snapshot.currentPhase, {
@@ -96,7 +96,7 @@ export function getWebObservationalCue(snapshot: ComputedIslamicDay, now: Date):
   switch (snapshot.currentPhase) {
     case 'sunrise_to_dhuhr': {
       const sub = getSunriseToDhuhrSubPeriod(now, snapshot.timeline.duhaStart, snapshot.timeline.dhuhr);
-      if (sub === 'duha' || sub === 'midday') return webCueEidDaytimeTaqabbal();
+      if (sub === 'duha') return webCueEidDaytimeTaqabbal();
       break;
     }
     case 'dhuhr_to_asr':

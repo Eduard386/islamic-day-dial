@@ -95,6 +95,54 @@ final class PhoneHomePresentationTests: XCTestCase {
         XCTAssertTrue(presentation.ringLegendItems.contains { $0.title == "Jumu'ah" && $0.isActive })
     }
 
+    func testPhoneHomePresentation_KeepsIstiwaCueOnFridayBeforeDhuhr() {
+        let timeline = makeTimeline(
+            sunrise: "2026-03-27T06:00:00Z",
+            duhaStart: "2026-03-27T06:20:00Z",
+            dhuhr: "2026-03-27T12:15:00Z",
+            asr: "2026-03-27T15:30:00Z",
+            nextMaghrib: "2026-03-27T18:10:00Z"
+        )
+        let now = isoDate("2026-03-27T12:12:00Z")
+        let snapshot = makeSnapshot(
+            timeline: timeline,
+            hijriDate: HijriDate(day: 8, monthNumber: 10, monthNameEn: "Shawwal", year: 1447),
+            currentPhase: .sunrise_to_dhuhr,
+            now: now
+        )
+
+        let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
+
+        XCTAssertEqual(presentation.backgroundKey, .midday)
+        XCTAssertEqual(presentation.rawSectorTitle, "Istiwa")
+        XCTAssertEqual(presentation.displayTitle, "Istiwa")
+        XCTAssertEqual(presentation.currentCueText, PHONE_CUE_MIDDAY)
+    }
+
+    func testPhoneHomePresentation_ShowsIstiwaCueOnEidBeforeDhuhr() {
+        let timeline = makeTimeline(
+            sunrise: "2026-03-20T06:00:00Z",
+            duhaStart: "2026-03-20T06:20:00Z",
+            dhuhr: "2026-03-20T12:15:00Z",
+            asr: "2026-03-20T15:30:00Z",
+            nextMaghrib: "2026-03-20T18:10:00Z"
+        )
+        let now = isoDate("2026-03-20T12:12:00Z")
+        let snapshot = makeSnapshot(
+            timeline: timeline,
+            hijriDate: HijriDate(day: 1, monthNumber: 10, monthNameEn: "Shawwal", year: 1447),
+            currentPhase: .sunrise_to_dhuhr,
+            now: now
+        )
+
+        let presentation = makePhoneHomePresentation(snapshot: snapshot, now: now)
+
+        XCTAssertEqual(presentation.rawSectorTitle, "Istiwa")
+        XCTAssertEqual(presentation.displayTitle, "EID AL-FITR")
+        XCTAssertEqual(presentation.currentCueText, PHONE_CUE_MIDDAY)
+        XCTAssertTrue(presentation.isEidDay)
+    }
+
     func testPhoneHomePresentation_UsesEidTitleDuringNoonWindow() {
         let timeline = makeTimeline(
             sunrise: "2026-03-20T06:00:00Z",
